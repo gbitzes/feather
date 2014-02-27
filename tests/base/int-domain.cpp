@@ -9,22 +9,6 @@ IntDomain *intDomainFactory(Int start, Int end) {
 	return new T(start, end);
 }
 
-class IntDomainTester {
-	private:
-		IntDomain* (*factory)(Int,Int);
-
-	public:	
-		IntDomainTester( IntDomain* (*factory)(Int,Int) ) {
-			this->factory = factory;
-		}
-
-		~IntDomainTester() {}
-
-		void test() {
-			// test1();
-		}
-};
-
 template <class T>
 class base_IntDomain : public testing::Test {
 	protected:
@@ -83,7 +67,7 @@ TYPED_TEST(base_IntDomain, Stress2) {
 }
 
 TYPED_TEST(base_IntDomain, Stress3) {
-	IntDomain *domain = this->factory(5, 10);
+	IntDomain *domain = this->factory(0, 10);
 
 	domain->removeRange(5, 10);
 	ASSERT_EQ(kPlusInf, domain->next(4) );
@@ -115,7 +99,7 @@ TYPED_TEST(base_IntDomain, Stress5) {
 }
 
 
-TYPED_TEST(base_IntDomain, Stress8) {
+TYPED_TEST(base_IntDomain, Stress6) {
 	IntDomain *domain = this->factory(1, 60000);
 
 	domain->removeRange(200, 400);
