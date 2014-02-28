@@ -48,7 +48,7 @@ class IntRanges : public IntDomain {
 		virtual Int nextGap(const Int value) const;
 		virtual bool containsRange(const Int rangeMin, const Int rangeMax) const;
 
-		virtual enum IntDomain::RemovalResult removeRange(Int rangeMin, Int rangeMax, bool saveOnChange);
+		virtual enum IntDomain::RemovalResult removeRange(Int rangeMin, Int rangeMax, bool saveOnChange, bool dontClear);
 		virtual void save();
 		virtual void restore();
 

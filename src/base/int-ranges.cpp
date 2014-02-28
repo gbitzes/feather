@@ -12,7 +12,8 @@ IntRanges::IntRanges(const Int minval, const Int maxval) {
 
 	this->minval = minval;
 	this->maxval = maxval;
-	
+	this->setcount = maxval - minval + 1;
+
 	/*
 	 * Initially the structure contains only one
 	 * range: minval to maxval
@@ -69,7 +70,7 @@ void IntRanges::restore() {
 }
 
 enum IntDomain::RemovalResult 
-IntRanges::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
+IntRanges::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange, bool dontClear) {
 
 	// cout << *this << endl;
 	// cout << "removeRange called with " << rangeMin << ".." << rangeMax << endl;
@@ -336,7 +337,7 @@ Int IntRanges::nextGap (const Int val) const {
 }
 // TODO: replace contains() with this
 bool IntRanges::containsRange(const Int rangeMin, const Int rangeMax) const {
-	if(rangeMin <= rangeMax)
+	if(rangeMin > rangeMax)
 		FEATHER_THROW("Invalid range: " << rangeMin << "," << rangeMax);
 
 	/* Out of bounds */
