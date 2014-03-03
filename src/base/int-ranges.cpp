@@ -22,7 +22,7 @@ IntRanges::IntRanges(const Int minval, const Int maxval) {
 	intervals[minval] = maxval;
 
 	/* Stores the initial save() of the bitset */
-	// IntRanges::save();
+	IntRanges::save();
 }
 
 void IntRanges::save() {
@@ -292,21 +292,23 @@ Int IntRanges::previous (const Int val) const {
 
 bool IntRanges::contains(const Int value) const {
 
-	if( value < minval || maxval < value )
-		return false;
+	return containsRange(value, value);
 
-	map<Int,Int>::const_iterator it = intervals.upper_bound(value);
+	// if( value < minval || maxval < value )
+	// 	return false;
+
+	// map<Int,Int>::const_iterator it = intervals.upper_bound(value);
 	
-	/* This means value is smaller than min(), so return false */
-	if( it == intervals.begin() )
-		return false;
+	//  This means value is smaller than min(), so return false 
+	// if( it == intervals.begin() )
+	// 	return false;
 
-	it--;
+	// it--;
 
-	if( it->first <= value && value <= it->second )
-		return true;
-	else
-		return false;
+	// if( it->first <= value && value <= it->second )
+	// 	return true;
+	// else
+	// 	return false;
 }
 
 Int IntRanges::nextGap (const Int val) const {
@@ -341,7 +343,7 @@ bool IntRanges::containsRange(const Int rangeMin, const Int rangeMax) const {
 		FEATHER_THROW("Invalid range: " << rangeMin << "," << rangeMax);
 
 	/* Out of bounds */
-	if( rangeMin < minval )
+	if( rangeMin < minval || rangeMax > maxval )
 		return false;
 
 	map<Int,Int>::const_iterator it = intervals.upper_bound(rangeMin);
@@ -355,13 +357,24 @@ bool IntRanges::containsRange(const Int rangeMin, const Int rangeMax) const {
 
 }
 
+string IntRanges::toString() const {
+	ostringstream ss;
+	ss << "[";
 
+	for (map<Int,Int>::const_iterator it = intervals.begin(); it != intervals.end(); ++it) {
 
+		if( it != intervals.begin()  )
+			ss << " ";
 
+		if( it->first == it->second )
+			ss << it->first;
+		else
+			ss << it->first << ".." << it->second;
+	}
 
-
-
-
+	ss << "]";
+	return ss.str();
+}
 
 } // namespace feather
 

@@ -118,8 +118,6 @@ TYPED_TEST(base_IntDomain, Stress6) {
 	delete domain;
 }
 
-// sentinel
-
 TYPED_TEST(base_IntDomain, Stress7) {
 	IntDomain *domain = this->factory(-1, 4);
 
@@ -351,6 +349,8 @@ TYPED_TEST(base_IntDomain, Stress14) {
 	 *  The bitset should now have the following form: 
 	 *  [0..14 26..27 29..39 56..98]
 	 */
+
+	ASSERT_EQ("[0..14 26..27 29..39 56..98]", domain->toString() );
 
 	int i;
 	for(i = -5; i <= 105; i++) {

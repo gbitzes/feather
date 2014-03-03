@@ -60,6 +60,8 @@ class IntDomain {
 		virtual Int next(const Int value) const = 0;
 		virtual Int nextGap(const Int value) const = 0;
 		virtual bool containsRange(const Int rangeMin, const Int rangeMax) const = 0;
+		virtual std::string toString() const = 0;
+
 		
 		enum RemovalResult {
 			change = 1,
@@ -72,7 +74,6 @@ class IntDomain {
 		virtual void save() = 0;
 		virtual void restore() = 0;
 
-		virtual std::string toString() = 0;
 
 	protected:
 

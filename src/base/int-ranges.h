@@ -47,12 +47,12 @@ class IntRanges : public IntDomain {
 		virtual Int next(const Int value) const;
 		virtual Int nextGap(const Int value) const;
 		virtual bool containsRange(const Int rangeMin, const Int rangeMax) const;
+		virtual std::string toString() const;
 
 		virtual enum IntDomain::RemovalResult removeRange(Int rangeMin, Int rangeMax, bool saveOnChange, bool dontClear);
 		virtual void save();
 		virtual void restore();
 
-		virtual std::string toString() {};
 	protected:
 		virtual IntDomainPosition* getPosition(const Int value) const {};
 		virtual Int advance(IntDomainPosition &pos) const {};
