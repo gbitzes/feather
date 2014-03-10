@@ -23,6 +23,18 @@ namespace feather {
 				: std::logic_error(message) {}
 	};
 
+	struct Range {
+		int start, end;
+
+		Range(int start, int end) {
+			this->start = start;
+			this->end = end;
+		}
+
+		bool isValid() {
+			return (end >= start);
+		}
+	};
 
 }
 

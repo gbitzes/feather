@@ -8,19 +8,6 @@
 
 namespace feather {
 
-struct Range {
-	int start, end;
-
-	Range(int start, int end) {
-		this->start = start;
-		this->end = end;
-	}
-
-	bool isValid() {
-		return (end >= start);
-	}
-};
-
 class IntRanges : public IntDomain {
 
 	private:
