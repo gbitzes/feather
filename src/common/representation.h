@@ -36,9 +36,9 @@ struct Representation {
 	 * important as it defines their ID.
 	 */
 
-	std::vector<IntRanges*> vars;
-
-
+	std::vector<IntRanges> vars;
+	std::vector<Constraint> constraints;
+	std::vector<Goal> goals;
 };
 
 
