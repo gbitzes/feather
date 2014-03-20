@@ -1,5 +1,5 @@
-#ifndef FEATHER_COMMON_GOALS_H
-#define FEATHER_COMMON_GOALS_H
+#ifndef ___FEATHER_COMMON_GOALS_H
+#define ___FEATHER_COMMON_GOALS_H
 
 /*
  * This file contains all the possible goals

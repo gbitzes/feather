@@ -1,5 +1,5 @@
-#ifndef FEATHER_BASE_UTILS_H
-#define FEATHER_BASE_UTILS_H
+#ifndef ___FEATHER_BASE_UTILS_H
+#define ___FEATHER_BASE_UTILS_H
 
 #include <feather/types.h>
 

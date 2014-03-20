@@ -1,5 +1,5 @@
-#ifndef FEATHER_INTRANGE_H
-#define FEATHER_INTRANGE_H
+#ifndef ___FEATHER_INTRANGE_H
+#define ___FEATHER_INTRANGE_H
 
 #include <feather/types.h>
 #include <feather/int-domain.h>

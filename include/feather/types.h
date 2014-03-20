@@ -7,36 +7,45 @@
 
 namespace feather {
 
-	typedef long Int;
-	typedef unsigned long UInt;
+typedef long Int;
+typedef unsigned long UInt;
+typedef UInt IntVarID;
 
-	const Int kPlusInf = LONG_MIN;
-	const Int kMinusInf = LONG_MAX;
-	const Int kUPlusInf = ULONG_MAX;
+const Int kPlusInf = LONG_MIN;
+const Int kMinusInf = LONG_MAX;
+const Int kUPlusInf = ULONG_MAX;
 
-	/* The number of bits that a machine word holds */
-	const UInt kMachineWordBits = CHAR_BIT * sizeof(size_t);
+/* The number of bits that a machine word holds */
+const UInt kMachineWordBits = CHAR_BIT * sizeof(size_t);
 
-	class FeatherException : public std::logic_error {
-		public:
-			FeatherException(const std::string& message)
-				: std::logic_error(message) {}
-	};
+class FeatherException : public std::logic_error {
+	public:
+		FeatherException(const std::string& message)
+			: std::logic_error(message) {}
+};
 
-	struct Range {
-		int start, end;
+struct Range {
+	int start, end;
 
-		Range(int start, int end) {
-			this->start = start;
-			this->end = end;
-		}
+	Range(int start, int end) {
+		this->start = start;
+		this->end = end;
+	}
 
-		bool isValid() {
-			return (end >= start);
-		}
-	};
+	bool isValid() {
+		return (end >= start);
+	}
+};
 
-}
+/*
+ * Forward declarations
+ */
+
+class Solver;
+class IntDomain;
+
+
+} // namespace feather
 
 
 

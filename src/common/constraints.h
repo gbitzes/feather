@@ -1,5 +1,5 @@
-#ifndef FEATHER_COMMON_CONSTRAINTS_H
-#define FEATHER_COMMON_CONSTRAINTS_H
+#ifndef ___FEATHER_COMMON_CONSTRAINTS_H
+#define ___FEATHER_COMMON_CONSTRAINTS_H
 
 /*
  * This file contains all the possible constraints
@@ -13,8 +13,7 @@ namespace feather {
 
 struct ConstraintType {
 	enum Type {
-
-		
+		YplusC = 0
 		
 	};
 };

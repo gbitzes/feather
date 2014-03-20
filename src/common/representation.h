@@ -1,9 +1,10 @@
-#ifndef FEATHER_COMMON_REPRESENTATION_H
-#define FEATHER_COMMON_REPRESENTATION_H
+#ifndef ___FEATHER_COMMON_REPRESENTATION_H
+#define ___FEATHER_COMMON_REPRESENTATION_H
 
 #include <feather/types.h>
 #include <common/constraints.h>
 #include <common/goals.h>
+#include <base/int-ranges.h>
 
 #include <vector>
 
@@ -27,6 +28,11 @@ struct Goal {
 	std::vector<Int> values;
 };
 
+struct RepresentationIntVar {
+	IntRanges *domain;
+	IntVarID id;
+};
+
 struct Representation {
 
 	/*
@@ -36,7 +42,7 @@ struct Representation {
 	 * important as it defines their ID.
 	 */
 
-	std::vector<IntRanges> vars;
+	std::vector<RepresentationIntVar> vars;
 	std::vector<Constraint> constraints;
 	std::vector<Goal> goals;
 };
