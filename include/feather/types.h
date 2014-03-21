@@ -9,7 +9,6 @@ namespace feather {
 
 typedef long Int;
 typedef unsigned long UInt;
-typedef UInt IntVarID;
 
 const Int kPlusInf = LONG_MIN;
 const Int kMinusInf = LONG_MAX;
@@ -41,7 +40,7 @@ struct Range {
  * Forward declarations
  */
 
-class Solver;
+// class Solver;
 class IntDomain;
 
 

@@ -1,20 +1,23 @@
-#ifndef FEATHER_FRONTEND_CPP_INTVAR_H
-#define FEATHER_FRONTEND_CPP_INTVAR_H
+#ifndef FEATHER_FRONTEND_CPP_SOLVER_H
+#define FEATHER_FRONTEND_CPP_SOLVER_H
 
 #include <feather/types.h>
-#include <feather/common/problem-manager.h>
-#include <common/representation.h>
+#include "int-var.h"
+#include "types.h"
 
 namespace feather {
 
 class Solver {
 
 	private:
-		Representation repr;
-		IntVarID makeIntVar(Int min, Int max);
+		Representation *repr;
 
 	public:
 
+		IntDomain& getDomain(IntVarID);
+		Solver();
+		~Solver();
+		IntVarID makeIntVar(Int min, Int max);
 	
 };
 

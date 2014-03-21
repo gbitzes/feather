@@ -29,8 +29,10 @@ struct Goal {
 };
 
 struct RepresentationIntVar {
-	IntRanges *domain;
+	IntRanges domain;
 	IntVarID id;
+
+	RepresentationIntVar(Int min, Int max) : domain(min, max) {}
 };
 
 struct Representation {
