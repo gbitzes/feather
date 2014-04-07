@@ -13,11 +13,18 @@ namespace feather {
 
 struct ConstraintType {
 	enum Type {
-		YplusC = 0
-		
+
+		/*
+		 * X = Y + C
+		 * [0] is id of X
+		 * [1] is id of Y
+		 * [2] is C
+		 */
+
+		XeqYplusC = 0
+
 	};
 };
-
 
 } // namespace feather
 #endif

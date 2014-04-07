@@ -1,5 +1,5 @@
-#ifndef ___FEATHER_INTRANGE_H
-#define ___FEATHER_INTRANGE_H
+#ifndef ___FEATHER_BASE_INTRANGES_H
+#define ___FEATHER_BASE_INTRANGES_H
 
 #include <feather/types.h>
 #include <feather/int-domain.h>
@@ -27,7 +27,7 @@ class IntRanges : public IntDomain {
 
 	public:
 		IntRanges(Int minval, Int maxval);
-		~IntRanges() {};
+		virtual ~IntRanges() {};
 
 		virtual bool contains(const Int value) const;
 		virtual Int previous(const Int value) const;
@@ -36,7 +36,7 @@ class IntRanges : public IntDomain {
 		virtual bool containsRange(const Int rangeMin, const Int rangeMax) const;
 		virtual std::string toString() const;
 
-		virtual enum IntDomain::RemovalResult removeRange(Int rangeMin, Int rangeMax, bool saveOnChange, bool dontClear);
+		virtual enum IntDomain::RemovalResult removeRange(Int rangeMin, Int rangeMax, bool saveOnChange);
 		virtual void save();
 		virtual void restore();
 

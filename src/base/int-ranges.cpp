@@ -70,7 +70,7 @@ void IntRanges::restore() {
 }
 
 enum IntDomain::RemovalResult 
-IntRanges::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange, bool dontClear) {
+IntRanges::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
 
 	// cout << *this << endl;
 	// cout << "removeRange called with " << rangeMin << ".." << rangeMax << endl;
@@ -80,9 +80,8 @@ IntRanges::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange, bool dontC
 		FEATHER_THROW("Invalid range: " << rangeMin << "-" << rangeMax);
 
 	/* Is the domain about to be cleared? */
-	// TODO: FIX
 	if ( rangeMin <= minval  &&  maxval <= rangeMax ) {
-		return cleared;
+		return wouldclear;
 	}
 
 	/* Will the domain remain intact? Just return, we have nothing more to do.. */

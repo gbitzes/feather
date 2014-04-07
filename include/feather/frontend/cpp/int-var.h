@@ -24,8 +24,13 @@ class IntVar {
 		bool initialized;
 
 	public:
+
+		void initialize(Solver&, IntVarID);
+
 		IntVar(Solver&, Int min, Int max);
+		IntVar(IntVarID id, Solver& slv);
 		IntVar();
+
 
 		/*
 		 * The default, member-wise copy
@@ -33,6 +38,18 @@ class IntVar {
 		 * we don't bother re-implementing it
 		 */
 
+		Solver &getSolver() const;
+		Int min() const;
+		Int max() const;
+		IntVarID getID() const;
+
+		/*
+		 * Convenience function that returns
+		 * whether two variables share the
+		 * same solver
+		 */
+
+		bool hasSameSolver(const IntVar other) const;
 };
 
 

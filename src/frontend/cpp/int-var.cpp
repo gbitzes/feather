@@ -1,7 +1,25 @@
 #include <feather/frontend/cpp/int-var.h>
 #include <feather/frontend/cpp/solver.h>
+#include <base/utils.h>
+#include <feather/int-domain.h>
 
 namespace feather {
+
+void IntVar::initialize(Solver &_slv, IntVarID id) {
+	initialized = true;
+	this->slv = &_slv;
+	this->id = id;
+	domain = &slv->getDomain(id);
+}
+
+Solver& IntVar::getSolver() const {
+	if(!initialized)
+		FEATHER_THROW("Uninitialized IntVar");
+
+	return *slv;
+}
+
+
 
 /*
  * Initialize an IntVar by creating a new variable
@@ -9,10 +27,17 @@ namespace feather {
  */
 
 IntVar::IntVar(Solver &_slv, Int min, Int max) {
-	initialized = true;
-	this->slv = &_slv;
-	id = slv->makeIntVar(min, max);
-	domain = &slv->getDomain(id);
+	IntVarID newvar = _slv.makeIntVar(min, max);
+	initialize(_slv, newvar);
+}
+
+/*
+ * Initialize an IntVar by providing an already
+ * existing id and solver
+ */
+
+IntVar::IntVar(IntVarID id, Solver& slv) {
+	initialize(slv, id);
 }
 
 /*
@@ -26,5 +51,23 @@ IntVar::IntVar() {
 	initialized = false; 
 }
 
+bool IntVar::hasSameSolver(IntVar other) const {
+	if(!initialized || !other.initialized )
+		return false;
+
+	return slv == other.slv;
+}
+
+Int IntVar::min() const {
+	return domain->min();
+}
+
+Int IntVar::max() const {
+	return domain->max();
+}
+
+IntVarID IntVar::getID() const {
+	return id;
+}
 
 }

@@ -1,6 +1,7 @@
 #include <feather/frontend/cpp/int-var.h>
 #include <feather/frontend/cpp/solver.h>
 #include <common/representation.h>
+#include <base/utils.h>
 
 namespace feather {
 
@@ -13,13 +14,16 @@ Solver::~Solver() {
 }
 
 IntVarID Solver::makeIntVar(Int min, Int max) {
-	repr->vars.push_back( RepresentationIntVar(min, max) );
+	return repr->addVar(min, max);
 }
 
 IntDomain& Solver::getDomain(IntVarID id) {
-	return repr->vars[id].domain;
+	return *repr->vars[id].domain;
 }
 
+void Solver::addConstraint(const Constraint &constr) {
+	repr->constraints.push_back(constr);
+}
 
 
 }

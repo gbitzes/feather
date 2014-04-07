@@ -2,6 +2,7 @@
 #define ___FEATHER_COMMON_REPRESENTATION_H
 
 #include <feather/types.h>
+#include <feather/frontend/cpp/types.h>
 #include <common/constraints.h>
 #include <common/goals.h>
 #include <base/int-ranges.h>
@@ -16,6 +17,8 @@ namespace feather {
  * we just provide a vector in which to store integers.
  * The meaning and order is decided by each 
  * individual constraint.
+ *
+ * Same for goals.
  */
 
 struct Constraint {
@@ -29,10 +32,8 @@ struct Goal {
 };
 
 struct RepresentationIntVar {
-	IntRanges domain;
+	IntRanges *domain;
 	IntVarID id;
-
-	RepresentationIntVar(Int min, Int max) : domain(min, max) {}
 };
 
 struct Representation {
@@ -47,6 +48,8 @@ struct Representation {
 	std::vector<RepresentationIntVar> vars;
 	std::vector<Constraint> constraints;
 	std::vector<Goal> goals;
+
+	IntVarID addVar(Int min, Int max);
 };
 
 

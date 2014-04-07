@@ -4,6 +4,7 @@
 #include <feather/types.h>
 
 #include <sstream>
+#include <iostream>
 
 namespace feather {
 
@@ -22,6 +23,21 @@ namespace feather {
 
 	#define FEATHER_THROW(message) \
 		throw FeatherException( STR(__FILE__ << ":" << __LINE__ << " (" << __func__ << ") " << message) )
+
+	/*
+	 * Log a message
+	 */
+
+	#define LOG(message) \
+	 	std::cout << __FILE__ << ":" << __LINE__ << " " << message << std::endl;
+
+	/*
+	 * Returns an std::vector of Int
+	 */
+
+
+
+
 
 } // namespace feather
 

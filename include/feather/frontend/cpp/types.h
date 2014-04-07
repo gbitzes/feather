@@ -8,6 +8,7 @@ namespace feather {
 
 	class Representation;
 	class Solver;
+	class Constraint;
 }
 
 

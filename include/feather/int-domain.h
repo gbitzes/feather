@@ -66,11 +66,10 @@ class IntDomain {
 		enum RemovalResult {
 			change = 1,
 			nochange,
-			cleared,
 			wouldclear
 		};
 
-		virtual enum RemovalResult removeRange(Int rangeMin, Int rangeMax, bool saveOnChange = false, bool dontClear = false) = 0;
+		virtual enum RemovalResult removeRange(Int rangeMin, Int rangeMax, bool saveOnChange = false) = 0;
 		virtual void save() = 0;
 		virtual void restore() = 0;
 
