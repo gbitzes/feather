@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.6)
 
 include_directories(.)
 
+# Let the code know whether this is a debug build
+set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG")
+
 # Fetch all cpp files in all files and folders
 file(GLOB_RECURSE sources "*.cpp")
 add_library(feather ${sources} )

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <base/int-ranges.h>
+#include <base/bitset.h>
 #include <iostream>
 
 using namespace feather;
@@ -21,7 +22,7 @@ class base_IntDomain : public testing::Test {
 };
 
 using testing::Types;
-typedef Types<IntRanges> Implementations;
+typedef Types<IntRanges, Bitset> Implementations;
 TYPED_TEST_CASE(base_IntDomain, Implementations);
 
 TYPED_TEST(base_IntDomain, Construction) {
@@ -152,6 +153,7 @@ TYPED_TEST(base_IntDomain, Stress7) {
 			ASSERT_FALSE(domain->contains(i));
 	}
 
+	delete domain;
 }
 
 TYPED_TEST(base_IntDomain, Stress8) {
@@ -179,6 +181,7 @@ TYPED_TEST(base_IntDomain, Stress8) {
 			ASSERT_FALSE(domain->contains(i));
 	}
 
+	delete domain;
 }
 
 TYPED_TEST(base_IntDomain, Stress9) {
@@ -206,6 +209,7 @@ TYPED_TEST(base_IntDomain, Stress9) {
 			ASSERT_FALSE(domain->contains(i));
 	}
 
+	delete domain;
 }
 
 TYPED_TEST(base_IntDomain, Stress10) {
@@ -267,12 +271,14 @@ TYPED_TEST(base_IntDomain, Stress10) {
 	for(i = 0; i <= 100; i++)
 		ASSERT_TRUE(domain->contains(i));
 
+	delete domain;
 }
 
 TYPED_TEST(base_IntDomain, Stress11) {
 	IntDomain *domain = this->factory(3, 3);
 	ASSERT_EQ(3, domain->next(1));
 	ASSERT_EQ(3, domain->previous(5));
+	delete domain;
 }
 
 TYPED_TEST(base_IntDomain, Stress12) {
@@ -307,8 +313,7 @@ TYPED_TEST(base_IntDomain, Stress12) {
 	for(i = 0; i <= 100; i++) 
 		ASSERT_TRUE(domain->contains(i));
 
-	// exit(0);
-
+	delete domain;
 }
 
 TYPED_TEST(base_IntDomain, Stress13) {
@@ -325,8 +330,9 @@ TYPED_TEST(base_IntDomain, Stress13) {
 			ASSERT_FALSE(domain->contains(i));
 		else
 			ASSERT_TRUE(domain->contains(i));
-
 	}
+
+	delete domain;
 }
 
 TYPED_TEST(base_IntDomain, Stress14) {
@@ -344,6 +350,7 @@ TYPED_TEST(base_IntDomain, Stress14) {
 
 	domain->removeRange(28, 28);
 	ASSERT_EQ(71, domain->size());
+	ASSERT_EQ(domain->next(kMinusInf), 0);
 
 	/*
 	 *  The bitset should now have the following form: 
@@ -394,6 +401,8 @@ TYPED_TEST(base_IntDomain, Stress14) {
 	ASSERT_TRUE(domain->containsRange(0, 0));
 	ASSERT_TRUE(domain->containsRange(90, 98));
 	ASSERT_FALSE(domain->containsRange(10, 30));
+
+	delete domain;
 }
 
 TYPED_TEST(base_IntDomain, Stress15) {
@@ -460,4 +469,37 @@ TYPED_TEST(base_IntDomain, Stress15) {
 	for(i = 0; i <= 100; i++)
 		ASSERT_TRUE(domain->contains(i));
 
+	delete domain;
+}
+
+TYPED_TEST(base_IntDomain, Stress16) {
+	IntDomain *domain = this->factory(0, 2000);
+
+	domain->removeRange(3, 5);
+	domain->removeRange(10, 20);
+	domain->removeRange(25, 1995);
+
+	ASSERT_EQ(domain->previous(1996), 24);
+	delete domain;
+}
+
+TYPED_TEST(base_IntDomain, Stress17) {
+	IntDomain *domain = this->factory(0, 50000);
+
+	domain->removeRange(1000, 2000);
+	ASSERT_EQ(domain->previous(2001), 999 );
+	ASSERT_EQ(domain->previous(1000), 999 );
+
+	domain->removeRange(999, 2000);
+	ASSERT_EQ(domain->previous(2001), 998 );
+	ASSERT_EQ(domain->previous(1000), 998 );
+
+	domain->removeRange(2001, 2001);
+	ASSERT_EQ(domain->previous(2003), 2002 );
+	ASSERT_EQ(domain->next(2001), 2002);
+
+	ASSERT_TRUE(domain->containsRange(40000, 50000));
+	ASSERT_FALSE(domain->containsRange(500, 5000) );
+
+	delete domain;
 }

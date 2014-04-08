@@ -76,15 +76,14 @@ IntRanges::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
 	// cout << "removeRange called with " << rangeMin << ".." << rangeMax << endl;
 
 	/* Invalid range? */
-	if( rangeMax < rangeMin )
-		FEATHER_THROW("Invalid range: " << rangeMin << "-" << rangeMax);
+	FEATHER_ASSERT(rangeMin <= rangeMax);
 
-	/* Is the domain about to be cleared? */
+	/* Domain to be cleared? */
 	if ( rangeMin <= minval  &&  maxval <= rangeMax ) {
 		return wouldclear;
 	}
 
-	/* Will the domain remain intact? Just return, we have nothing more to do.. */
+	/* Domain remains intact? */
 	if ( rangeMax < minval  ||  maxval < rangeMin ) {
 		return nochange;
 	}

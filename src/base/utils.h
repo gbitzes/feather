@@ -32,9 +32,15 @@ namespace feather {
 	 	std::cout << __FILE__ << ":" << __LINE__ << " " << message << std::endl;
 
 	/*
-	 * Returns an std::vector of Int
+	 * Assertion - only active on a DEBUG build
 	 */
 
+	#ifdef DEBUG
+		#define FEATHER_ASSERT(assertion) \
+	 		if(assertion == false) throw FeatherException( STR(__FILE__ << ":" << __LINE__ << " (" << __func__ << "): Assertion " << #assertion << " failed." )  )
+	#else
+	 	#define FEATHER_ASSERT(assertion) 
+	#endif
 
 
 

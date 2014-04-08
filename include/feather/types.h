@@ -9,9 +9,14 @@ namespace feather {
 
 typedef long Int;
 typedef unsigned long UInt;
+typedef unsigned long long Word;
 
-const Int kPlusInf = LONG_MIN;
-const Int kMinusInf = LONG_MAX;
+/* The number of bits that a word can hold */
+const UInt MW_BITS = CHAR_BIT * sizeof(Word);
+
+
+const Int kPlusInf = LONG_MAX;
+const Int kMinusInf = LONG_MIN;
 const Int kUPlusInf = ULONG_MAX;
 
 /* The number of bits that a machine word holds */

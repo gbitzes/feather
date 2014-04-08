@@ -13,7 +13,7 @@ class Bitset : public IntDomain {
 
 		struct BitsetState {
 			Int minval, maxval, setcount, minDom, nbits;
-			std::vector<size_t> *machw;
+			std::vector<Word> *machw;
 
 			BitsetState(Int minval, Int maxval, Int setcount) {
 				this->minval = minval;
@@ -29,7 +29,7 @@ class Bitset : public IntDomain {
 		 * in which the bits of the bitset are stored
 		 */
 
-		std::vector<size_t> *machw;
+		std::vector<Word> *machw;
 
 		/*
 		 * Stores clones of the state of the bitset 
@@ -38,16 +38,22 @@ class Bitset : public IntDomain {
 
 		 std::vector<BitsetState> clones;
 
-		 /*
-		  * The 0-th bit of the bitset corresponds
-		  * to the value stored in offset.
-		  *
-		  * (as opposed to the 0-th bit of the bitset
-		  *  corresponding to value 0 - this way we
-		  *  can store negative or very large values)
-		  */
+		/*
+		 * The 0-th bit of the bitset corresponds
+		 * to the value stored in offset.
+		 *
+		 * (as opposed to the 0-th bit of the bitset
+		 *  corresponding to value 0 - this way we
+		 *  can store negative or very large values)
+		 */
 
-		 Int offset;
+		Int offset;
+
+		/*
+		 * Number of bits (active or inactive) contained
+		 * in the bitset
+		 */
+		UInt nbits;
 
 	public:
 		Bitset(Int minval, Int maxval);
@@ -60,7 +66,7 @@ class Bitset : public IntDomain {
 		virtual bool containsRange(const Int rangeMin, const Int rangeMax) const;
 		virtual std::string toString() const;
 
-		virtual enum IntDomain::RemovalResult removeRange(Int rangeMin, Int rangeMax, bool saveOnChange, bool dontClear);
+		virtual enum IntDomain::RemovalResult removeRange(Int rangeMin, Int rangeMax, bool saveOnChange);
 		virtual void save();
 		virtual void restore();
 
