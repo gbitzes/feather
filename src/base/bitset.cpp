@@ -9,11 +9,27 @@ namespace feather {
 namespace {
 
 	/*
+	 * Returns a word with all bits set
+	 */
+
+	inline Word allBitsON() {
+		return ~0ull;
+	}
+
+	inline Word allBitsOFF() {
+		return 0ull;
+	}
+
+	inline Word firstBitON() {
+		return 1ull;
+	}
+
+	/*
 	 * Returns a machine word with its bits set to 1 from start to end
 	 * Example: mwWithSetBits(2, 5) should return something like 011110000...
 	 */
 	inline Word mwWithBits(Int start, Int end) {
-		Word all = ~0ull;
+		Word all = allBitsON();
 		Word left = all << start-1;
 		Word right = (all >> ( (sizeof(Word)*CHAR_BIT) -end) );
 		return left & right;
@@ -178,7 +194,7 @@ Bitset::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
 		 	 * Initially, each position just contains machine words with all their bits set
 		 	 */
 
-		 	machw->resize((nbits-1)/MW_BITS + 1, ~0ul);
+		 	machw->resize((nbits-1)/MW_BITS + 1, allBitsON() );
 		 }
 	}
 	/* machw will change, record it if you haven't already */
@@ -205,20 +221,20 @@ Bitset::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
 	else {
 		/* Take care of the first */
 		Int start = minbit % MW_BITS + 1;
-		Word word = ~0ull << start-1;
+		Word word = allBitsON() << start-1;
 		setcount -= popcount((*machw)[minmw] & word);
 		(*machw)[minmw] = (*machw)[minmw] & ~word;
 
 		/* Take care of the last */
 		Int end = maxbit % MW_BITS + 1;
-		word = ~(~0ull << end);
+		word = ~(allBitsON() << end);
 		setcount -= popcount((*machw)[maxmw] & word);
 		(*machw)[maxmw] = (*machw)[maxmw] & ~word;
 
 		/* Take care of the in-between words, if they exist */
 		for(int i = minmw+1; i <= maxmw-1; i++) {
 			setcount -= popcount((*machw)[i]);
-			(*machw)[i] = 0ull;
+			(*machw)[i] = allBitsOFF();
 		}
 	}
 
@@ -241,7 +257,7 @@ bool Bitset::contains(const Int val) const {
 
 	UInt bit = val - offset;
 	UInt mw = bit / MW_BITS;
-	Word word = 1ll << bit % MW_BITS;
+	Word word = firstBitON() << bit % MW_BITS;
 
 	return (*machw)[mw] & word;
 }
@@ -260,7 +276,7 @@ Int Bitset::next(const Int val) const {
 	Word word = (*machw)[mw] >> (nbit%MW_BITS);
 
 	/* Our next value is in the same machine word */
-	if(word != 0ul) {
+	if(word != allBitsOFF()) {
 		/* Calculate the number of leading zeroes */
 		UInt zeroes = bitscan(word);
 		return val + zeroes;
@@ -271,7 +287,7 @@ Int Bitset::next(const Int val) const {
 		for(Int i = mw+1; i < machw->size(); i++) {
 			word = machw->at(i);
 
-			if(word != 0ul) {
+			if(word != allBitsOFF()) {
 				Int zeroes = bitscan(word);
 				return val + (MW_BITS - nbit%MW_BITS) + (MW_BITS*(i-mw-1)) + zeroes;
 			}
@@ -298,7 +314,7 @@ Int Bitset::previous(const Int val) const {
 	// // assert_Ns( nbit < nbits ,
 	// // 	"NsBitset::previous: Machine word out of `*this' range");
 
-	// if ( (*machw)[mw]  ==  0ul )    {
+	// if ( (*machw)[mw]  ==  allBitsOFF() )    {
 	// 	// speedup by means of comparing the whole word
 	// 	nbit  =  mw * MW_BITS -1;
 
@@ -317,7 +333,7 @@ Int Bitset::previous(const Int val) const {
 
 	// for ( ;   mw >= 0;   --mw)    {
 
-	// 	if ( (*machw)[mw]  ==  0ul )    {
+	// 	if ( (*machw)[mw]  ==  allBitsOFF() )    {
 	// 		// speedup by means of comparing the whole word
 	// 		nbit  -=  MW_BITS;
 
@@ -349,7 +365,7 @@ Int Bitset::previous(const Int val) const {
 	Word word = (*machw)[mw] << MW_BITS - (nbit%MW_BITS);
 
 	/* Our next value is in the same machine word */
-	if(word != 0ul) {
+	if(word != allBitsOFF() ) {
 		/* Calculate the number of leading zeroes */
 		UInt zeroes = bitscanReverse(word);
 		//printWord(word);
@@ -361,7 +377,7 @@ Int Bitset::previous(const Int val) const {
 		for(Int i = mw-1; i >= 0; i--) {
 			word = machw->at(i);
 
-			if(word != 0ul) {
+			if(word != allBitsOFF() ) {
 				Int zeroes = bitscanReverse(word);
 				return val - (nbit%MW_BITS) - (MW_BITS*(mw-i-1)) - zeroes;
 			}
@@ -384,19 +400,19 @@ Int Bitset::nextGap(const Int val) const {
 		nbit  =  val - offset + 1;
 
 	UInt       mw  =  nbit / MW_BITS;
-	unsigned long  mwbit  =  1l<<(nbit%MW_BITS);
+	Word mwbit  =  firstBitON() <<(nbit%MW_BITS);
 	UInt   maxbit  =  maxval-offset;
 
 	// assert_Ns( maxbit < nbits  &&  nbit < nbits ,
 	// 	"NsBitset::nextGap: Machine word out of `*this' range");
 
-	if ( (*machw)[mw]  ==  ~0ul )    {
+	if ( (*machw)[mw]  ==  allBitsON() )    {
 		// speedup by means of comparing the whole word
 		nbit  =  (mw + 1) * MW_BITS;
 
 	}  else  {
 
-		for ( ;   mwbit!=0  &&  nbit <= maxbit;   mwbit<<=1)    {
+		for ( ;   mwbit!= allBitsOFF()  &&  nbit <= maxbit;   mwbit<<=1)    {
 
 			if ( ! ( (*machw)[mw] & mwbit ) )
 				return  (nbit + offset);
@@ -409,13 +425,13 @@ Int Bitset::nextGap(const Int val) const {
 
 	for ( ;   mw < machw->size();   ++mw)    {
 
-		if ( (*machw)[mw]  ==  ~0ul )    {
+		if ( (*machw)[mw]  ==  allBitsON() )    {
 			// speedup by means of comparing the whole word
 			nbit  +=  MW_BITS;
 
 		}  else  {
 
-			for (mwbit=1;  mwbit!=0 && nbit<=maxbit;  mwbit<<=1)
+			for (mwbit= allBitsON() ;  mwbit!= allBitsOFF() && nbit<=maxbit;  mwbit<<=1)
 			{
 				if ( ! ( (*machw)[mw] & mwbit ) )
 					return  (nbit + offset);
@@ -443,7 +459,7 @@ bool Bitset::containsRange(const Int rangeMin, const Int rangeMax) const {
 		UInt  nbit  =  val - offset;
 		UInt  mw    =  nbit / MW_BITS;
 
-		if ( (*machw)[mw]  ==  ~0ul )    {
+		if ( (*machw)[mw]  ==  allBitsON() )    {
 			// speedup by means of comparing the whole word
 
 			if ( MW_BITS - nbit % MW_BITS  >
@@ -458,7 +474,7 @@ bool Bitset::containsRange(const Int rangeMin, const Int rangeMax) const {
 
 		}  else  {
 
-			unsigned long  mwbit  =  1l<<(nbit%MW_BITS);
+			Word mwbit  =  firstBitON() <<(nbit%MW_BITS);
 
 			if ( ! ( (*machw)[mw] & mwbit ) )
 				return  false;
@@ -491,6 +507,7 @@ string Bitset::toString() const {
 			ss << ".." << gap-1 << " ";
 	}
 	ss << "]";
+
 	return ss.str();
 }
 

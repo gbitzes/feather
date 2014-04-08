@@ -351,6 +351,7 @@ TYPED_TEST(base_IntDomain, Stress14) {
 	domain->removeRange(28, 28);
 	ASSERT_EQ(71, domain->size());
 	ASSERT_EQ(domain->next(kMinusInf), 0);
+	ASSERT_EQ(domain->nextGap(29), 40);
 
 	/*
 	 *  The bitset should now have the following form: 
