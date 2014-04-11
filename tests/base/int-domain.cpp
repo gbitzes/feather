@@ -360,6 +360,15 @@ TYPED_TEST(base_IntDomain, Stress14) {
 
 	ASSERT_EQ("[0..14 26..27 29..39 56..98]", domain->toString() );
 
+	/*
+	 * Try cloning the domain
+	 */
+
+	IntDomain *clone = this->factory(domain->min(), domain->max() );
+	clone->removeAllBut(domain);
+	ASSERT_EQ( clone->toString(), domain->toString() );
+	delete clone;
+
 	int i;
 	for(i = -5; i <= 105; i++) {
 		if( (0  <= i && i <= 14)  ||

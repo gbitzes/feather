@@ -12,13 +12,13 @@ namespace feather {
  * IntDomain.
  *
  * Depends on the implementation. A bitset could
- * hold which word and which bit inside the word
+ * hold which chunk and which bit inside the chunk
  * corresponds to value. A range set could store
  * the iterator to the range that contains some
  * particular value. 
  * 
  * This is in order to speed up things like next().
- * Knowing the exact word in a bitset will save us
+ * Knowing the exact chunk in a bitset will save us
  * the division and modulo to locate it each time.
  */
 class IntDomainPosition {
@@ -73,6 +73,12 @@ class IntDomain {
 		virtual void save() = 0;
 		virtual void restore() = 0;
 
+		/* 
+		 * Removes all values inside the domain
+		 * _except_ those inside the given argument
+		 */
+		 
+		void removeAllBut(IntDomain*);
 
 	protected:
 

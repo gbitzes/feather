@@ -36,20 +36,22 @@ struct RepresentationIntVar {
 	IntVarID id;
 };
 
-struct Representation {
+class Representation {
 
-	/*
-	 * The variables are represented as a set 
-	 * of ranges that specify their domain.
-	 * The index of them inside the vector is very
-	 * important as it defines their ID.
-	 */
+	public:
+		/*
+		 * The variables are represented as a set 
+		 * of ranges that specify their domain.
+		 * The index of them inside the vector is very
+		 * important as it defines their ID.
+		 */
 
-	std::vector<RepresentationIntVar> vars;
-	std::vector<const Constraint*> constraints;
-	std::vector<Goal> goals;
+		std::vector<RepresentationIntVar> vars;
+		std::vector<const Constraint*> constraints;
+		std::vector<Goal> goals;
 
-	IntVarID addVar(Int min, Int max);
+		IntVarID addVar(Int min, Int max);
+		~Representation();
 };
 
 

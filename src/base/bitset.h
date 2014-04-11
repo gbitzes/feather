@@ -13,7 +13,7 @@ class Bitset : public IntDomain {
 
 		struct BitsetState {
 			Int minval, maxval, setcount, minDom, nbits;
-			std::vector<Word> *machw;
+			std::vector<Chunk> *machw;
 
 			BitsetState(Int minval, Int maxval, Int setcount) {
 				this->minval = minval;
@@ -25,11 +25,11 @@ class Bitset : public IntDomain {
 		};
 
 		/*
-		 * An array consisting of machine words in
-		 * in which the bits of the bitset are stored
+		 * An array consisting of chunks in
+		 * which the bits of the bitset are stored
 		 */
 
-		std::vector<Word> *machw;
+		std::vector<Chunk> *machw;
 
 		/*
 		 * Stores clones of the state of the bitset 
@@ -57,7 +57,7 @@ class Bitset : public IntDomain {
 
 	public:
 		Bitset(Int minval, Int maxval);
-		virtual ~Bitset() {};
+		virtual ~Bitset();
 
 		virtual bool contains(const Int value) const;
 		virtual Int previous(const Int value) const;

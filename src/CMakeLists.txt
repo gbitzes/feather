@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.6)
 
 include_directories(.)
 
+add_definitions("-g")
+
 # Let the code know whether this is a debug build
 set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG")
 

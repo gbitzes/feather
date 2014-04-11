@@ -76,7 +76,7 @@ IntRanges::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
 	// cout << "removeRange called with " << rangeMin << ".." << rangeMax << endl;
 
 	/* Invalid range? */
-	FEATHER_ASSERT(rangeMin <= rangeMax);
+	// FEATHER_ASSERT(rangeMin <= rangeMax);
 
 	/* Domain to be cleared? */
 	if ( rangeMin <= minval  &&  maxval <= rangeMax ) {
@@ -212,12 +212,17 @@ IntRanges::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
 		// cout << "there's stuff to delete" << endl;
 
 		/* Yes - delete the blocks between itFirst and itLast except itLast */
-		while( itFirst != intervals.end() && itLast->first >= itFirst->first ) {
-
+		while( itFirst != intervals.end() && itLast->first >= itFirst->first ) {			
 			/* Store to history */
 			history.push( Range(itFirst->first, itFirst->second) );
 
 			setcount -= (itFirst->second - itFirst->first)+1;
+			
+			if(itFirst == itLast) {
+				intervals.erase(itFirst);
+				break;
+			}
+
 			intervals.erase(itFirst++);
 		}
 	}

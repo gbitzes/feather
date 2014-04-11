@@ -15,7 +15,7 @@ class Naxos : public ProblemManager {
 		/* Specifies whether a representation has already been provided */
 		bool hasRepresentation;
 
-		std::map<Int, NsIntVar*> vars;
+		std::map<IntVarID, NsIntVar*> vars;
 
 		void addVar(const RepresentationIntVar&);
 
