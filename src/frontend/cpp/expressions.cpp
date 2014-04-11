@@ -1,5 +1,5 @@
 #include <feather/frontend/cpp/expressions.h>
-#include <common/create-constraint.h>
+#include <common/constraints.h>
 #include <iostream>
 #include <base/utils.h>
 #include <base/int-ranges.h>
@@ -17,7 +17,7 @@ namespace feather {
 
 		Solver &slv = Y.getSolver();
 		IntVarID id = slv.makeIntVar( Y.min()+C, Y.max()+C );
-		slv.addConstraint( __create_XeqYplusC(id, Y.getID(), C) );
+		slv.addConstraint( new Constr_XeqYplusC(id, Y.getID(), C) );
 
 		return IntVar(id, slv);
 	}

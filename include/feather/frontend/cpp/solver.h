@@ -18,7 +18,7 @@ class Solver {
 		Solver();
 		~Solver();
 		IntVarID makeIntVar(Int min, Int max);
-		void addConstraint(const Constraint&);
+		void addConstraint(const Constraint *const constr);
 
 };
 

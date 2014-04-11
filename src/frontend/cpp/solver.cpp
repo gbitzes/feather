@@ -21,7 +21,7 @@ IntDomain& Solver::getDomain(IntVarID id) {
 	return *repr->vars[id].domain;
 }
 
-void Solver::addConstraint(const Constraint &constr) {
+void Solver::addConstraint(const Constraint *const constr) {
 	repr->constraints.push_back(constr);
 }
 

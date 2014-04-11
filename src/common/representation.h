@@ -21,10 +21,10 @@ namespace feather {
  * Same for goals.
  */
 
-struct Constraint {
-	enum ConstraintType::Type type;
-	std::vector<Int> values;
-};
+// class Constraint {
+// 	enum ConstraintType::Type type;
+// 	std::vector<Int> values;
+// };
 
 struct Goal {
 	enum GoalType::Type type;
@@ -46,7 +46,7 @@ struct Representation {
 	 */
 
 	std::vector<RepresentationIntVar> vars;
-	std::vector<Constraint> constraints;
+	std::vector<const Constraint*> constraints;
 	std::vector<Goal> goals;
 
 	IntVarID addVar(Int min, Int max);
