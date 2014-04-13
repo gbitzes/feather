@@ -11,7 +11,7 @@ namespace feather {
  * Y + C
  */
 
-	IntVar operator+ (const IntVar Y, const Int C) {
+	IntVar operator+ (IntVar Y, Int C) {
 		if(C == 0)
 			return Y;
 
@@ -22,11 +22,11 @@ namespace feather {
 		return IntVar(id, slv);
 	}
 
-	IntVar operator+ (const Int C, const IntVar Y) {
+	IntVar operator+ (Int C, IntVar Y) {
 		return Y+C;
 	}
 
- 	IntVar operator- (const IntVar Y, const Int C) {
+ 	IntVar operator- (IntVar Y, Int C) {
  		return Y + (-C);
  	}
 
@@ -34,7 +34,7 @@ namespace feather {
  * Y / C
  */
 
- 	IntVar operator/ (const IntVar Y, const Int C) {
+ 	IntVar operator/ (IntVar Y, Int C) {
 
  	}
 
@@ -42,7 +42,7 @@ namespace feather {
  * Y + Z
  */
 
- 	IntVar operator+ (const IntVar Y, const IntVar Z) {
+ 	IntVar operator+ (IntVar Y, IntVar Z) {
 
  	}
 
@@ -50,7 +50,7 @@ namespace feather {
  * Y - Z
  */
 
- 	IntVar operator- (const IntVar Y, const IntVar Z) {
+ 	IntVar operator- (IntVar Y, IntVar Z) {
 
  	}
 
@@ -58,11 +58,11 @@ namespace feather {
  * C - Z
  */
 
- 	IntVar operator- (const Int C, const IntVar Z) {
+ 	IntVar operator- (Int C, IntVar Z) {
 
  	}
 
- 	IntVar operator- (const IntVar Z) {
+ 	IntVar operator- (IntVar Z) {
  		return 0 - Z;
  	}
 
@@ -70,7 +70,7 @@ namespace feather {
  * Y * Z
  */
 
- 	IntVar operator* (const IntVar Y, const IntVar Z) {
+ 	IntVar operator* (IntVar Y, IntVar Z) {
 
  	}
 
@@ -78,11 +78,11 @@ namespace feather {
  * Y * C
  */
 
-	IntVar operator* (const IntVar Y, const Int C) {
+	IntVar operator* (IntVar Y, Int C) {
 
 	}
 
-	IntVar operator* (const Int C, const IntVar Y) {
+	IntVar operator* (Int C, IntVar Y) {
 		return Y*C;
 	}
 

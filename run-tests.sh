@@ -7,5 +7,13 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=DEBUG  .. 
 make -j4
 cd ..
-bin/tests
+
+# If an argument has been supplied, run only those tests
+if [ $# == 1 ] 
+then
+        bin/tests --gtest_filter="*$1*"
+else
+        # Otherwise, run everything
+        bin/tests
+fi
 

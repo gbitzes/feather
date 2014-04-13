@@ -14,6 +14,9 @@ typedef unsigned long UInt;
 typedef unsigned long long Chunk;
 const UInt CHUNK_BITS = CHAR_BIT * sizeof(Chunk);
 
+typedef UInt IntVarID;
+typedef UInt IntVarArrayID;
+typedef UInt SolutionID;
 
 const Int kPlusInf = LONG_MAX;
 const Int kMinusInf = LONG_MIN;
@@ -44,7 +47,7 @@ struct Range {
 
 // class Solver;
 class IntDomain;
-
+class ProblemManager;
 
 } // namespace feather
 

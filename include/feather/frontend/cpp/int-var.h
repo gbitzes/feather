@@ -7,8 +7,6 @@
 
 namespace feather {
 
-typedef UInt IntVarID;
-
 /*
  * IntVar is a convenience class used by the user
  * to define their problem. Uses operator overloading
@@ -20,9 +18,12 @@ class IntVar {
 	private:
 		IntVarID id;
 		Solver *slv;
+		IntDomain *representationDomain;
 		IntDomain *domain;
 		bool initialized;
+		SolutionID currentSolutionID;
 
+		void updateDomain();
 	public:
 
 		void initialize(Solver&, IntVarID);
@@ -39,9 +40,14 @@ class IntVar {
 		 */
 
 		Solver &getSolver() const;
-		Int min() const;
-		Int max() const;
+		Int min();
+		Int max();
+		Int value();
+		Int isBound();
+
 		IntVarID getID() const;
+		IntDomain const* getDomain() const;
+
 
 		/*
 		 * Convenience function that returns
@@ -50,6 +56,13 @@ class IntVar {
 		 */
 
 		bool hasSameSolver(const IntVar other) const;
+
+		/*
+		 * Tests whether two IntVars refer to the same
+		 * variable
+		 */
+
+		bool operator==(const IntVar other) const;
 };
 
 

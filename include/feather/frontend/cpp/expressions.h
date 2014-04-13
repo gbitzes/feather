@@ -10,47 +10,47 @@ namespace feather {
 	 * Y + C
 	 */
 
-	IntVar operator+ (const IntVar Y, const Int C);
-	IntVar operator+ (const Int C, const IntVar Y);
-	IntVar operator- (const IntVar Y, const Int C);
+	IntVar operator+ (IntVar Y, Int C);
+	IntVar operator+ (Int C, IntVar Y);
+	IntVar operator- (IntVar Y, Int C);
 
 	/*
 	 * Y / C
 	 */
 
-	IntVar operator/ (const IntVar Y, const Int C);
+	IntVar operator/ (IntVar Y, Int C);
 
 	/*
 	 * Y + Z
 	 */
 
-	IntVar operator+ (const IntVar Y, const IntVar Z);
+	IntVar operator+ (IntVar Y, IntVar Z);
 
 	/*
 	 * Y - Z
 	 */
 
-	IntVar operator- (const IntVar Y, const IntVar Z);
+	IntVar operator- (IntVar Y, IntVar Z);
 
 	/*
 	 * C - Z
 	 */
 
-	IntVar operator- (const Int C, const IntVar Z);
-	IntVar operator- (const IntVar Z);
+	IntVar operator- (Int C, IntVar Z);
+	IntVar operator- (IntVar Z);
 
 	/*
 	 * Y * Z
 	 */
 
-	IntVar operator* (const IntVar Y, const IntVar Z);
+	IntVar operator* (IntVar Y, IntVar Z);
 
 	/*
 	 * Y * C
 	 */
 
-	IntVar operator* (const IntVar Y, const Int C);
-	IntVar operator* (const Int C, const IntVar Y);
+	IntVar operator* (IntVar Y, Int C);
+	IntVar operator* (Int C, IntVar Y);
 
 
 	// TODO? 
@@ -78,7 +78,7 @@ namespace feather {
 	// 		 * constraints
 	// 		 */
 
-	// 		virtual IntVar post() const = 0;
+	// 		virtual IntVar post() = 0;
 
 			
 	// 		 * Implicitly convert an Expression

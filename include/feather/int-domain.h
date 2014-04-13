@@ -78,7 +78,7 @@ class IntDomain {
 		 * _except_ those inside the given argument
 		 */
 		 
-		void removeAllBut(IntDomain*);
+		void removeAllBut(IntDomain const*);
 
 	protected:
 

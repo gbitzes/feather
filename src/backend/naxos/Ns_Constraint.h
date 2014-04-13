@@ -2,8 +2,11 @@
 #define FEATHER_BACKEND_NSCONSTRAINT_H
 
 #include <backend/naxos/NsIntVar.h>
+#include <base/utils.h>
 
 namespace feather {
+
+class Ns_QueueItem;
 
 class Ns_Constraint {
 
@@ -21,7 +24,7 @@ class Ns_Constraint {
 		}
 
 		virtual void ArcCons() = 0;
-		virtual void LocalArcCons() = 0;
+		virtual void LocalArcCons(Ns_QueueItem&) = 0;
 
 		/* The number of the variables involved in the constraint */
 		virtual Int varsInvolvedIn() const = 0;
@@ -64,13 +67,13 @@ class Ns_ConstrXlessthanY : public Ns_Constraint {
 
 	public:
 		Ns_ConstrXlessthanY(NsIntVar *x, NsIntVar *y) : varX(x), varY(y) {
-			FEATHER_ASSERT(  &x->getNaxos() == &y->getNaxos() );
+			FEATHER_ASSERT(  &x->manager() == &y->manager() );
 		}
 
 		virtual Int varsInvolvedIn() const { return 2; }
 
 		virtual void ArcCons();
-		virtual void LocalArcCons();
+		virtual void LocalArcCons(Ns_QueueItem&);
 
 };
 
@@ -80,30 +83,30 @@ class Ns_ConstrXlesseqthanY : public Ns_Constraint {
 
 	public:
 		Ns_ConstrXlesseqthanY(NsIntVar *x, NsIntVar *y) : varX(x), varY(y) {
-			FEATHER_ASSERT( &x->getNaxos() == &y->getNaxos() );
+			FEATHER_ASSERT( &x->manager() == &y->manager() );
 		}
 
 		virtual Int varsInvolvedIn() const { return 2; }
 
 		virtual void ArcCons();
-		virtual void LocalArcCons();
+		virtual void LocalArcCons(Ns_QueueItem&);
 };
 
 class Ns_ConstrXeqYplusC : public Ns_Constraint { 
 	private:
-		NsIntVar *varX, *varY;
-		Int c;
+		NsIntVar *VarX, *VarY;
+		Int C;
 
 	public:
-		Ns_ConstrXeqYplusC(NsIntVar *x, NsIntVar *y, Int c_) : varX(x), varY(y), c(c_) {
+		Ns_ConstrXeqYplusC(NsIntVar *x, NsIntVar *y, Int c_) : VarX(x), VarY(y), C(c_) {
 			revisionType = BIDIRECTIONAL_CONSISTENCY;
-			FEATHER_ASSERT( &x->getNaxos() == &y->getNaxos() );
+			FEATHER_ASSERT( &x->manager() == &y->manager() );
 		}
 
 		virtual Int varsInvolvedIn() const { return 2; }
 
 		virtual void ArcCons();
-		virtual void LocalArcCons();
+		virtual void LocalArcCons(Ns_QueueItem&);
 };
 
 

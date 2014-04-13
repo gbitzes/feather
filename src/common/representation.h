@@ -26,14 +26,20 @@ namespace feather {
 // 	std::vector<Int> values;
 // };
 
-struct Goal {
-	enum GoalType::Type type;
-	std::vector<Int> values;
-};
+// struct Goal {
+// 	enum GoalType::Type type;
+// 	std::vector<Int> values;
+// };
 
 struct RepresentationIntVar {
 	IntRanges *domain;
 	IntVarID id;
+};
+
+class RepresentationIntVarArray {
+	public:
+		std::deque<IntVarID> vars;
+		IntVarArrayID id;
 };
 
 class Representation {
@@ -48,9 +54,12 @@ class Representation {
 
 		std::vector<RepresentationIntVar> vars;
 		std::vector<const Constraint*> constraints;
-		std::vector<Goal> goals;
+		std::vector<const Goal*> goals;
+		std::vector<RepresentationIntVarArray*> arrays;
 
 		IntVarID addVar(Int min, Int max);
+		IntVarArrayID addArray();
+
 		~Representation();
 };
 

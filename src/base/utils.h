@@ -35,7 +35,7 @@ namespace feather {
 	 * Assertion - only active on a DEBUG build
 	 */
 
-	#ifdef DEBUG
+	#ifdef DEBUG	
 		#define FEATHER_ASSERT(assertion) \
 	 		if(assertion == false) throw FeatherException( STR(__FILE__ << ":" << __LINE__ << " (" << __func__ << "): Assertion " << #assertion << " failed." )  )
 	#else

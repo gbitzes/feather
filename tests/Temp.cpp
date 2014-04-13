@@ -4,6 +4,7 @@
 #include <base/utils.h>
 #include <backend/naxos/naxos.h>
 #include <backend/naxos/Ns_Constraint.h>
+#include <feather/frontend/cpp/int-var-array.h>
 
 using namespace feather;
 

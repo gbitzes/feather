@@ -3,7 +3,7 @@
 
 namespace feather {
 
-void IntDomain::removeAllBut(IntDomain *source) {
+void IntDomain::removeAllBut(IntDomain const* source) {
 	Int val, gap;
 	gap = kMinusInf;
 

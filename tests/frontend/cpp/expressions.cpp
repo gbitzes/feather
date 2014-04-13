@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 #include <feather/frontend/cpp/expressions.h>
+#include <backend/naxos/naxos.h>
 
 using namespace feather;
 using namespace std;
 
 
 TEST(frontend_Expressions, T1) {
-	Solver slv;
+	Solver slv( new Naxos() );
 	IntVar a(slv, 0, 10);
 
 	ASSERT_EQ( a.min(), 0 );

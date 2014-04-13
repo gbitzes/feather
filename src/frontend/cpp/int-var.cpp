@@ -9,7 +9,9 @@ void IntVar::initialize(Solver &_slv, IntVarID id) {
 	initialized = true;
 	this->slv = &_slv;
 	this->id = id;
-	domain = &slv->getDomain(id);
+	representationDomain = &slv->getRepresentationDomain(id);
+	domain = representationDomain;
+	currentSolutionID = slv->getSolutionID();
 }
 
 Solver& IntVar::getSolver() const {
@@ -58,16 +60,44 @@ bool IntVar::hasSameSolver(IntVar other) const {
 	return slv == other.slv;
 }
 
-Int IntVar::min() const {
+Int IntVar::min() {
+	updateDomain();
 	return domain->min();
 }
 
-Int IntVar::max() const {
+Int IntVar::max() {
+	updateDomain();
 	return domain->max();
+}
+
+Int IntVar::value() {
+	updateDomain();
+	if(domain->max() == domain->min() )
+		return domain->max();
+
+	FEATHER_THROW("Variable is not bound to a single value");
+}
+
+IntDomain const* IntVar::getDomain() const {
+	return domain;
+}
+
+void IntVar::updateDomain() {
+	if( slv->getSolutionID() != currentSolutionID ) {
+		if(domain != representationDomain)
+			delete domain;
+
+		domain = slv->getDomain(id);
+	}
 }
 
 IntVarID IntVar::getID() const {
 	return id;
 }
+
+bool IntVar::operator==(const IntVar other) const {
+	return other.hasSameSolver(*this) && getID() == other.getID();
+}
+
 
 }
