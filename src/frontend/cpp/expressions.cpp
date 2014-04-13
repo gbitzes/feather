@@ -11,80 +11,95 @@ namespace feather {
  * Y + C
  */
 
-	IntVar operator+ (IntVar Y, Int C) {
-		if(C == 0)
-			return Y;
+ 	IntVar ExprYplusC::post() {
+ 		if(C == 0)
+ 			return Y;
 
 		Solver &slv = Y.getSolver();
 		IntVarID id = slv.makeIntVar( Y.min()+C, Y.max()+C );
 		slv.addConstraint( new Constr_XeqYplusC(id, Y.getID(), C) );
 
 		return IntVar(id, slv);
-	}
-
-	IntVar operator+ (Int C, IntVar Y) {
-		return Y+C;
-	}
-
- 	IntVar operator- (IntVar Y, Int C) {
- 		return Y + (-C);
  	}
 
 /*
  * Y / C
  */
 
- 	IntVar operator/ (IntVar Y, Int C) {
+ 	IntVar ExprYdivC::post() {
+ 		if(C == 0) FEATHER_THROW("Attempted division by zero");
+ 		if(C == 1) return Y;
 
+		Solver &slv = Y.getSolver();
+		IntVarID id = slv.makeIntVar( Y.min()/C, Y.max()/C );
+		slv.addConstraint( new Constr_XeqYdivC(id, Y.getID(), C) );
+
+		return IntVar(id, slv);
  	}
 
 /*
  * Y + Z
  */
 
- 	IntVar operator+ (IntVar Y, IntVar Z) {
+ 	IntVar ExprYplusZ::post() {
+		Solver &slv = Y.getSolver();
+		IntVarID id = slv.makeIntVar( Y.min()+Z.min(), Y.max()+Z.max() );
+		slv.addConstraint( new Constr_XeqYplusZ(id, Y.getID(), Z.getID()) );
 
+		return IntVar(id, slv);
  	}
+
 
 /*
  * Y - Z
  */
 
- 	IntVar operator- (IntVar Y, IntVar Z) {
+ 	IntVar ExprYminusZ::post() {
+		Solver &slv = Y.getSolver();
+		IntVarID id = slv.makeIntVar( Y.min()-Z.min(), Y.max()-Z.max() );
+		slv.addConstraint( new Constr_XeqYminusZ(id, Y.getID(), Z.getID()) );
 
+		return IntVar(id, slv);
  	}
 
 /*
  * C - Z
  */
 
- 	IntVar operator- (Int C, IntVar Z) {
+ 	IntVar ExprCminusZ::post() {
+		Solver &slv = Z.getSolver();
+		IntVarID id = slv.makeIntVar( C-Z.min(), C-Z.max() );
+		slv.addConstraint( new Constr_XeqCminusZ(id, C, Z.getID()) );
 
- 	}
-
- 	IntVar operator- (IntVar Z) {
- 		return 0 - Z;
+		return IntVar(id, slv);
  	}
 
 /*
  * Y * Z
  */
 
- 	IntVar operator* (IntVar Y, IntVar Z) {
+ 	IntVar ExprYtimesZ::post() {
+		Solver &slv = Y.getSolver();
+		IntVarID id = slv.makeIntVar( Y.min()*Z.min(), Y.max()*Z.max() );
+		slv.addConstraint( new Constr_XeqYtimesZ(id, Y.getID(), Z.getID()) );
 
+		return IntVar(id, slv);
  	}
 
 /*
  * Y * C
  */
 
-	IntVar operator* (IntVar Y, Int C) {
+ 	IntVar ExprYtimesC::post() {
+ 		if(C == 1)
+ 			return Y;
 
-	}
+		Solver &slv = Y.getSolver();
+		IntVarID id = slv.makeIntVar( Y.min()*C, Y.max()*C );
+		slv.addConstraint( new Constr_XeqYtimesC(id, Y.getID(), C) );
 
-	IntVar operator* (Int C, IntVar Y) {
-		return Y*C;
-	}
+		return IntVar(id, slv);
+ 	}
 
 
 

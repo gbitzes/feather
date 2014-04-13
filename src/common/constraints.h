@@ -15,7 +15,18 @@ namespace Constraints {
 	enum Type {
 		XeqYplusC = 0,
 		XlessthanY,
-		XlesseqthanY
+		XlesseqthanY,
+		XeqYdivC,
+		XeqYplusZ,
+		XeqYminusZ,
+		XeqCminusZ,
+		XeqYtimesZ,
+		XeqYtimesC,
+		XeqYdivZ,
+		XeqCdivZ,
+		XeqYmodZ,
+		XeqYmodC,
+		XeqCmodZ
 	};
 };
 
@@ -33,33 +44,35 @@ class Constraint {
  * Do not edit by hand!
  */
 
-class Constr_XlessthanY : public Constraint {
-	public:
+#include <common/constraints.icc>
 
-		const IntVarID fX, fY;
+// class Constr_XlessthanY : public Constraint {
+// 	public:
 
-		Constr_XlessthanY(IntVarID x, IntVarID y)
-			 : Constraint(Constraints::XlessthanY), fX(x), fY(y) { } 
-};
+// 		const IntVarID fX, fY;
 
-class Constr_XlesseqthanY : public Constraint {
-	public:
+// 		Constr_XlessthanY(IntVarID x, IntVarID y)
+// 			 : Constraint(Constraints::XlessthanY), fX(x), fY(y) { } 
+// };
 
-		const IntVarID fX, fY;
+// class Constr_XlesseqthanY : public Constraint {
+// 	public:
 
-		Constr_XlesseqthanY(IntVarID x, IntVarID y)
-			 : Constraint(Constraints::XlesseqthanY), fX(x), fY(y) { } 
-};
+// 		const IntVarID fX, fY;
 
-class Constr_XeqYplusC : public Constraint {
-	public:
+// 		Constr_XlesseqthanY(IntVarID x, IntVarID y)
+// 			 : Constraint(Constraints::XlesseqthanY), fX(x), fY(y) { } 
+// };
 
-		const IntVarID fX, fY;
-		const Int fC;
+// class Constr_XeqYplusC : public Constraint {
+// 	public:
 
-		Constr_XeqYplusC(IntVarID x, IntVarID y, Int c)
-			 : Constraint(Constraints::XeqYplusC), fX(x), fY(y), fC(c) { } 
-};
+// 		const IntVarID fX, fY;
+// 		const Int fC;
+
+// 		Constr_XeqYplusC(IntVarID x, IntVarID y, Int c)
+// 			 : Constraint(Constraints::XeqYplusC), fX(x), fY(y), fC(c) { } 
+// };
 
 
 
