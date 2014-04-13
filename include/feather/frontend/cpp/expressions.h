@@ -182,34 +182,87 @@ namespace feather {
 	 * Y / Z
 	 */
 
-	// IntVar operator/ (IntVar Y, IntVar Z);
+	class ExprYdivZ : public Expression {
+		private:
+			IntVar Y, Z;
+		public:
+			ExprYdivZ(IntVar Y_, IntVar Z_) : Y(Y_), Z(Z_) {}
+			virtual IntVar post();
+	};
+
+	inline ExprYdivZ operator/ (IntVar Y, IntVar Z) {
+		return ExprYdivZ(Y, Z);
+	}
 
 	/*
 	 * C / Z
 	 */
 
-	// IntVar operator/ (Int C, IntVar Z);
+	class ExprCdivZ : public Expression {
+		private:
+			Int C;
+			IntVar Z;
+		public:
+			ExprCdivZ(Int C_, IntVar Z_) : C(C_), Z(Z_) {}
+			virtual IntVar post();
+	};
+
+	inline ExprCdivZ operator/ (Int C, IntVar Z) {
+		return ExprCdivZ(C, Z);
+	}
 
 	/*
 	 * Y % Z
 	 */
 
-	// IntVar operator% (IntVar Y, IntVar Z);
+	class ExprYmodZ : public Expression {
+		private:
+			IntVar Y, Z;
+		public:
+			ExprYmodZ(IntVar Y_, IntVar Z_) : Y(Y_), Z(Z_) {}
+			virtual IntVar post();
+	};
+
+	inline ExprYmodZ operator% (IntVar Y, IntVar Z) {
+		return ExprYmodZ(Y, Z);
+	}
 
 	/*
 	 * Y % C
 	 */
 
-	// IntVar operator% (IntVar Y, Int C);
+	class ExprYmodC : public Expression {
+		private:
+			IntVar Y;
+			Int C;
+		public:
+			ExprYmodC(IntVar Y_, Int C_) : Y(Y_), C(C_) {}
+			virtual IntVar post();
+	};
+
+	inline ExprYmodC operator% (IntVar Y, Int C) {
+		return ExprYmodC(Y, C);
+	}
 
 	/*
 	 * C % Z
 	 */
 
-	// IntVar operator% (Int C, IntVar Z);
+	class ExprCmodZ : public Expression {
+		private:
+			Int C;
+			IntVar Z;
+		public:
+			ExprCmodZ(Int C_, IntVar Z_) : C(C_), Z(Z_) {}
+			virtual IntVar post();
+	};
 
+	inline ExprCmodZ operator% (Int C, IntVar Z) {
+		return ExprCmodZ(C, Z);
+	}
 
-	/* Ns_Expression subcategory describing constraints.
+	/*
+	 * Ns_Expression subcategory describing constraints.
      * The following abstract class represents the expressions 
      * category that can be viewed both as a constraint (e.g. X < Y) 
      * and as an expression/meta-constraint (e.g. Z == X < Y) 
