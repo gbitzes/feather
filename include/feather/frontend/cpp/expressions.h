@@ -2,7 +2,9 @@
 #define FEATHER_FRONTEND_CPP_INTVAR_EXPRESSIONS_H
 
 #include <feather/types.h>
-#include "int-var.h"
+#include <feather/frontend/cpp/int-var.h>
+#include <feather/frontend/cpp/int-var-array.h>
+
 
 namespace feather {
 	
@@ -262,6 +264,75 @@ namespace feather {
 	}
 
 	/*
+	 * |Y|
+	 */
+
+	class ExprAbsY : public Expression {
+		private:
+			IntVar Y;
+		public:
+			ExprAbsY(IntVar Y_) : Y(Y_) {}
+			virtual IntVar post();
+	};
+
+	/*
+	 * min
+	 */
+
+	class ExprMin : public Expression {
+		private:
+			IntVarArray Arr;
+		public:
+			ExprMin(IntVarArray Arr_) : Arr(Arr_) {}
+			virtual IntVar post();
+	};
+
+	inline ExprMin Minimum(IntVarArray Arr) {
+		return ExprMin(Arr);
+	}
+
+	/*
+	 * max
+	 */
+
+	class ExprMax : public Expression {
+		private:
+			IntVarArray Arr;
+		public:
+			ExprMax(IntVarArray Arr_) : Arr(Arr_) {}
+			virtual IntVar post();
+	};
+
+	inline ExprMax Maximum(IntVarArray Arr) {
+		return ExprMax(Arr);
+	}
+
+	/*
+	 * sum
+	 */
+
+	class ExprSum : public Expression {
+		private:
+			IntVarArray Arr;
+			UInt start, length;
+		public:
+			ExprSum(IntVarArray Arr_) : Arr(Arr_), start(0), length(Arr_.size()) {}
+			ExprSum(IntVarArray Arr_, UInt start_, UInt length_) : Arr(Arr_), start(start_), length(length_) {
+				if(start+length <= Arr.size())
+					FEATHER_THROW("start+length exceeds bounds of array");
+			}
+			virtual IntVar post();
+	};
+
+	inline ExprSum Sum(IntVarArray Arr) {
+		return ExprSum(Arr);
+	}
+
+	inline ExprSum Sum(IntVarArray Arr, UInt start, UInt length) {
+		return ExprSum(Arr, start, length);
+	}
+
+	/*
 	 * Ns_Expression subcategory describing constraints.
      * The following abstract class represents the expressions 
      * category that can be viewed both as a constraint (e.g. X < Y) 
@@ -280,12 +351,54 @@ namespace feather {
     		bool isPositive;
     	public:
     		ExprConstr(const bool positive) : isPositive(positive) {}
-
+    		virtual IntVar postC(bool positively = true) = 0;
+    		virtual Constraint* postConstraint(bool positively = true) = 0;
+    		virtual IntVar post() {
+    			return postC(true);
+    		}
     };
 
 	/*
 	 * Y < C
 	 */
+
+	class ExprConstrYlessthanC : public ExprConstr {
+		private:
+			IntVar Y;
+			Int C;
+		public:
+			ExprConstrYlessthanC(IntVar Y_, Int C_, bool posit) : ExprConstr(posit), Y(Y_), C(C_) {}
+			virtual Constraint* postConstraint(bool);
+			virtual IntVar postC(bool);
+	};
+
+	/*
+	 * Y <= C
+	 */
+
+	class ExprConstrYlessthaneqC : public ExprConstr {
+		private:
+			IntVar Y;
+			Int C;
+		public:
+			ExprConstrYlessthaneqC(IntVar Y_, Int C_, bool posit) : ExprConstr(posit), Y(Y_), C(C_) {}
+			virtual Constraint* postConstraint(bool);
+			virtual IntVar postC(bool);
+	};
+
+	/*
+	 * Y == C
+	 */
+
+	class ExprConstrYeqC : public ExprConstr {
+		private:
+			IntVar Y;
+			Int C;
+		public:
+			ExprConstrYeqC(IntVar Y_, Int C_, bool posit) : ExprConstr(posit), Y(Y_), C(C_) {}
+			virtual Constraint* postConstraint(bool);
+			virtual IntVar postC(bool);
+	};
 
 
 
