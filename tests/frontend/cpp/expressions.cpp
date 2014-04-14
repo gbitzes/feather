@@ -76,4 +76,14 @@ TEST(frontend_Expressions, T1) {
 	//nopqrstuvxyz
 
 
+	IntVar n = a < 5;
+
+}
+
+TEST(frontend_Expressions, T2) {
+	Solver slv( new Naxos() );
+	IntVar a(slv, 0, 10);
+	IntVar n = a < 5;
+	std::cout << "next one" << std::endl;
+	IntVar k = !(a < 5);
 }

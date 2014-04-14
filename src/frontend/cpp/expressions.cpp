@@ -102,5 +102,18 @@ namespace feather {
  	}
 
 
+/*
+ * Y < C
+ */
+
+	IntVar ExprConstrYlessthanC::postC() {
+
+	}
+
+	Constraint* ExprConstrYlessthanC::postConstraint() {
+
+	}
+
+
 
 }

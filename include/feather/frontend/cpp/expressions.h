@@ -350,13 +350,48 @@ namespace feather {
 
     		bool isPositive;
     	public:
-    		ExprConstr(const bool positive) : isPositive(positive) {}
-    		virtual IntVar postC(bool positively = true) = 0;
-    		virtual Constraint* postConstraint(bool positively = true) = 0;
+    		ExprConstr() : isPositive(true) {}
+    		void flip() { isPositive = !isPositive; }
+    		virtual IntVar postC() = 0;
+    		virtual Constraint* postConstraint() = 0;
     		virtual IntVar post() {
-    			return postC(true);
+    			return postC();
+    		}
+
+    		ExprConstr& operator!() {
+    			flip();
+    			return *this;
     		}
     };
+
+    /*
+     * !(ExprConstr)
+     */
+
+	// inline ExprConstrYlessthanC operator!(ExprConstrYlessthanC expr) {
+ //    	expr.flip();
+ //    	return expr;
+ //    }
+
+
+
+    // class ExprConstrNegation : public ExprConstr {
+    // 	private:
+    // 		ExprConstr& expr;
+    // 	public:
+    // 		ExprConstrNegation(ExprConstr& expr_) : ExprConstr(true), expr(expr_) {}
+    // 		virtual IntVar postC(bool positively = true) {
+    // 			return expr.postC(!positively);
+    // 		}
+    // 		virtual Constraint* postConstraint(bool positively = true) {
+    // 			return expr.postConstraint(!positively);
+    // 		}
+    // };
+
+    // inline ExprConstrNegation operator!(Expression& expr) {
+    // 	return ExprConstrNegation()
+    // }
+
 
 	/*
 	 * Y < C
@@ -367,10 +402,18 @@ namespace feather {
 			IntVar Y;
 			Int C;
 		public:
-			ExprConstrYlessthanC(IntVar Y_, Int C_, bool posit) : ExprConstr(posit), Y(Y_), C(C_) {}
-			virtual Constraint* postConstraint(bool);
-			virtual IntVar postC(bool);
+			ExprConstrYlessthanC(IntVar Y_, Int C_) : Y(Y_), C(C_) {}
+			virtual Constraint* postConstraint();
+			virtual IntVar postC();
 	};
+
+	inline ExprConstrYlessthanC operator<(IntVar Y, Int C) {
+		return ExprConstrYlessthanC(Y, C);
+	}
+
+	inline ExprConstrYlessthanC operator>(Int C, IntVar Y) {
+		return Y<C;
+	}
 
 	/*
 	 * Y <= C
@@ -381,10 +424,18 @@ namespace feather {
 			IntVar Y;
 			Int C;
 		public:
-			ExprConstrYlessthaneqC(IntVar Y_, Int C_, bool posit) : ExprConstr(posit), Y(Y_), C(C_) {}
-			virtual Constraint* postConstraint(bool);
-			virtual IntVar postC(bool);
+			ExprConstrYlessthaneqC(IntVar Y_, Int C_) : Y(Y_), C(C_) {}
+			virtual Constraint* postConstraint();
+			virtual IntVar postC();
 	};
+
+	inline ExprConstrYlessthaneqC operator<=(IntVar Y, Int C) {
+		return ExprConstrYlessthaneqC(Y, C);
+	}
+
+	inline ExprConstrYlessthaneqC operator>=(Int C, IntVar Y) {
+		return Y<=C;
+	}
 
 	/*
 	 * Y == C
@@ -395,12 +446,46 @@ namespace feather {
 			IntVar Y;
 			Int C;
 		public:
-			ExprConstrYeqC(IntVar Y_, Int C_, bool posit) : ExprConstr(posit), Y(Y_), C(C_) {}
-			virtual Constraint* postConstraint(bool);
-			virtual IntVar postC(bool);
+			ExprConstrYeqC(IntVar Y_, Int C_) : Y(Y_), C(C_) {}
+			virtual Constraint* postConstraint();
+			virtual IntVar postC();
 	};
 
+	inline ExprConstrYeqC operator==(IntVar Y, Int C) {
+		return ExprConstrYeqC(Y, C);
+	}
 
+	/*
+	 * Y < Z
+	 */
+
+	class ExprConstrYlessthanZ : public ExprConstr {
+		private:
+			IntVar Y, Z;
+		public:
+			ExprConstrYlessthanZ(IntVar Y_, IntVar Z_) : Y(Y_), Z(Z_) {}
+			virtual Constraint* postConstraint();
+			virtual IntVar postC();
+	};
+
+	/*
+	 * Y <= Z
+	 */
+
+	class ExprConstrYlessthaneqZ : public ExprConstr {
+		private:
+			IntVar Y, Z;
+		public:
+			ExprConstrYlessthaneqZ(IntVar Y_, IntVar Z_) : Y(Y_), Z(Z_) {}
+			virtual Constraint* postConstraint();
+			virtual IntVar postC();
+	};
+
+	/*
+	 * Y == Z
+	 */
+
+	
 
 
 
