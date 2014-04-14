@@ -87,3 +87,33 @@ TEST(frontend_Expressions, T2) {
 	std::cout << "next one" << std::endl;
 	IntVar k = !(a < 5);
 }
+
+TEST(frontend_Expressions, T3 ) {
+	Solver slv( new Naxos() );
+	IntVar a(slv, 0, 100);
+	slv.addConstraint(a > 50);
+	ASSERT_EQ(a.min(), 51);
+	ASSERT_EQ(a.max(), 100);
+
+	slv.addConstraint(a <= 80);
+	ASSERT_EQ(a.min(), 51);
+	ASSERT_EQ(a.max(), 80);
+
+	IntVar b(slv, 0, 100);
+	slv.addConstraint( !(b > 90) );
+	ASSERT_EQ(b.min(), 0);
+	ASSERT_EQ(b.max(), 90);
+
+	IntVar c(slv, 0, 10);
+	slv.addConstraint(c == 5);
+	ASSERT_EQ(c.min(), 5);
+	ASSERT_EQ(c.max(), 5);
+	ASSERT_EQ(c.value(), 5);
+
+	IntVar d(slv, 0, 10);
+	slv.addConstraint( !(d == 5) );
+	ASSERT_FALSE(d.contains(5));
+
+	ASSERT_THROW(slv.addConstraint(d==5), FeatherException);
+
+}

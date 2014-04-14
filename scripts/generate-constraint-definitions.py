@@ -122,5 +122,16 @@ if __name__ == '__main__':
 		  	  ["IntVarID", ["y"]]
 		  	] 
 		  )
+	define("XeqY", 
+		  	[ 
+		  	  ["IntVarID", ["x", "y"]]
+		  	] 
+		  )
+	define("XneqY", 
+		  	[ 
+		  	  ["IntVarID", ["x", "y"]]
+		  	] 
+		  )
+
 
 

@@ -26,7 +26,10 @@ namespace Constraints {
 		XeqCdivZ,
 		XeqYmodZ,
 		XeqYmodC,
-		XeqCmodZ
+		XeqCmodZ,
+		XeqAbsY,
+		XeqY,
+		XneqY
 	};
 };
 

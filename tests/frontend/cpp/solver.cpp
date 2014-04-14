@@ -19,17 +19,17 @@ TEST(frontend_Solver, Basic) {
 	arr.push_back(c);
 
 	IntVarArray::iterator iter = arr.begin();
-	ASSERT_EQ(*iter, a);
+	ASSERT_TRUE( (*iter).equals(a) );
 	++iter;
-	ASSERT_EQ(*iter, b);
+	ASSERT_TRUE( (*iter).equals(b) );
 	++iter;
-	ASSERT_EQ(*iter, c);
+	ASSERT_TRUE( (*iter).equals(c) );
 	++iter;
 	ASSERT_THROW(*iter, FeatherException);
 
-	ASSERT_EQ( arr[0], a );
-	ASSERT_EQ( arr[1], b );
-	ASSERT_EQ( arr[2], c );
+	ASSERT_TRUE( arr[0].equals(a) );
+	ASSERT_TRUE( arr[1].equals(b) );
+	ASSERT_TRUE( arr[2].equals(c) );
 
 	ASSERT_EQ( arr.size(), 3);
 	ASSERT_FALSE( arr.empty() );

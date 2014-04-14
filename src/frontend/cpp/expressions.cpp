@@ -107,12 +107,96 @@ namespace feather {
  */
 
 	IntVar ExprConstrYlessthanC::postC() {
+		// Solver &slv = Y.getSolver();
+		// if(isPositive) {
+		// 	IntVarID id = slv.makeIntVar(Y.max() < C, Y.min() < C);
+		// }
+	}
+
+	Constraint const* ExprConstrYlessthanC::postConstraint() {
+		if(isPositive)
+			Y.remove(C, kPlusInf);
+		else
+			Y.remove(kMinusInf, C-1);
+		return NULL;
+	}
+
+ /*
+  * Y <= C
+  */
+
+ 	IntVar ExprConstrYlesseqthanC::postC() {
+
+ 	}
+
+	Constraint const* ExprConstrYlesseqthanC::postConstraint() {
+		if(isPositive)
+			Y.remove(C+1, kPlusInf);
+		else
+			Y.remove(kMinusInf, C);
+		return NULL;
+	}
+
+	IntVar ExprConstrYeqC::postC() {
 
 	}
 
-	Constraint* ExprConstrYlessthanC::postConstraint() {
-
+	Constraint const* ExprConstrYeqC::postConstraint() {
+		if(isPositive) {
+			Y.remove(kMinusInf, C-1);
+			Y.remove(C+1, kPlusInf);
+		} 
+		else {
+			if(Y.contains(C))
+				Y.remove(C);
+		}
+		return NULL;
 	}
+
+ /*
+  * Y < Z
+  */
+
+  	IntVar ExprConstrYlessthanZ::postC() {
+
+  	}
+
+  	Constraint const* ExprConstrYlessthanZ::postConstraint() {
+  		if(isPositive)
+  			return new Constr_XlessthanY(Y.getID(), Z.getID());
+  		else
+  			return new Constr_XlesseqthanY(Z.getID(), Y.getID());
+  	}
+
+  /*
+   * Y <= Z
+   */
+
+   	IntVar ExprConstrYlesseqthanZ::postC() {
+
+  	}
+
+  	Constraint const* ExprConstrYlesseqthanZ::postConstraint() {
+  		if(isPositive)
+  			return new Constr_XlesseqthanY(Y.getID(), Z.getID());
+  		else
+  			return new Constr_XlessthanY(Z.getID(), Y.getID());
+  	}
+
+  /*
+   * Y == Z
+   */
+
+   	IntVar ExprConstrYeqZ::postC() {
+
+  	}
+
+  	Constraint const* ExprConstrYeqZ::postConstraint() {
+  		if(isPositive)
+  			return new Constr_XeqY(Y.getID(), Z.getID());
+  		else
+  			return new Constr_XneqY(Z.getID(), Y.getID());
+  	}
 
 
 

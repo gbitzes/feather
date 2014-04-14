@@ -36,6 +36,8 @@ class Solver {
 		void addConstraint(const Constraint *const constr);
 
 		void finalize();
+		bool isFinalized();
+
 		bool nextSolution();
 
 		SolutionID getSolutionID();		

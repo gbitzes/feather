@@ -41,7 +41,16 @@ IntDomain* Solver::getDomain(IntVarID id) {
 }
 
 void Solver::addConstraint(const Constraint *const constr) {
-	repr->constraints.push_back(constr);
+	/* 
+	 * There is a valid case in which the constraint
+	 * is "static" - all changes can be performed just
+	 * by modifying the domain and nothing more needs
+	 * to be passed on to the backend. In this case,
+	 * a NULL constraint is returned by the expressions
+	 */
+
+	if(constr != 0)
+		repr->constraints.push_back(constr);
 }
 
 bool Solver::nextSolution() {
@@ -56,6 +65,10 @@ bool Solver::nextSolution() {
 void Solver::finalize() {
 	finalized = true;
 	fPM->supplyRepresentation(*repr);
+}
+
+bool Solver::isFinalized() {
+	return finalized;
 }
 
 void Solver::addGoal(Goal *goal) {

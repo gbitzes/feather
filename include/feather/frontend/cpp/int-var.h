@@ -32,6 +32,9 @@ class IntVar {
 		IntVar(IntVarID id, Solver& slv);
 		IntVar();
 
+		void remove(Int, Int);
+		void remove(Int);
+		bool contains(Int) const;
 
 		/*
 		 * The default, member-wise copy
@@ -62,7 +65,7 @@ class IntVar {
 		 * variable
 		 */
 
-		bool operator==(const IntVar other) const;
+		bool equals(const IntVar other) const;
 };
 
 

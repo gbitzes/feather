@@ -133,3 +133,30 @@ class Constr_XeqCmodZ : public Constraint {
 			 : Constraint(Constraints::XeqCmodZ), fC(c), fX(x), fZ(z) { } 
 };
 
+class Constr_XeqAbsY : public Constraint {
+	public:
+
+		const IntVarID fY;
+
+		Constr_XeqAbsY(IntVarID y)
+			 : Constraint(Constraints::XeqAbsY), fY(y) { } 
+};
+
+class Constr_XeqY : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+
+		Constr_XeqY(IntVarID x, IntVarID y)
+			 : Constraint(Constraints::XeqY), fX(x), fY(y) { } 
+};
+
+class Constr_XneqY : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+
+		Constr_XneqY(IntVarID x, IntVarID y)
+			 : Constraint(Constraints::XneqY), fX(x), fY(y) { } 
+};
+
