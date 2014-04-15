@@ -18,6 +18,42 @@ class Constr_XlesseqthanY : public Constraint {
 			 : Constraint(Constraints::XlesseqthanY), fX(x), fY(y) { } 
 };
 
+class Constr_XeqAbsY : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+
+		Constr_XeqAbsY(IntVarID x, IntVarID y)
+			 : Constraint(Constraints::XeqAbsY), fX(x), fY(y) { } 
+};
+
+class Constr_XeqY : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+
+		Constr_XeqY(IntVarID x, IntVarID y)
+			 : Constraint(Constraints::XeqY), fX(x), fY(y) { } 
+};
+
+class Constr_XneqY : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+
+		Constr_XneqY(IntVarID x, IntVarID y)
+			 : Constraint(Constraints::XneqY), fX(x), fY(y) { } 
+};
+
+class Constr_XorY : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+
+		Constr_XorY(IntVarID x, IntVarID y)
+			 : Constraint(Constraints::XorY), fX(x), fY(y) { } 
+};
+
 class Constr_XeqYplusC : public Constraint {
 	public:
 
@@ -38,6 +74,26 @@ class Constr_XeqYdivC : public Constraint {
 			 : Constraint(Constraints::XeqYdivC), fX(x), fY(y), fC(c) { } 
 };
 
+class Constr_XeqYtimesC : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+		const Int fC;
+
+		Constr_XeqYtimesC(IntVarID x, IntVarID y, Int c)
+			 : Constraint(Constraints::XeqYtimesC), fX(x), fY(y), fC(c) { } 
+};
+
+class Constr_XeqYmodC : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+		const Int fC;
+
+		Constr_XeqYmodC(IntVarID x, IntVarID y, Int c)
+			 : Constraint(Constraints::XeqYmodC), fX(x), fY(y), fC(c) { } 
+};
+
 class Constr_XeqYplusZ : public Constraint {
 	public:
 
@@ -56,16 +112,6 @@ class Constr_XeqYminusZ : public Constraint {
 			 : Constraint(Constraints::XeqYminusZ), fX(x), fY(y), fZ(z) { } 
 };
 
-class Constr_XeqCminusZ : public Constraint {
-	public:
-
-		const Int fC;
-		const IntVarID fX, fZ;
-
-		Constr_XeqCminusZ(Int c, IntVarID x, IntVarID z)
-			 : Constraint(Constraints::XeqCminusZ), fC(c), fX(x), fZ(z) { } 
-};
-
 class Constr_XeqYtimesZ : public Constraint {
 	public:
 
@@ -73,16 +119,6 @@ class Constr_XeqYtimesZ : public Constraint {
 
 		Constr_XeqYtimesZ(IntVarID x, IntVarID y, IntVarID z)
 			 : Constraint(Constraints::XeqYtimesZ), fX(x), fY(y), fZ(z) { } 
-};
-
-class Constr_XeqYtimesC : public Constraint {
-	public:
-
-		const IntVarID fX, fY;
-		const Int fC;
-
-		Constr_XeqYtimesC(IntVarID x, IntVarID y, Int c)
-			 : Constraint(Constraints::XeqYtimesC), fX(x), fY(y), fC(c) { } 
 };
 
 class Constr_XeqYdivZ : public Constraint {
@@ -94,16 +130,6 @@ class Constr_XeqYdivZ : public Constraint {
 			 : Constraint(Constraints::XeqYdivZ), fX(x), fY(y), fZ(z) { } 
 };
 
-class Constr_XeqCdivZ : public Constraint {
-	public:
-
-		const Int fC;
-		const IntVarID fX, fZ;
-
-		Constr_XeqCdivZ(Int c, IntVarID x, IntVarID z)
-			 : Constraint(Constraints::XeqCdivZ), fC(c), fX(x), fZ(z) { } 
-};
-
 class Constr_XeqYmodZ : public Constraint {
 	public:
 
@@ -113,50 +139,142 @@ class Constr_XeqYmodZ : public Constraint {
 			 : Constraint(Constraints::XeqYmodZ), fX(x), fY(y), fZ(z) { } 
 };
 
-class Constr_XeqYmodC : public Constraint {
+class Constr_XeqCminusZ : public Constraint {
 	public:
 
-		const IntVarID fX, fY;
+		const IntVarID fX;
 		const Int fC;
+		const IntVarID fZ;
 
-		Constr_XeqYmodC(IntVarID x, IntVarID y, Int c)
-			 : Constraint(Constraints::XeqYmodC), fX(x), fY(y), fC(c) { } 
+		Constr_XeqCminusZ(IntVarID x, Int c, IntVarID z)
+			 : Constraint(Constraints::XeqCminusZ), fX(x), fC(c), fZ(z) { } 
+};
+
+class Constr_XeqCdivZ : public Constraint {
+	public:
+
+		const IntVarID fX;
+		const Int fC;
+		const IntVarID fZ;
+
+		Constr_XeqCdivZ(IntVarID x, Int c, IntVarID z)
+			 : Constraint(Constraints::XeqCdivZ), fX(x), fC(c), fZ(z) { } 
 };
 
 class Constr_XeqCmodZ : public Constraint {
 	public:
 
+		const IntVarID fX;
 		const Int fC;
-		const IntVarID fX, fZ;
+		const IntVarID fZ;
 
-		Constr_XeqCmodZ(Int c, IntVarID x, IntVarID z)
-			 : Constraint(Constraints::XeqCmodZ), fC(c), fX(x), fZ(z) { } 
+		Constr_XeqCmodZ(IntVarID x, Int c, IntVarID z)
+			 : Constraint(Constraints::XeqCmodZ), fX(x), fC(c), fZ(z) { } 
 };
 
-class Constr_XeqAbsY : public Constraint {
-	public:
-
-		const IntVarID fY;
-
-		Constr_XeqAbsY(IntVarID y)
-			 : Constraint(Constraints::XeqAbsY), fY(y) { } 
-};
-
-class Constr_XeqY : public Constraint {
+class Constr_MetaXeqYlessthanC : public Constraint {
 	public:
 
 		const IntVarID fX, fY;
+		const Int fC;
 
-		Constr_XeqY(IntVarID x, IntVarID y)
-			 : Constraint(Constraints::XeqY), fX(x), fY(y) { } 
+		Constr_MetaXeqYlessthanC(IntVarID x, IntVarID y, Int c)
+			 : Constraint(Constraints::MetaXeqYlessthanC), fX(x), fY(y), fC(c) { } 
 };
 
-class Constr_XneqY : public Constraint {
+class Constr_MetaXeqYlesseqthanC : public Constraint {
 	public:
 
 		const IntVarID fX, fY;
+		const Int fC;
 
-		Constr_XneqY(IntVarID x, IntVarID y)
-			 : Constraint(Constraints::XneqY), fX(x), fY(y) { } 
+		Constr_MetaXeqYlesseqthanC(IntVarID x, IntVarID y, Int c)
+			 : Constraint(Constraints::MetaXeqYlesseqthanC), fX(x), fY(y), fC(c) { } 
+};
+
+class Constr_MetaXeqYgreaterthanC : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+		const Int fC;
+
+		Constr_MetaXeqYgreaterthanC(IntVarID x, IntVarID y, Int c)
+			 : Constraint(Constraints::MetaXeqYgreaterthanC), fX(x), fY(y), fC(c) { } 
+};
+
+class Constr_MetaXeqYgreatereqthanC : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+		const Int fC;
+
+		Constr_MetaXeqYgreatereqthanC(IntVarID x, IntVarID y, Int c)
+			 : Constraint(Constraints::MetaXeqYgreatereqthanC), fX(x), fY(y), fC(c) { } 
+};
+
+class Constr_MetaXeqYeqC : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+		const Int fC;
+
+		Constr_MetaXeqYeqC(IntVarID x, IntVarID y, Int c)
+			 : Constraint(Constraints::MetaXeqYeqC), fX(x), fY(y), fC(c) { } 
+};
+
+class Constr_MetaXeqYneqC : public Constraint {
+	public:
+
+		const IntVarID fX, fY;
+		const Int fC;
+
+		Constr_MetaXeqYneqC(IntVarID x, IntVarID y, Int c)
+			 : Constraint(Constraints::MetaXeqYneqC), fX(x), fY(y), fC(c) { } 
+};
+
+class Constr_MetaXeqYlessthanZ : public Constraint {
+	public:
+
+		const IntVarID fX, fY, fZ;
+
+		Constr_MetaXeqYlessthanZ(IntVarID x, IntVarID y, IntVarID z)
+			 : Constraint(Constraints::MetaXeqYlessthanZ), fX(x), fY(y), fZ(z) { } 
+};
+
+class Constr_MetaXeqYlesseqthanZ : public Constraint {
+	public:
+
+		const IntVarID fX, fY, fZ;
+
+		Constr_MetaXeqYlesseqthanZ(IntVarID x, IntVarID y, IntVarID z)
+			 : Constraint(Constraints::MetaXeqYlesseqthanZ), fX(x), fY(y), fZ(z) { } 
+};
+
+class Constr_MetaXeqYandZ : public Constraint {
+	public:
+
+		const IntVarID fX, fY, fZ;
+
+		Constr_MetaXeqYandZ(IntVarID x, IntVarID y, IntVarID z)
+			 : Constraint(Constraints::MetaXeqYandZ), fX(x), fY(y), fZ(z) { } 
+};
+
+class Constr_MetaXeqYorZ : public Constraint {
+	public:
+
+		const IntVarID fX, fY, fZ;
+
+		Constr_MetaXeqYorZ(IntVarID x, IntVarID y, IntVarID z)
+			 : Constraint(Constraints::MetaXeqYorZ), fX(x), fY(y), fZ(z) { } 
+};
+
+class Constr_MetaXeqYeqZ : public Constraint {
+	public:
+
+		const IntVarID fX, fY, fZ;
+		const bool fNeg;
+
+		Constr_MetaXeqYeqZ(IntVarID x, IntVarID y, IntVarID z, bool neg)
+			 : Constraint(Constraints::MetaXeqYeqZ), fX(x), fY(y), fZ(z), fNeg(neg) { } 
 };
 

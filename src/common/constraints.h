@@ -13,23 +13,35 @@ namespace feather {
 
 namespace Constraints {
 	enum Type {
-		XeqYplusC = 0,
-		XlessthanY,
+		XlessthanY = 0,
 		XlesseqthanY,
-		XeqYdivC,
-		XeqYplusZ,
-		XeqYminusZ,
-		XeqCminusZ,
-		XeqYtimesZ,
-		XeqYtimesC,
-		XeqYdivZ,
-		XeqCdivZ,
-		XeqYmodZ,
-		XeqYmodC,
-		XeqCmodZ,
 		XeqAbsY,
 		XeqY,
-		XneqY
+		XneqY,
+		XorY,
+		XeqYplusC,
+		XeqYdivC,
+		XeqYtimesC,
+		XeqYmodC,
+		XeqYplusZ,
+		XeqYminusZ,
+		XeqYtimesZ,
+		XeqYdivZ,
+		XeqYmodZ,
+		XeqCminusZ,
+		XeqCdivZ,
+		XeqCmodZ,
+		MetaXeqYlessthanC,
+		MetaXeqYlesseqthanC,
+		MetaXeqYgreaterthanC,
+		MetaXeqYgreatereqthanC,
+		MetaXeqYeqC,
+		MetaXeqYneqC,
+		MetaXeqYlessthanZ,
+		MetaXeqYlesseqthanZ,
+		MetaXeqYeqZ,
+		MetaXeqYandZ,
+		MetaXeqYorZ
 	};
 };
 
@@ -48,36 +60,6 @@ class Constraint {
  */
 
 #include <common/constraints.icc>
-
-// class Constr_XlessthanY : public Constraint {
-// 	public:
-
-// 		const IntVarID fX, fY;
-
-// 		Constr_XlessthanY(IntVarID x, IntVarID y)
-// 			 : Constraint(Constraints::XlessthanY), fX(x), fY(y) { } 
-// };
-
-// class Constr_XlesseqthanY : public Constraint {
-// 	public:
-
-// 		const IntVarID fX, fY;
-
-// 		Constr_XlesseqthanY(IntVarID x, IntVarID y)
-// 			 : Constraint(Constraints::XlesseqthanY), fX(x), fY(y) { } 
-// };
-
-// class Constr_XeqYplusC : public Constraint {
-// 	public:
-
-// 		const IntVarID fX, fY;
-// 		const Int fC;
-
-// 		Constr_XeqYplusC(IntVarID x, IntVarID y, Int c)
-// 			 : Constraint(Constraints::XeqYplusC), fX(x), fY(y), fC(c) { } 
-// };
-
-
 
 } // namespace feather
 #endif

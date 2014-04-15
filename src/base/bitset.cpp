@@ -164,12 +164,12 @@ Bitset::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
 
 	/* Domain to be cleared? */
 	if(rangeMin <= minval  &&  maxval <= rangeMax) {
-		return wouldclear;
+		return WOULDCLEAR;
 	}
 
 	/* Domain remains intact? */
 	if(rangeMax < minval  ||  maxval < rangeMin) {
-		return nochange;
+		return NOCHANGE;
 	}
 
 	/* Domain will be altered - need to save? */
@@ -194,12 +194,12 @@ Bitset::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
 		 if(rangeMin <= minval) {
 		 	setcount -= rangeMax + 1 - minval;
 		 	minval = rangeMax + 1;
-		 	return change;
+		 	return CHANGE;
 		 }
 		 else if(maxval <= rangeMax) {
 		 	setcount -= maxval - (rangeMin - 1);
 		 	maxval = rangeMin - 1;
-		 	return change;
+		 	return CHANGE;
 		 }
 		 else {
 		 	/*
@@ -256,7 +256,7 @@ Bitset::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
 	if (rangeMax == maxval)
 		maxval = previous(maxval);
 
-	return change;
+	return CHANGE;
 }
 
 bool Bitset::contains(const Int val) const {

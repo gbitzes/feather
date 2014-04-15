@@ -104,7 +104,7 @@ void IntVar::remove(Int from, Int to) {
 		FEATHER_THROW("Problem has been finalized - not possible to make changes");
 	if(from > to)
 		FEATHER_THROW("Invalid range");
-	if( representationDomain->removeRange(from, to) == IntDomain::wouldclear )
+	if( representationDomain->removeRange(from, to) == IntDomain::WOULDCLEAR )
 		FEATHER_THROW("Removal of values would give an empty domain");
 }
 

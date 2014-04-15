@@ -115,5 +115,5 @@ TEST(frontend_Expressions, T3 ) {
 	ASSERT_FALSE(d.contains(5));
 
 	ASSERT_THROW(slv.addConstraint(d==5), FeatherException);
-
 }
+

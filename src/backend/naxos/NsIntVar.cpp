@@ -104,7 +104,7 @@ bool NsIntVar::removeRange(const Int first, const Int last, const Ns_Constraint 
 
 		result = domain->removeRange(first, last, saveonchange);
 		
-		modified = result == IntDomain::change;
+		modified = result == IntDomain::CHANGE;
 		
 		if(modified) {
 			naxos.domainModified(domain);

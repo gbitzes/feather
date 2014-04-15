@@ -80,12 +80,12 @@ IntRanges::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
 
 	/* Domain to be cleared? */
 	if ( rangeMin <= minval  &&  maxval <= rangeMax ) {
-		return wouldclear;
+		return WOULDCLEAR;
 	}
 
 	/* Domain remains intact? */
 	if ( rangeMax < minval  ||  maxval < rangeMin ) {
-		return nochange;
+		return NOCHANGE;
 	}
 
 	/*
@@ -232,7 +232,7 @@ IntRanges::removeRange(Int rangeMin, Int rangeMax, bool saveOnChange) {
 	maxval = (--intervals.end())->second;
 
 	// cout << "result: " << *this << endl;
-	return change;
+	return CHANGE;
 }
 
 Int IntRanges::next (const Int val) const {

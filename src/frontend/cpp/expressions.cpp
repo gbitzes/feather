@@ -6,6 +6,12 @@
 
 namespace feather {
 
+namespace {
+	bool intersectionEmpty(IntVar &Y, IntVar Z) {
+		return (Y.min() > Z.max()) || (Y.max() < Z.min());
+	}
+}
+
 
 /*
  * Y + C
@@ -107,10 +113,17 @@ namespace feather {
  */
 
 	IntVar ExprConstrYlessthanC::postC() {
-		// Solver &slv = Y.getSolver();
-		// if(isPositive) {
-		// 	IntVarID id = slv.makeIntVar(Y.max() < C, Y.min() < C);
-		// }
+		Solver &slv = Y.getSolver();
+		IntVarID id;
+		if(isPositive) {
+			id = slv.makeIntVar(Y.max() < C, Y.min() < C);
+			slv.addConstraint( new Constr_MetaXeqYlessthanC(id, Y.getID(), C) );
+		}
+		else {
+			id = slv.makeIntVar(Y.min() >= C, Y.max() >= C);
+			slv.addConstraint( new Constr_MetaXeqYgreatereqthanC(id, Y.getID(), C));
+		}
+		return IntVar(id, slv);
 	}
 
 	Constraint const* ExprConstrYlessthanC::postConstraint() {
@@ -126,7 +139,16 @@ namespace feather {
   */
 
  	IntVar ExprConstrYlesseqthanC::postC() {
-
+ 		Solver &slv = Y.getSolver();
+ 		IntVarID id;
+ 		if(isPositive) {
+ 			id = slv.makeIntVar(Y.max() <= C, Y.min() <= C);
+ 			slv.addConstraint( new Constr_MetaXeqYlesseqthanC(id, Y.getID(), C));
+ 		}
+ 		else {
+ 			id = slv.makeIntVar(Y.min() > C, Y.max() > C);
+ 			slv.addConstraint( new Constr_MetaXeqYgreaterthanC(id, Y.getID(), C));
+ 		}
  	}
 
 	Constraint const* ExprConstrYlesseqthanC::postConstraint() {
@@ -137,8 +159,21 @@ namespace feather {
 		return NULL;
 	}
 
-	IntVar ExprConstrYeqC::postC() {
+  /*
+   * Y == C
+   */
 
+	IntVar ExprConstrYeqC::postC() {
+		Solver &slv = Y.getSolver();
+		IntVarID id;
+		if(isPositive) {
+			id = slv.makeIntVar(Y.min()==C && Y.max()==C, Y.contains(C) );
+			slv.addConstraint( new Constr_MetaXeqYeqC(id, Y.getID(), C));
+		}
+		else {
+			id = slv.makeIntVar(!Y.contains(C), (Y.min()!=C || Y.max()!=C) );
+			slv.addConstraint( new Constr_MetaXeqYneqC(id, Y.getID(), C));
+		}
 	}
 
 	Constraint const* ExprConstrYeqC::postConstraint() {
@@ -158,7 +193,16 @@ namespace feather {
   */
 
   	IntVar ExprConstrYlessthanZ::postC() {
-
+  		Solver &slv = Y.getSolver();
+  		IntVarID id;
+  		if(isPositive) {
+  			id = slv.makeIntVar(Y.max() < Z.min(), Y.min() < Z.max());
+  			slv.addConstraint( new Constr_MetaXeqYlessthanZ(id, Y.getID(), Z.getID()) );
+  		}
+  		else {
+  			id = slv.makeIntVar(Z.max() <= Y.min(), Z.min() <= Y.max());
+			slv.addConstraint( new Constr_MetaXeqYlesseqthanZ(id, Z.getID(), Y.getID() ));
+  		}
   	}
 
   	Constraint const* ExprConstrYlessthanZ::postConstraint() {
@@ -173,7 +217,16 @@ namespace feather {
    */
 
    	IntVar ExprConstrYlesseqthanZ::postC() {
-
+  		Solver &slv = Y.getSolver();
+  		IntVarID id;
+  		if(isPositive) {
+  			id = slv.makeIntVar(Y.max() <= Z.min(), Y.min() <= Z.max());
+  			slv.addConstraint( new Constr_MetaXeqYlesseqthanZ(id, Y.getID(), Z.getID()) );
+  		}
+  		else {
+  			id = slv.makeIntVar(Z.max() < Y.min(), Z.min() < Y.max());
+			slv.addConstraint( new Constr_MetaXeqYlessthanZ(id, Z.getID(), Y.getID() ));
+  		}
   	}
 
   	Constraint const* ExprConstrYlesseqthanZ::postConstraint() {
@@ -188,7 +241,16 @@ namespace feather {
    */
 
    	IntVar ExprConstrYeqZ::postC() {
-
+  		Solver &slv = Y.getSolver();
+  		IntVarID id;
+  		if(isPositive) {
+  			id = slv.makeIntVar(Y.max()==Z.min() && Y.min()==Z.max(), !intersectionEmpty(Y, Z) );
+  			slv.addConstraint( new Constr_MetaXeqYeqZ(id, Y.getID(), Z.getID(), false));
+  		}
+  		else {
+  			id = slv.makeIntVar(intersectionEmpty(Y, Z), !(Y.max()==Z.min() && Y.min()==Z.max()) );
+			slv.addConstraint( new Constr_MetaXeqYeqZ(id, Z.getID(), Y.getID(), true));
+  		}
   	}
 
   	Constraint const* ExprConstrYeqZ::postConstraint() {
