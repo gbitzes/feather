@@ -24,6 +24,17 @@ class NsIntVar {
 		Ns_HistoryId_t  lastSaveId;
 
 	public:
+		typedef IntDomain::Iterator const_iterator;
+
+		const const_iterator begin() const {
+			return domain->begin();
+		}
+
+		const const_iterator end() const {
+			return domain->end();
+		}
+
+
 		NsIntVar(IntDomain *domain, Naxos&);
 		~NsIntVar();
 
@@ -67,9 +78,23 @@ class NsIntVar {
 			return domain->size();
 		}
 
+		Int previous (const Int toVal)  const {
+			return  domain->previous(toVal);
+		}
+
+		Int next (const Int toVal)  const {
+			return  domain->next(toVal);
+		}
+
 		Naxos& manager() const {
 			return naxos;
 		}
+
+		Int value() const {
+			FEATHER_ASSERT( isBound() );
+			return domain->min();
+		}
+
 
 		Int min() const {
 			return domain->min();
@@ -78,6 +103,16 @@ class NsIntVar {
 		Int max() const {
 			return domain->max();
 		}
+
+		bool contains(const Int val) const {
+			return contains(val, val);
+		}
+
+		bool contains (const Int first, const Int last)  const {
+			return domain->containsRange(first, last);
+		}
+
+
 
 		IntDomain const* getDomain() const {
 			return domain;

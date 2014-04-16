@@ -61,9 +61,9 @@ class Ns_Constraint {
 
 class Ns_ConstrXlessthanY : public Ns_Constraint {
 	private:
-		NsIntVar *varX, *varY;
+		NsIntVar *VarX, *VarY;
 	public:
-		Ns_ConstrXlessthanY(NsIntVar *x, NsIntVar *y) : varX(x), varY(y) {
+		Ns_ConstrXlessthanY(NsIntVar *x, NsIntVar *y) : VarX(x), VarY(y) {
 			FEATHER_ASSERT(  &x->manager() == &y->manager() );
 		}
 
@@ -75,9 +75,9 @@ class Ns_ConstrXlessthanY : public Ns_Constraint {
 
 class Ns_ConstrXlesseqthanY : public Ns_Constraint {
 	private:
-		NsIntVar *varX, *varY;
+		NsIntVar *VarX, *VarY;
 	public:
-		Ns_ConstrXlesseqthanY(NsIntVar *x, NsIntVar *y) : varX(x), varY(y) {
+		Ns_ConstrXlesseqthanY(NsIntVar *x, NsIntVar *y) : VarX(x), VarY(y) {
 			FEATHER_ASSERT( &x->manager() == &y->manager() );
 		}
 
@@ -554,6 +554,61 @@ class Ns_ConstrXorY : public Ns_Constraint  {
 		virtual void LocalArcCons(Ns_QueueItem&);
 };
 
+class Ns_ConstrXeqY : public Ns_Constraint  {
+
+	private:
+
+		NsIntVar  *VarX, *VarY;
+
+
+	public:
+
+		Ns_ConstrXeqY (NsIntVar *X, NsIntVar *Y)
+		 : VarX(X), VarY(Y)
+		{
+			revisionType  =  BIDIRECTIONAL_CONSISTENCY;
+
+
+			FEATHER_ASSERT( &VarX->manager() == &VarY->manager());
+		}
+
+		virtual int   varsInvolvedIn (void)  const    {  return 2;  }
+		virtual void  ArcCons      (void);
+		virtual void  LocalArcCons (Ns_QueueItem& Qitem);
+};
+
+class Ns_ConstrXneqY : public Ns_Constraint  {
+	private:
+		NsIntVar *VarX, *VarY;
+	public:
+		Ns_ConstrXneqY (NsIntVar *X, NsIntVar *Y)
+		 : VarX(X), VarY(Y)
+		{
+			FEATHER_ASSERT( &VarX->manager() == &VarY->manager());
+		}
+
+		virtual int   varsInvolvedIn (void)  const    {  return 2;  }
+		virtual void  ArcCons      (void);
+		virtual void  LocalArcCons (Ns_QueueItem& Qitem);
+};
+
+class Ns_ConstrXeqAbsY : public Ns_Constraint  {
+	private:
+		NsIntVar  *VarX, *VarY;
+	public:
+		Ns_ConstrXeqAbsY (NsIntVar *X, NsIntVar *Y)
+		 : VarX(X), VarY(Y)
+		{
+			revisionType  =  BIDIRECTIONAL_CONSISTENCY;
+
+
+			FEATHER_ASSERT( &VarX->manager() == &VarY->manager() );
+		}
+
+		virtual int   varsInvolvedIn (void)  const    {  return 2;  }
+		virtual void  ArcCons      (void);
+		virtual void  LocalArcCons (Ns_QueueItem& Qitem);
+};
 
 
 
