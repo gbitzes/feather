@@ -107,10 +107,10 @@ bool NsIntVar::removeRange(const Int first, const Int last, const Ns_Constraint 
 		
 		modified = result == IntDomain::CHANGE;
 		
-		if(modified) {
+		if(saveonchange && result == IntDomain::CHANGE) {
 			naxos.domainModified(domain);
 			lastSaveId = naxos.getCurrentHistoryId();
-		}
+		} 
 
 		// modified = true;
 

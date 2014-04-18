@@ -113,3 +113,6 @@ TEST(frontend_Solver, nqueens11) {
 	std::cout << nqueens(11) << std::endl;
 }
 
+TEST(frontend_Solver, nqueens12) {
+	std::cout << nqueens(12) << std::endl;
+}
