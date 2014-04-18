@@ -513,3 +513,25 @@ TYPED_TEST(base_IntDomain, Stress17) {
 
 	delete domain;
 }
+
+TYPED_TEST(base_IntDomain, Stress18) {
+	IntDomain *domain = this->factory(0, 10);
+	domain->removeRange(5, 7);
+	domain->removeRange(2, 3);
+	domain->removeRange(9, 9);
+
+	IntDomain::Iterator iter = domain->begin();
+	ASSERT_EQ(*iter, 0);
+	++iter;
+	ASSERT_EQ(*iter, 1);
+	++iter;
+	ASSERT_EQ(*iter, 4);
+	++iter;
+	ASSERT_EQ(*iter, 8);
+	++iter;
+	ASSERT_EQ(*iter, 10);
+	++iter;
+	ASSERT_EQ(iter, domain->end());
+
+	delete domain;
+}

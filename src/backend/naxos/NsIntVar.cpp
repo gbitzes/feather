@@ -1,6 +1,7 @@
 #include "NsIntVar.h"
 #include <backend/naxos/naxos.h>
 #include <backend/naxos/Ns_Constraint.h>
+#include <base/bitset.h>
 
 namespace feather {
 
@@ -93,7 +94,7 @@ bool NsIntVar::removeRange(const Int first, const Int last, const Ns_Constraint 
 		}
 	}
 
-	if (!rangeEmpty)    {
+	if (!rangeEmpty && !isTransparent)    {
 		
 		IntDomain::RemovalResult result;
 		bool saveonchange = false;
@@ -127,18 +128,32 @@ bool NsIntVar::removeRange(const Int first, const Int last, const Ns_Constraint 
 	return  true;
 }
 
-
+void NsIntVar::removeAll() {
+	naxos.foundAnInconsistency();
+}
 
 NsIntVar::NsIntVar(IntDomain *domain, Naxos &naxos_) : naxos(naxos_) {
 	this->domain = domain;
 	arcsConnectedTo = 0;
 	constraintNeedsRemovedValues = false;
 	queueItem = 0;
+	isTransparent = false;
 
 	/* Making lastSaveId dirty as the domain has not been saved */
 	lastSaveId.id     =  kUPlusInf;
 	lastSaveId.level  =  0;
+}
 
+NsIntVar::NsIntVar(Naxos& naxos_, Int min, Int max) : naxos(naxos_) {
+	this->domain = new Bitset(min, max);
+	arcsConnectedTo = 0;
+	constraintNeedsRemovedValues = false;
+	queueItem = 0;
+	isTransparent = false;
+
+	/* Making lastSaveId dirty as the domain has not been saved */
+	lastSaveId.id     =  kUPlusInf;
+	lastSaveId.level  =  0;	
 }
 
 NsIntVar::~NsIntVar() {

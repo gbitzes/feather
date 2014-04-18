@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.6)
 set(GTEST ${CMAKE_SOURCE_DIR}/external/gtest )
 set(GTEST_BINARY_DIR ${CMAKE_BINARY_DIR}/external/gtest )
 
+add_definitions("-std=c++11")
+
 # Download and configure gtest
 if (NOT EXISTS ${GTEST} )
 	message("Gtest not found - downloading and extracting...")

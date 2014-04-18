@@ -3,6 +3,7 @@
 
 #include <backend/naxos/NsIntVar.h>
 #include <base/utils.h>
+#include "NsIntVarArray.h"
 
 namespace feather {
 
@@ -610,11 +611,101 @@ class Ns_ConstrXeqAbsY : public Ns_Constraint  {
 		virtual void  LocalArcCons (Ns_QueueItem& Qitem);
 };
 
+class Ns_ConstrAllDiff : public Ns_Constraint {
+	private:
+		NsIntVarArray *VarArr;
+	public:
+		Ns_ConstrAllDiff(NsIntVarArray *VarArr_init);
+
+		virtual int varsInvolvedIn() const { return VarArr->size(); }
+
+		virtual void  ArcCons      (void);
+		virtual void  LocalArcCons (Ns_QueueItem& Qitem);
+};
+
+class Ns_ConstrAllDiffStrong : public Ns_Constraint  {
+
+	public:
+
+		//  `groupedNsIntVar', as the name suggests, is a class that
+		//   extends `NsIntVar', by adding the information concerning
+		//   the id of the group taht the constrained variable belongs to.
+
+		class  groupedNsIntVar  {
+
+			public:
+
+				NsIntVar&  Var;
+
+			private:
+
+				NsIntVar  vGroup;
+
+
+			public:
+
+				typedef  Int  group_t;
+
+				static const group_t  FIRST_GROUP  =  kMinusInf + 1;
+
+
+				groupedNsIntVar (NsIntVar& Var_init)
+				 : Var(Var_init), vGroup(Var.manager(), FIRST_GROUP, kPlusInf-1)	{	}
+
+					group_t
+				group (void)
+				{
+					return  vGroup.min();
+				}
+
+
+					void
+				setGroup (const group_t groupVal)
+				{
+					assert_Ns( vGroup.contains(groupVal-1),  "groupedNsIntVar::setGroup: `groupVal-1' is not contained in`vGroup'" );
+					assert_Ns( vGroup.removeRange(kMinusInf, groupVal-1, 0),  "groupedNsIntVar::setGroup: Could not change group to `groupVal'" );
+					assert_Ns( group() == groupVal,  "groupedNsIntVar::setGroup: Not succesful change of group to `groupVal'" );
+				}
+
+
+				bool  removeDomain (const NsIntVar& V, const Ns_Constraint *c);
+		};
 
 
 
+	private:
+
+		NsDeque<groupedNsIntVar>  VarArr;
+
+		typedef  Ns_UNORDERED_MAP<Ns_pointer_t,groupedNsIntVar*>  VarPointerGroup_t;
+
+		VarPointerGroup_t  VarPointerGroup;
+
+		//NsIntVarArray  VarArrGroup;
+		//NsIntVar       vGroupCounter;
+
+		const unsigned long   Capacity;
 
 
+	public:
+
+		Ns_ConstrAllDiffStrong (NsIntVarArray *VarArr_init, const unsigned long Cap);
+
+		virtual int   varsInvolvedIn (void)  const    {  return VarArr.size();  }
+
+
+		//	virtual void
+		//toGraphFile (std::ofstream& fileConstraintsGraph)  const
+		//{
+		//	Ns_arrayConstraintToGraphFile(
+		//		fileConstraintsGraph,
+		//		&VarArr, this, "!= strong");
+		//}
+
+
+		virtual void  ArcCons      (void);
+		virtual void  LocalArcCons (Ns_QueueItem& Qitem);
+};
 
 } // namespace feather
 

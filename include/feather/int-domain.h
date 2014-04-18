@@ -158,7 +158,105 @@ class IntDomain {
 				}
 		};
 
+		class ReverseIterator {
+			private:
+				const IntDomain *domain;
+				IntDomainPosition *pos;
+				Int value;
+			public:
+				ReverseIterator() {
+					domain = NULL;
+					pos = NULL;
+					value = kPlusInf;
+				}
+
+				~ReverseIterator() {
+					if(pos != NULL)
+						delete pos;
+				}
+
+				ReverseIterator(const IntDomain &_domain) {
+					domain = &_domain;
+					value = domain->max();
+					pos = domain->getPosition(value);
+				}
+
+				bool operator==(const ReverseIterator& b) const {
+					return value == b.value;
+				}
+
+				bool operator!=(const ReverseIterator& b) const {
+					return !(*this == b);
+				}
+
+				// TODO: throw exception if ReverseIterator has reached the end?
+				Int operator*() const {
+					return pos->value;
+				}
+
+				ReverseIterator& operator++() {
+					value = domain->moveback(*pos);
+					return *this;
+				}
+
+				ReverseIterator& operator--() {
+					value = domain->advance(*pos);
+					return *this;
+				}
+
+				ReverseIterator& end() {
+					pos->value = kMinusInf;
+					value = kMinusInf;
+					return *this;
+				}
+		};
+
+		class GapIterator {
+			private:
+				const IntDomain *domain;
+				Int value;
+			public:
+				GapIterator() {
+					domain = NULL;
+					value = kPlusInf;
+				}
+
+				~GapIterator() {
+				}
+
+				GapIterator(const IntDomain &_domain) {
+					domain = &_domain;
+					value = domain->nextGap(domain->min());
+				}
+
+				bool operator==(const GapIterator& b) const {
+					return value == b.value;
+				}
+
+				bool operator!=(const GapIterator& b) const {
+					return !(*this == b);
+				}
+
+				// TODO: throw exception if GapIterator has reached the end?
+				Int operator*() const {
+					return value;
+				}
+
+				GapIterator& operator++() {
+					value = domain->nextGap(value);
+					return *this;
+				}
+
+				GapIterator& end() {
+					value = kPlusInf;
+					return *this;
+				}
+		};
+
+
 		friend class Iterator;
+		friend class ReverseIterator;
+		friend class GapIterator;
 
 		const Iterator begin() const {
 			return Iterator(*this);
@@ -167,6 +265,24 @@ class IntDomain {
 		const Iterator end() const {
 			return Iterator();
 		}
+
+		const ReverseIterator rbegin() const {
+			return ReverseIterator(*this);
+		}
+
+		const ReverseIterator rend() const {
+			return ReverseIterator();
+		}
+
+		const GapIterator gap_begin() const {
+			return GapIterator(*this);
+		}
+
+		const GapIterator gap_end() const {
+			return GapIterator();
+		}
+
+
 };
 
 } // namespace feather

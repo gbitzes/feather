@@ -24,9 +24,7 @@ namespace Constraints {
 		XeqYtimesC,
 		XeqYmodC,
 		XeqYplusZ,
-		XeqYminusZ,
 		XeqYtimesZ,
-		XeqYdivZ,
 		XeqYmodZ,
 		XeqCminusZ,
 		XeqCdivZ,
@@ -41,7 +39,9 @@ namespace Constraints {
 		MetaXeqYlesseqthanZ,
 		MetaXeqYeqZ,
 		MetaXeqYandZ,
-		MetaXeqYorZ
+		MetaXeqYorZ,
+		AllDiff,
+		AllDiffStrong
 	};
 };
 

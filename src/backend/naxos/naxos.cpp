@@ -1108,21 +1108,39 @@ Naxos::Naxos()
 }
 
 namespace {
-	void addXeqYopC(NsIntVar *varx, NsIntVar *vary, Ns_Constraint *constr) {
+	void addTwoVars(NsIntVar *varx, NsIntVar *vary, Ns_Constraint *constr) {
 		varx->addConstraint(constr);
 		vary->addConstraint(constr);
 		constr->ArcCons();
 	}
+
+	void addThreeVars(NsIntVar *varx, NsIntVar *vary, NsIntVar *varz, Ns_Constraint *constr) {
+		varx->addConstraint(constr);
+		vary->addConstraint(constr);
+		varz->addConstraint(constr);
+		constr->ArcCons();
+	}
+
+	void addArr(NsIntVarArray &arr, Ns_Constraint *constr) {
+		NsIndex i = 0;
+		for(i = 0; i < arr.size(); i++)
+			arr[i].addConstraint(constr);
+		constr->ArcCons();
+	}
+
 }
 
 Ns_Constraint* Naxos::addConstraint(const Constraint& con) {
 	switch(con.fType) {
-		case Constraints::XeqYplusC: {
-			const Constr_XeqYplusC &scon = static_cast<const Constr_XeqYplusC&>(con);
-			Ns_ConstrXeqYplusC *nscons = new Ns_ConstrXeqYplusC( vars[scon.fX], vars[scon.fY], scon.fC);
-			addXeqYopC(vars[scon.fX], vars[scon.fY], nscons);
-			return nscons;
+		#include "constraint-glue.icc"
+
+		case Constraints::AllDiff: {
+			const Constr_AllDiff &scon = static_cast<const Constr_AllDiff&>(con);
+			Ns_ConstrAllDiff *nscon = new Ns_ConstrAllDiff(vararrays[scon.fArr]);
+			addArr(*vararrays[scon.fArr], nscon);
+			return nscon;
 		}
+
 		default:
 			FEATHER_THROW("Unrecognized constraint");
 	}
@@ -1163,7 +1181,7 @@ void Naxos::addArray(const RepresentationIntVarArray& array) {
 	std::deque<IntVarID>::const_iterator it;
 	for(it = array.vars.begin(); it != array.vars.end(); it++) {
 		FEATHER_ASSERT( vars[*it] != NULL );
-		nsarray->push_back( vars[*it] );
+		nsarray->push_back( *vars[*it] );
 	}
 
 	vararrays[array.id] = nsarray;

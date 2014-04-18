@@ -8,6 +8,10 @@
 
 namespace feather {
 
+class IntRangesPosition : public IntDomainPosition {
+
+};
+
 class IntRanges : public IntDomain {
 
 	private:
@@ -41,9 +45,9 @@ class IntRanges : public IntDomain {
 		virtual void restore();
 
 	protected:
-		virtual IntDomainPosition* getPosition(const Int value) const {};
-		virtual Int advance(IntDomainPosition &pos) const {};
-		virtual Int moveback(IntDomainPosition &pos) const {};
+		virtual IntDomainPosition* getPosition(const Int value) const;
+		virtual Int advance(IntDomainPosition &pos) const;
+		virtual Int moveback(IntDomainPosition &pos) const;
 
 
 

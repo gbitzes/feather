@@ -23,7 +23,14 @@ class NsIntVar {
 		/* The timestamp that can be used in chronological backtracking */
 		Ns_HistoryId_t  lastSaveId;
 
+		bool isTransparent;
+
 	public:
+
+		void transparent() {
+			isTransparent = true;
+		}
+
 		typedef IntDomain::Iterator const_iterator;
 
 		const const_iterator begin() const {
@@ -34,8 +41,30 @@ class NsIntVar {
 			return domain->end();
 		}
 
+		typedef IntDomain::ReverseIterator const_reverse_iterator;
+
+		const const_reverse_iterator rbegin() const {
+			return domain->rbegin();
+		}
+
+		const const_reverse_iterator rend() const {
+			return domain->rend();
+		}
+
+		typedef IntDomain::GapIterator const_gap_iterator;
+
+		const const_gap_iterator gap_begin() const {
+			return domain->gap_begin();
+		}
+
+		const const_gap_iterator gap_end() const {
+			return domain->gap_end();
+		}
+
+
 
 		NsIntVar(IntDomain *domain, Naxos&);
+		NsIntVar(Naxos&, Int min, Int max);
 		~NsIntVar();
 
 		/*
@@ -46,7 +75,7 @@ class NsIntVar {
 		 */
 
 		void removeAll();
-
+		
 		bool removeSingle (const Int val, const Ns_Constraint *c) {
 			return  removeRange(val, val, c);
 		}

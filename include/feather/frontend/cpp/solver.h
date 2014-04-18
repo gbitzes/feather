@@ -19,6 +19,7 @@ class Solver {
 		bool finalized;
 		bool solving;
 		SolutionID currentSolutionID;
+		void finalize();
 	public:
 
 		IntDomain& getRepresentationDomain(IntVarID);
@@ -33,9 +34,8 @@ class Solver {
 		IntVarID makeIntVar(Int min, Int max);
 		IntVarArrayID makeIntVarArray();
 
-		void addConstraint(const Constraint *const constr);
+		void add(const Constraint *const constr);
 
-		void finalize();
 		bool isFinalized();
 
 		bool nextSolution();

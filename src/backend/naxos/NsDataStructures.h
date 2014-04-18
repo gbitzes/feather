@@ -6,6 +6,65 @@
 
 namespace feather {
 
+	/* A flexible array data structure (like std::deque)
+	   A safer version of \c std::deque that throws an exception when an
+	   out_of_range request is being made.  (It takes advantage of the
+	   internal at() method that does this work) 
+	*/
+
+	template <class TemplType> 
+	class  NsDeque : public std::deque<TemplType>  {
+
+		public:
+
+			NsDeque (void) : std::deque<TemplType>() {    
+			}
+
+			NsDeque (const typename std::deque<TemplType>::size_type n) : std::deque<TemplType>(n) {    
+			}
+
+			typename std::deque<TemplType>::reference 
+			operator  [] (const typename std::deque<TemplType>::size_type i) {
+				return  this->at(i);
+			}
+
+			typename std::deque<TemplType>::const_reference
+			operator  [] (const typename std::deque<TemplType>::size_type i)  const {
+				return  this->at(i);
+			}
+
+			typename std::deque<TemplType>::reference front (void) {
+				if ( std::deque<TemplType>::empty() )
+					throw  std::out_of_range("NsDeque::front: Empty deque");
+
+				return  std::deque<TemplType>::front();
+			}
+
+			typename std::deque<TemplType>::const_reference front (void)  const {
+				if ( std::deque<TemplType>::empty() )
+					throw  std::out_of_range("NsDeque::front: Empty deque");
+
+				return  std::deque<TemplType>::front();
+			}
+
+
+			typename std::deque<TemplType>::reference back (void) {
+				if ( std::deque<TemplType>::empty() )
+					throw  std::out_of_range("NsDeque::back: Empty deque");
+
+				return  std::deque<TemplType>::back();
+			}
+
+
+			typename std::deque<TemplType>::const_reference back (void)  const {
+				if ( std::deque<TemplType>::empty() )
+					throw  std::out_of_range("NsDeque::back: Empty deque");
+
+				return  std::deque<TemplType>::back();
+			} 
+	};
+
+
 template <class TemplType>
 class NsQueue : public std::queue<TemplType> {
 	public:

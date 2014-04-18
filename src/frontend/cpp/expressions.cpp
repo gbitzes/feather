@@ -23,7 +23,7 @@ namespace {
 
 		Solver &slv = Y.getSolver();
 		IntVarID id = slv.makeIntVar( Y.min()+C, Y.max()+C );
-		slv.addConstraint( new Constr_XeqYplusC(id, Y.getID(), C) );
+		slv.add( new Constr_XeqYplusC(id, Y.getID(), C) );
 
 		return IntVar(id, slv);
  	}
@@ -38,7 +38,7 @@ namespace {
 
 		Solver &slv = Y.getSolver();
 		IntVarID id = slv.makeIntVar( Y.min()/C, Y.max()/C );
-		slv.addConstraint( new Constr_XeqYdivC(id, Y.getID(), C) );
+		slv.add( new Constr_XeqYdivC(id, Y.getID(), C) );
 
 		return IntVar(id, slv);
  	}
@@ -50,7 +50,7 @@ namespace {
  	IntVar ExprYplusZ::post() {
 		Solver &slv = Y.getSolver();
 		IntVarID id = slv.makeIntVar( Y.min()+Z.min(), Y.max()+Z.max() );
-		slv.addConstraint( new Constr_XeqYplusZ(id, Y.getID(), Z.getID()) );
+		slv.add( new Constr_XeqYplusZ(id, Y.getID(), Z.getID()) );
 
 		return IntVar(id, slv);
  	}
@@ -62,8 +62,8 @@ namespace {
 
  	IntVar ExprYminusZ::post() {
 		Solver &slv = Y.getSolver();
-		IntVarID id = slv.makeIntVar( Y.min()-Z.min(), Y.max()-Z.max() );
-		slv.addConstraint( new Constr_XeqYminusZ(id, Y.getID(), Z.getID()) );
+		IntVarID id = slv.makeIntVar( Y.min()-Z.max(), Y.max()-Z.min() );
+		slv.add( new Constr_XeqYplusZ(Y.getID(), id, Z.getID()) );
 
 		return IntVar(id, slv);
  	}
@@ -74,8 +74,8 @@ namespace {
 
  	IntVar ExprCminusZ::post() {
 		Solver &slv = Z.getSolver();
-		IntVarID id = slv.makeIntVar( C-Z.min(), C-Z.max() );
-		slv.addConstraint( new Constr_XeqCminusZ(id, C, Z.getID()) );
+		IntVarID id = slv.makeIntVar( C-Z.max(), C-Z.min() );
+		slv.add( new Constr_XeqCminusZ(id, C, Z.getID()) );
 
 		return IntVar(id, slv);
  	}
@@ -87,7 +87,7 @@ namespace {
  	IntVar ExprYtimesZ::post() {
 		Solver &slv = Y.getSolver();
 		IntVarID id = slv.makeIntVar( Y.min()*Z.min(), Y.max()*Z.max() );
-		slv.addConstraint( new Constr_XeqYtimesZ(id, Y.getID(), Z.getID()) );
+		slv.add( new Constr_XeqYtimesZ(id, Y.getID(), Z.getID()) );
 
 		return IntVar(id, slv);
  	}
@@ -102,11 +102,25 @@ namespace {
 
 		Solver &slv = Y.getSolver();
 		IntVarID id = slv.makeIntVar( Y.min()*C, Y.max()*C );
-		slv.addConstraint( new Constr_XeqYtimesC(id, Y.getID(), C) );
+		slv.add( new Constr_XeqYtimesC(id, Y.getID(), C) );
 
 		return IntVar(id, slv);
  	}
 
+/*
+ * Y / Z
+ */
+
+ 	// IntVar ExprYdivZ::post() {
+ 	// 	if(C == 1)
+ 	// 		return Y;
+
+		// Solver &slv = Y.getSolver();
+		// IntVarID id = slv.makeIntVar( Y.min()*C, Y.max()*C );
+		// slv.add( new Constr_XeqYtimesC(id, Y.getID(), C) );
+
+		// return IntVar(id, slv);
+ 	// }
 
 /*
  * Y < C
@@ -117,11 +131,11 @@ namespace {
 		IntVarID id;
 		if(isPositive) {
 			id = slv.makeIntVar(Y.max() < C, Y.min() < C);
-			slv.addConstraint( new Constr_MetaXeqYlessthanC(id, Y.getID(), C) );
+			slv.add( new Constr_MetaXeqYlessthanC(id, Y.getID(), C) );
 		}
 		else {
 			id = slv.makeIntVar(Y.min() >= C, Y.max() >= C);
-			slv.addConstraint( new Constr_MetaXeqYgreatereqthanC(id, Y.getID(), C));
+			slv.add( new Constr_MetaXeqYgreatereqthanC(id, Y.getID(), C));
 		}
 		return IntVar(id, slv);
 	}
@@ -143,11 +157,11 @@ namespace {
  		IntVarID id;
  		if(isPositive) {
  			id = slv.makeIntVar(Y.max() <= C, Y.min() <= C);
- 			slv.addConstraint( new Constr_MetaXeqYlesseqthanC(id, Y.getID(), C));
+ 			slv.add( new Constr_MetaXeqYlesseqthanC(id, Y.getID(), C));
  		}
  		else {
  			id = slv.makeIntVar(Y.min() > C, Y.max() > C);
- 			slv.addConstraint( new Constr_MetaXeqYgreaterthanC(id, Y.getID(), C));
+ 			slv.add( new Constr_MetaXeqYgreaterthanC(id, Y.getID(), C));
  		}
  	}
 
@@ -168,11 +182,11 @@ namespace {
 		IntVarID id;
 		if(isPositive) {
 			id = slv.makeIntVar(Y.min()==C && Y.max()==C, Y.contains(C) );
-			slv.addConstraint( new Constr_MetaXeqYeqC(id, Y.getID(), C));
+			slv.add( new Constr_MetaXeqYeqC(id, Y.getID(), C));
 		}
 		else {
 			id = slv.makeIntVar(!Y.contains(C), (Y.min()!=C || Y.max()!=C) );
-			slv.addConstraint( new Constr_MetaXeqYneqC(id, Y.getID(), C));
+			slv.add( new Constr_MetaXeqYneqC(id, Y.getID(), C));
 		}
 	}
 
@@ -197,11 +211,11 @@ namespace {
   		IntVarID id;
   		if(isPositive) {
   			id = slv.makeIntVar(Y.max() < Z.min(), Y.min() < Z.max());
-  			slv.addConstraint( new Constr_MetaXeqYlessthanZ(id, Y.getID(), Z.getID()) );
+  			slv.add( new Constr_MetaXeqYlessthanZ(id, Y.getID(), Z.getID()) );
   		}
   		else {
   			id = slv.makeIntVar(Z.max() <= Y.min(), Z.min() <= Y.max());
-			slv.addConstraint( new Constr_MetaXeqYlesseqthanZ(id, Z.getID(), Y.getID() ));
+			slv.add( new Constr_MetaXeqYlesseqthanZ(id, Z.getID(), Y.getID() ));
   		}
   	}
 
@@ -221,11 +235,11 @@ namespace {
   		IntVarID id;
   		if(isPositive) {
   			id = slv.makeIntVar(Y.max() <= Z.min(), Y.min() <= Z.max());
-  			slv.addConstraint( new Constr_MetaXeqYlesseqthanZ(id, Y.getID(), Z.getID()) );
+  			slv.add( new Constr_MetaXeqYlesseqthanZ(id, Y.getID(), Z.getID()) );
   		}
   		else {
   			id = slv.makeIntVar(Z.max() < Y.min(), Z.min() < Y.max());
-			slv.addConstraint( new Constr_MetaXeqYlessthanZ(id, Z.getID(), Y.getID() ));
+			slv.add( new Constr_MetaXeqYlessthanZ(id, Z.getID(), Y.getID() ));
   		}
   	}
 
@@ -245,11 +259,11 @@ namespace {
   		IntVarID id;
   		if(isPositive) {
   			id = slv.makeIntVar(Y.max()==Z.min() && Y.min()==Z.max(), !intersectionEmpty(Y, Z) );
-  			slv.addConstraint( new Constr_MetaXeqYeqZ(id, Y.getID(), Z.getID(), false));
+  			slv.add( new Constr_MetaXeqYeqZ(id, Y.getID(), Z.getID(), false));
   		}
   		else {
   			id = slv.makeIntVar(intersectionEmpty(Y, Z), !(Y.max()==Z.min() && Y.min()==Z.max()) );
-			slv.addConstraint( new Constr_MetaXeqYeqZ(id, Z.getID(), Y.getID(), true));
+			slv.add( new Constr_MetaXeqYeqZ(id, Z.getID(), Y.getID(), true));
   		}
   	}
 
@@ -260,6 +274,21 @@ namespace {
   			return new Constr_XneqY(Z.getID(), Y.getID());
   	}
 
+  /*
+   * alldiff
+   */
 
+	Constraint const* AllDiff(IntVarArray VarArr, unsigned long Capacity) {
+		if(VarArr.size() <= Capacity || (Capacity == 0 && VarArr.size() <= 1))
+			return 0; // no constraint
+
+		Constraint *newconstr;
+		if(Capacity == 0)
+			newconstr = new Constr_AllDiff(VarArr.getID());
+		else
+			newconstr = new Constr_AllDiffStrong(VarArr.getID(), Capacity);
+
+		return newconstr;
+	}
 
 }

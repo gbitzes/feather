@@ -178,14 +178,14 @@ class NsgLabeling : public NsGoal {
 
 		NsGoal* GOAL() {
 			bool flag = false;
-			UInt index = 0;
+			NsIndex index = 0;
 			UInt minDom = kPlusInf;
 
 			// std::cout << "pointer of vararr" << &VarArr << std::endl;
 
-			for(UInt i = 0; i < VarArr.size(); ++i) {
-				if(!VarArr[i]->isBound() && VarArr[i]->size() < minDom) {
-					minDom = VarArr[i]->size();
+			for(NsIndex i = 0; i < VarArr.size(); ++i) {
+				if(!VarArr[i].isBound() && VarArr[i].size() < minDom) {
+					minDom = VarArr[i].size();
 					index = i;
 					flag = true;
 				}
@@ -197,7 +197,7 @@ class NsgLabeling : public NsGoal {
 			if(flag == false)
 				return NULL;
 
-			return (new NsgAND(new NsgInDomain(*VarArr[index]), new NsgLabeling(*this) ));
+			return (new NsgAND(new NsgInDomain(VarArr[index]), new NsgLabeling(*this) ));
 		}
 };
 

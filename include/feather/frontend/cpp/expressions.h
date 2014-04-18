@@ -470,6 +470,16 @@ namespace feather {
 		return ExprConstrYeqC(Y, C);
 	}
 
+	inline ExprConstrYeqC operator!=(IntVar Y, Int C) {
+		ExprConstrYeqC con = Y == C;
+		con.flip();
+		return con;
+	}
+
+	inline ExprConstrYeqC operator!=(Int C, IntVar Y) {
+		return Y != C;
+	}
+
 
 	/*
 	 * Y < Z
@@ -583,18 +593,7 @@ namespace feather {
 	 * alldiff
 	 */
 
-	class ExprConstrAllDiff : public ExprConstr {
-		private:
-			IntVarArray Arr;
-			const unsigned long Capacity;
-			ExprConstrAllDiff(IntVarArray Arr_, unsigned long Cap_) : Arr(Arr_), Capacity(Cap_) {}
-			virtual Constraint const* postConstraint();
-			virtual IntVar postC();
-	};
-
-
-
-
+	Constraint const* AllDiff(IntVarArray, unsigned long = 0);
 
 }
 

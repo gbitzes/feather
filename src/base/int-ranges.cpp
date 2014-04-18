@@ -357,8 +357,24 @@ bool IntRanges::containsRange(const Int rangeMin, const Int rangeMax) const {
 	}
 	else
 		return false;
-
 }
+
+IntDomainPosition* IntRanges::getPosition(const Int value) const {
+	IntRangesPosition *pos = new IntRangesPosition();
+	pos->value = value;
+	return pos;
+};
+Int IntRanges::advance(IntDomainPosition &pos) const {
+	IntRangesPosition *spos = static_cast<IntRangesPosition*>(&pos);
+	spos->value = next(spos->value);
+	return spos->value;
+};
+Int IntRanges::moveback(IntDomainPosition &pos) const {
+	IntRangesPosition *spos = static_cast<IntRangesPosition*>(&pos);
+	spos->value = previous(spos->value);
+	return spos->value;	
+};
+
 
 string IntRanges::toString() const {
 	ostringstream ss;

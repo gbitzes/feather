@@ -4,6 +4,7 @@
 #include <feather/types.h>
 #include "solver.h"
 #include "types.h"
+#include <feather/int-domain.h>
 
 namespace feather {
 
@@ -66,6 +67,7 @@ class IntVar {
 		 */
 
 		bool equals(const IntVar other) const;
+
 };
 
 

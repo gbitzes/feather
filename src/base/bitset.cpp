@@ -499,6 +499,23 @@ bool Bitset::containsRange(const Int rangeMin, const Int rangeMax) const {
 
 }
 
+IntDomainPosition* Bitset::getPosition(const Int value) const {
+	BitsetPosition *pos = new BitsetPosition();
+	pos->value = value;
+	return pos;
+};
+Int Bitset::advance(IntDomainPosition &pos) const {
+	BitsetPosition *spos = static_cast<BitsetPosition*>(&pos);
+	spos->value = next(spos->value);
+	return spos->value;
+};
+Int Bitset::moveback(IntDomainPosition &pos) const {
+	BitsetPosition *spos = static_cast<BitsetPosition*>(&pos);
+	spos->value = previous(spos->value);
+	return spos->value;
+};
+
+
 string Bitset::toString() const {
 	ostringstream ss;
 	ss << "[";

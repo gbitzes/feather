@@ -40,7 +40,7 @@ IntDomain* Solver::getDomain(IntVarID id) {
 		return fPM->getDomain(id);
 }
 
-void Solver::addConstraint(const Constraint *const constr) {
+void Solver::add(const Constraint *const constr) {
 	/* 
 	 * There is a valid case in which the constraint
 	 * is "static" - all changes can be performed just
@@ -54,6 +54,9 @@ void Solver::addConstraint(const Constraint *const constr) {
 }
 
 bool Solver::nextSolution() {
+	if(!finalized)
+		finalize();
+
 	solving = true;
 	bool ret = fPM->nextSolution();
 	if(ret)
