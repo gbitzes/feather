@@ -12,8 +12,9 @@ void IntVar::initialize(Solver &_slv, IntVarID id) {
 	this->slv = &_slv;
 	this->id = id;
 	representationDomain = &slv->getRepresentationDomain(id);
-	domain = representationDomain;
-	currentSolutionID = slv->getSolutionID();
+	currentSolutionID = 0;
+	domain = NULL;
+	updateDomain();
 }
 
 Solver& IntVar::getSolver() const {
@@ -126,6 +127,11 @@ IntVarID IntVar::getID() const {
 bool IntVar::equals(const IntVar other) const {
 	ASSERT_INITIALIZED();
 	return other.hasSameSolver(*this) && getID() == other.getID();
+}
+
+std::string IntVar::toString() {
+	updateDomain();
+	return domain->toString();
 }
 
 

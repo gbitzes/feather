@@ -67,6 +67,7 @@ class IntVar {
 		 */
 
 		bool equals(const IntVar other) const;
+		std::string toString();
 
 };
 

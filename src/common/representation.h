@@ -11,26 +11,6 @@
 
 namespace feather {
 
-/*
- * We don't really know what kinds of things a
- * constraint or goal might need to store inside -
- * we just provide a vector in which to store integers.
- * The meaning and order is decided by each 
- * individual constraint.
- *
- * Same for goals.
- */
-
-// class Constraint {
-// 	enum ConstraintType::Type type;
-// 	std::vector<Int> values;
-// };
-
-// struct Goal {
-// 	enum GoalType::Type type;
-// 	std::vector<Int> values;
-// };
-
 struct RepresentationIntVar {
 	IntRanges *domain;
 	IntVarID id;
@@ -56,6 +36,7 @@ class Representation {
 		std::vector<const Constraint*> constraints;
 		std::vector<const Goal*> goals;
 		std::vector<RepresentationIntVarArray*> arrays;
+		IntVarID minObj = -1;
 
 		IntVarID addVar(Int min, Int max);
 		IntVarArrayID addArray();

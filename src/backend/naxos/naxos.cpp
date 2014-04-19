@@ -1035,7 +1035,7 @@ bool Naxos::nextSolution() {
 				}
 
 				searchNodes.solutionNode(vMinObj);
-				//std::cout << "Found solution after " << iterations << " iterations" << std::endl;
+				// std::cout << "Found solution after " << iterations << " iterations" << std::endl;
 				// cout << "Found solution, search space estimation is " << estimateSearchSpace() << endl;
 				// if( estimateSearchSpace() != 1)
 				// 	throw NsException("search space not 1");
@@ -1085,7 +1085,10 @@ void Naxos::supplyRepresentation(const Representation& repr) {
 			NsGoal *goal = convertGoal( *(*it) );
 			searchNodes.top().stackAND.push( goal );
 		}
-
+	}
+	/* Set minObj, if one has been supplied */
+	if(repr.minObj != -1) {
+		minimize( *vars[repr.minObj] );
 	}
 }
 

@@ -70,6 +70,13 @@ void Solver::finalize() {
 	fPM->supplyRepresentation(*repr);
 }
 
+void Solver::minimize(const IntVar var) {
+	if(repr->minObj != -1)
+		FEATHER_THROW("Already set minimization target");
+
+	repr->minObj = var.getID();
+}
+
 bool Solver::isFinalized() {
 	return finalized;
 }

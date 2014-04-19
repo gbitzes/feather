@@ -485,6 +485,12 @@ class Naxos : public ProblemManager {
 			return  Q;
 		}
 
+		void minimize (NsIntVar& VarObj) {
+			vMinObj          =  &VarObj;
+			bestMinObjValue  =   vMinObj->max();
+		}
+
+
 	public:
 		virtual void supplyRepresentation(const Representation&);
 		virtual void clearRepresentation();	

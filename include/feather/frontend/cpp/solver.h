@@ -34,10 +34,9 @@ class Solver {
 		IntVarID makeIntVar(Int min, Int max);
 		IntVarArrayID makeIntVarArray();
 
+		void minimize(const IntVar);
 		void add(const Constraint *const constr);
-
 		bool isFinalized();
-
 		bool nextSolution();
 
 		SolutionID getSolutionID();		
