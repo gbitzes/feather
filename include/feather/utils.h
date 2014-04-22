@@ -42,6 +42,15 @@ namespace feather {
 	 	#define FEATHER_ASSERT(assertion) 
 	#endif
 
+	/*
+	 * Disallow copying and assigning
+	 */
+
+	#define DISALLOW_COPY_AND_ASSIGN(TypeName) \
+		TypeName(const TypeName&); \
+		void operator=(const TypeName&)
+
+
 
 
 

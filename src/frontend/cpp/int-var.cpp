@@ -1,6 +1,6 @@
 #include <feather/frontend/cpp/int-var.h>
 #include <feather/frontend/cpp/solver.h>
-#include <base/utils.h>
+#include <feather/utils.h>
 #include <feather/int-domain.h>
 
 #define ASSERT_INITIALIZED() if(!initialized) FEATHER_THROW("IntVar has not been initialized")
@@ -12,8 +12,8 @@ void IntVar::initialize(Solver &_slv, IntVarID id) {
 	this->slv = &_slv;
 	this->id = id;
 	representationDomain = &slv->getRepresentationDomain(id);
+	domain = representationDomain;
 	currentSolutionID = 0;
-	domain = NULL;
 	updateDomain();
 }
 
@@ -132,6 +132,16 @@ bool IntVar::equals(const IntVar other) const {
 std::string IntVar::toString() {
 	updateDomain();
 	return domain->toString();
+}
+
+IntVar::iterator IntVar::begin() {
+	ASSERT_INITIALIZED();
+	return domain->begin();
+}
+
+IntVar::iterator IntVar::end() {
+	ASSERT_INITIALIZED();
+	return domain->end();
 }
 
 

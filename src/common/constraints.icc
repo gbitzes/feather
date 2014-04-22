@@ -279,3 +279,24 @@ class Constr_AllDiffStrong : public Constraint {
 			 : Constraint(Constraints::AllDiffStrong), fArr(arr), fCapacity(capacity) { } 
 };
 
+class Constr_XeqSum : public Constraint {
+	public:
+
+		const IntVarID fX;
+		const IntVarArrayID fArr;
+		const UInt fStart, fLength;
+
+		Constr_XeqSum(IntVarID x, IntVarArrayID arr, UInt start, UInt length)
+			 : Constraint(Constraints::XeqSum), fX(x), fArr(arr), fStart(start), fLength(length) { } 
+};
+
+class Constr_XeqElement : public Constraint {
+	public:
+
+		const IntVarID fX, fIndex;
+		const IntDequeID fArr;
+
+		Constr_XeqElement(IntVarID x, IntVarID index, IntDequeID arr)
+			 : Constraint(Constraints::XeqElement), fX(x), fIndex(index), fArr(arr) { } 
+};
+

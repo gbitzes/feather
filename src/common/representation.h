@@ -22,6 +22,13 @@ class RepresentationIntVarArray {
 		IntVarArrayID id;
 };
 
+struct RepresentationIntDeque {
+	std::deque<Int> contents;
+	IntDequeID id;
+
+	RepresentationIntDeque(UInt size) : contents(size) {}
+};
+
 class Representation {
 
 	public:
@@ -36,10 +43,12 @@ class Representation {
 		std::vector<const Constraint*> constraints;
 		std::vector<const Goal*> goals;
 		std::vector<RepresentationIntVarArray*> arrays;
+		std::vector<RepresentationIntDeque*> deques;
 		IntVarID minObj = -1;
 
 		IntVarID addVar(Int min, Int max);
 		IntVarArrayID addArray();
+		IntDequeID addDeque(UInt size = 0);
 
 		~Representation();
 };

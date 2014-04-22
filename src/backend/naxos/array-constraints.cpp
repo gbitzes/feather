@@ -1,7 +1,7 @@
 #include <backend/naxos/Ns_Constraint.h>
 #include <backend/naxos/naxos.h>
 #include <backend/naxos/internal.h>
-#include <base/utils.h>
+#include <feather/utils.h>
 #include <cstdlib>
 #include <utility>
 
@@ -288,7 +288,7 @@ Ns_ConstrAllDiffStrong::Ns_ConstrAllDiffStrong (NsIntVarArray *VarArr_init, unsi
 	}
 
 	//for (X = VarArr->begin();   X != VarArr->end();   ++X)
-	//	VarArrGroup.push_back( NsIntVar(pm, NsMINUS_INF+1, NsPLUS_INF-1) );
+	//	VarArrGroup.push_back( NsIntVar(pm, kMinusInf+1, kPlusInf-1) );
 }
 
 
@@ -707,6 +707,110 @@ Ns_ConstrAllDiffStrong::LocalArcCons (Ns_QueueItem& Qitem)
 
 	//ArcCons();
 	allDiffBoundsConsistency(VarArr, Capacity, groupFired, this);
+}
+
+Ns_ConstrXeqSum::Ns_ConstrXeqSum (NsIntVar *X, NsIntVarArray *VarArr_init)
+		: /*Ns_Constraint(2),*/ VarX(X), VarArr(VarArr_init),
+		  start(0), length(VarArr_init->size())
+{
+	assert_Ns( ! VarArr->empty() ,
+			"Ns_ConstrXeqSum::Ns_ConstrXeqSum: Empty `VarArr'");
+
+	Naxos&  pm = VarX->manager();
+
+	for (NsIntVarArray::iterator  V = VarArr->begin();   V != VarArr->end();   ++V)   {
+		assert_Ns( &pm == &V->manager(),  "Ns_ConstrXeqSum::Ns_ConstrXeqSum: All the variables of a constraint must belong to the same NsProblemManager");
+	}
+}
+
+
+
+Ns_ConstrXeqSum::Ns_ConstrXeqSum (NsIntVar *X, NsIntVarArray *VarArr_init,
+		const NsIndex start_init, const NsIndex length_init)
+		: /*Ns_Constraint(2),*/ VarX(X), VarArr(VarArr_init), start(start_init), length(length_init)
+{
+	revisionType  =  BIDIRECTIONAL_CONSISTENCY;
+
+
+	assert_Ns( ! VarArr->empty() ,
+			"Ns_ConstrXeqSum::Ns_ConstrXeqSum: Empty `VarArr'");
+
+	Naxos&  pm = VarX->manager();
+
+	for (NsIndex  i=start;   i < start+length;   ++i)   {
+		NsIntVar&  V = (*VarArr)[i];
+		assert_Ns( &pm == &V.manager(),  "Ns_ConstrXeqSum::Ns_ConstrXeqSum: All the variables of a constraint must belong to the same NsProblemManager");
+	}
+}
+
+
+// bounds-consistency only
+	void
+Ns_ConstrXeqSum::ArcCons (void)
+{
+	Int  sumMin, sumMax;
+	array_sum_min_max(VarArr, start, length, sumMin, sumMax);
+	NsIndex  i;
+
+	bool  changed_summinmax = true;
+
+	for ( ; ; )  {
+		do  {
+			if ( ! VarX->removeRange(kMinusInf, sumMin-1, this) )
+				return;
+
+			for (i = start;   i < start+length;   ++i)   {
+				NsIntVar&  V = (*VarArr)[i];
+				if ( V.min() + sumMax - V.max() < VarX->min() )   {
+					sumMin -= V.min();
+					if ( ! V.removeRange(kMinusInf,  - sumMax + V.max() + VarX->min() -1, this) )
+						return;
+					sumMin += V.min();
+					changed_summinmax = true;
+				}
+			}
+
+		} while (VarX->min() < sumMin);
+
+		//  Initially `changed_summinmax' was intentionally set true, in order the
+		//   following `if' statement to be ignored, the first time it is executed.
+		if ( ! changed_summinmax )
+			break;
+		changed_summinmax = false;
+
+		do  {
+			if ( ! VarX->removeRange(sumMax+1, kPlusInf, this) )
+				return;
+
+			for (i = start;   i < start+length;   ++i)   {
+				NsIntVar&  V = (*VarArr)[i];
+				if ( V.max() + sumMin - V.min() > VarX->max() )   {
+					sumMax -= V.max();
+					if ( ! V.removeRange(- sumMin + V.min() + VarX->max() +1,  kPlusInf, this) )
+						return;
+					sumMax += V.max();
+					changed_summinmax = true;
+				}
+			}
+
+		} while (VarX->max() > sumMax);
+
+		if ( ! changed_summinmax )
+			break;
+		changed_summinmax = false;
+	}
+}
+
+
+// bounds-consistency only
+	void
+Ns_ConstrXeqSum::LocalArcCons (Ns_QueueItem& Qitem)
+{
+	//if (Qitem.getVarFired()->min() < Qitem.getW()  &&  Qitem.getW() < Qitem.getVarFired()->max())
+	//	return;	// bounds-consistency does not care
+
+	ArcCons();
+	//throw  NsException("Ns_ConstrXeqSum::LocalArcCons: unimplemented");
 }
 
 

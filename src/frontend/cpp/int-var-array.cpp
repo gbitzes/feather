@@ -1,8 +1,16 @@
 #include <feather/frontend/cpp/int-var-array.h>
-#include <base/utils.h>
+#include <feather/utils.h>
 #include <common/representation.h>
 
 namespace feather {
+
+Solver& IntVarArray::getSolver() const {
+	return slv;
+}
+
+IntVarArrayID IntVarArray::getID() const {
+	return id;
+}
 
 void IntVarArray::push_front(const IntVar& var) {
 	if( &var.getSolver() != &slv )

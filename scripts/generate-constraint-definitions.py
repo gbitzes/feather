@@ -127,6 +127,24 @@ if __name__ == '__main__':
 		  	]
 		  )
 
+	define("XeqSum", 
+		  	[ 
+		  	  ["IntVarID", ["x"]],
+		  	  ["IntVarArrayID", ["arr"]],
+		  	  ["UInt", ["start", "length"]]
+		  	]
+		  )
+
+	define("XeqElement",
+		  	[
+		  	  ["IntVarID", ["x", "index"]],
+		  	  ["IntDequeID", ["arr"]]
+		  	]
+		  )
+
+
+
+
 
 	if len(sys.argv) > 1:
 		print ",\n".join(allConstraints)

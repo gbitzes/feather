@@ -4,6 +4,7 @@
 #include <feather/types.h>
 #include <feather/frontend/cpp/int-var.h>
 #include <feather/frontend/cpp/int-var-array.h>
+#include <feather/utils.h>
 
 
 namespace feather {
@@ -281,13 +282,13 @@ namespace feather {
 
 	class ExprMin : public Expression {
 		private:
-			IntVarArray Arr;
+			IntVarArray& Arr;
 		public:
-			ExprMin(IntVarArray Arr_) : Arr(Arr_) {}
+			ExprMin(IntVarArray& Arr_) : Arr(Arr_) {}
 			virtual IntVar post();
 	};
 
-	inline ExprMin Minimum(IntVarArray Arr) {
+	inline ExprMin Minimum(IntVarArray& Arr) {
 		return ExprMin(Arr);
 	}
 
@@ -297,13 +298,13 @@ namespace feather {
 
 	class ExprMax : public Expression {
 		private:
-			IntVarArray Arr;
+			IntVarArray& Arr;
 		public:
-			ExprMax(IntVarArray Arr_) : Arr(Arr_) {}
+			ExprMax(IntVarArray& Arr_) : Arr(Arr_) {}
 			virtual IntVar post();
 	};
 
-	inline ExprMax Maximum(IntVarArray Arr) {
+	inline ExprMax Maximum(IntVarArray& Arr) {
 		return ExprMax(Arr);
 	}
 
@@ -313,22 +314,22 @@ namespace feather {
 
 	class ExprSum : public Expression {
 		private:
-			IntVarArray Arr;
+			IntVarArray& Arr;
 			UInt start, length;
 		public:
-			ExprSum(IntVarArray Arr_) : Arr(Arr_), start(0), length(Arr_.size()) {}
-			ExprSum(IntVarArray Arr_, UInt start_, UInt length_) : Arr(Arr_), start(start_), length(length_) {
+			ExprSum(IntVarArray& Arr_) : Arr(Arr_), start(0), length(Arr_.size()) {}
+			ExprSum(IntVarArray& Arr_, UInt start_, UInt length_) : Arr(Arr_), start(start_), length(length_) {
 				if(start+length <= Arr.size())
 					FEATHER_THROW("start+length exceeds bounds of array");
 			}
 			virtual IntVar post();
 	};
 
-	inline ExprSum Sum(IntVarArray Arr) {
+	inline ExprSum Sum(IntVarArray& Arr) {
 		return ExprSum(Arr);
 	}
 
-	inline ExprSum Sum(IntVarArray Arr, UInt start, UInt length) {
+	inline ExprSum Sum(IntVarArray& Arr, UInt start, UInt length) {
 		return ExprSum(Arr, start, length);
 	}
 
@@ -593,9 +594,11 @@ namespace feather {
 	 * alldiff
 	 */
 
-	Constraint const* AllDiff(IntVarArray, unsigned long = 0);
+	Constraint const* AllDiff(IntVarArray&, unsigned long = 0);
+
 
 }
+
 
 
 #endif

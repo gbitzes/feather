@@ -31,6 +31,12 @@ def gen_XeqYopZ(name):
 	print("\taddThreeVars(vars[scon.fX], vars[scon.fY], vars[scon.fZ], nscon);")
 	gen_return()
 
+def gen_XeqArrOp(name):
+	gen_case(name)
+	gen_static_cast(name)
+	print("\tNs_Constr"+name+" *nscon = new Ns_Constr"+name+" (vars[scon.fX], vararrays[scon.fArr]);")
+	print("\taddArr(*vararrays[scon.fArr], scon.fStart, scon.fLength, nscon);")
+	gen_return()
 
 		# XeqCminusZ,
 		# XeqCdivZ,
@@ -70,7 +76,7 @@ def main():
 	# gen_XeqYopZ("XeqYdivZ")
 	# gen_XeqYopZ("XeqYmodZ")
 
-
+	gen_XeqArrOp("XeqSum")
 
 
 if __name__ == '__main__':

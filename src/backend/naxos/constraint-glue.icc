@@ -102,3 +102,9 @@ case Constraints::XeqYtimesZ: {
 	addThreeVars(vars[scon.fX], vars[scon.fY], vars[scon.fZ], nscon);
 	return nscon;
 }
+case Constraints::XeqSum: {
+	const Constr_XeqSum &scon = static_cast<const Constr_XeqSum&>(con);
+	Ns_ConstrXeqSum *nscon = new Ns_ConstrXeqSum (vars[scon.fX], vararrays[scon.fArr]);
+	addArr(*vararrays[scon.fArr], scon.fStart, scon.fLength, nscon);
+	return nscon;
+}

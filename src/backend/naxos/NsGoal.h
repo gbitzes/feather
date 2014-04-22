@@ -1,7 +1,7 @@
 #ifndef FEATHER_BACKEND_NSGOAL_H
 #define FEATHER_BACKEND_NSGOAL_H
 
-#include <base/utils.h>
+#include <feather/utils.h>
 #include <backend/naxos/NsIntVar.h>
 #include <backend/naxos/NsIntVarArray.h>
 #include <backend/naxos/NsDataStructures.h>

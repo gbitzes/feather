@@ -2,7 +2,7 @@
 #define FEATHER_FRONTEND_CPP_INTVARARRAY_H
 
 #include <feather/types.h>
-#include <base/utils.h>
+#include <feather/utils.h>
 #include "solver.h"
 #include "types.h"
 #include <deque>
@@ -13,6 +13,8 @@ class RepresentationIntVarArray;
 
 class IntVarArray {
 	private:
+		DISALLOW_COPY_AND_ASSIGN(IntVarArray);
+
 		/* 
 		 * Order of declaration is super-important here.
 		 * As all members are initialized in the initialization-list,
@@ -24,18 +26,17 @@ class IntVarArray {
 		Solver &slv;
 		IntVarArrayID id;
 		RepresentationIntVarArray &array;
-
 	public:
-		IntVarArray(Solver &solver) 
-			: slv(solver), id(slv.makeIntVarArray()), 
-			  array(slv.getArray(id)) { }
+
+		IntVarArray(Solver &solver) : slv(solver), 
+		   id(slv.makeIntVarArray()), array(slv.getArray(id)) {
+		}
 
 		void push_front(const IntVar&);
 		void push_back(const IntVar&);
 
-		IntVarArrayID getID() { 
-			return id;
-		}
+		Solver& getSolver() const;
+		IntVarArrayID getID() const;
 
 		class const_iterator;
 
@@ -46,7 +47,6 @@ class IntVarArray {
 		class iterator {
 			private:
 				bool initialized;
-				// Ns_PointArray_t  *PointArr;
 				Solver* slv;
 				std::deque<IntVarID> *arr;
 				std::deque<IntVarID>::iterator it;

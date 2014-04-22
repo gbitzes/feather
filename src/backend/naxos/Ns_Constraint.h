@@ -2,7 +2,7 @@
 #define FEATHER_BACKEND_NSCONSTRAINT_H
 
 #include <backend/naxos/NsIntVar.h>
-#include <base/utils.h>
+#include <feather/utils.h>
 #include "NsIntVarArray.h"
 
 namespace feather {
@@ -706,6 +706,22 @@ class Ns_ConstrAllDiffStrong : public Ns_Constraint  {
 		virtual void  ArcCons      (void);
 		virtual void  LocalArcCons (Ns_QueueItem& Qitem);
 };
+
+class Ns_ConstrXeqSum : public Ns_Constraint  {
+	private:
+		NsIntVar  *VarX;
+		NsIntVarArray  *VarArr;
+		NsIndex  start, length;
+	public:
+		Ns_ConstrXeqSum (NsIntVar *X, NsIntVarArray *VarArr_init);
+		Ns_ConstrXeqSum (NsIntVar *X, NsIntVarArray *VarArr_init,
+				const NsIndex start_init, const NsIndex length_init);
+		virtual int varsInvolvedIn() const {  return  (1 + length);  }
+
+		virtual void ArcCons();
+		virtual void LocalArcCons(Ns_QueueItem& Qitem);
+};
+
 
 } // namespace feather
 

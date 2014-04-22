@@ -41,7 +41,9 @@ namespace Constraints {
 		MetaXeqYandZ,
 		MetaXeqYorZ,
 		AllDiff,
-		AllDiffStrong
+		AllDiffStrong,
+		XeqSum,
+		XeqElement
 	};
 };
 

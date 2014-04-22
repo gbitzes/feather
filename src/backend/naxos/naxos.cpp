@@ -1,6 +1,6 @@
 #include "naxos.h"
 #include <common/representation.h>
-#include <base/utils.h>
+#include <feather/utils.h>
 #include <base/bitset.h>
 #include <vector>
 #include "NsIntVar.h"
@@ -555,7 +555,7 @@ bool Naxos::backtrack() {
 		else
 			continue;
 
-		if ( vMinObj  !=  0 )   {
+		if(vMinObj  !=  0) {
 
 			vMinObj->remove(bestMinObjValue, kPlusInf);
 
@@ -837,9 +837,7 @@ void Naxos::giveupWork() {
 
 /* Finds next solution of the problem.  Returns false when no solution is found */
 bool Naxos::nextSolution() {
-
 	if ( firstNextSolution )   {
-
 		/*  
 		 * Search has not started yet - prune the search tree
 		 * according to how Solver is dictating
@@ -876,8 +874,10 @@ bool Naxos::nextSolution() {
 			|| (searchNodes.top().stackAND.empty()
 				&&  searchNodes.top().delayedGoal == searchNodes.gend()) )
 	{
-		if ( ! backtrack() )
+
+		if ( ! backtrack() ) {
 			return  false;
+		}
 	}
 
 	NsGoal  *CurrGoal, *NewGoal;
@@ -913,8 +913,9 @@ bool Naxos::nextSolution() {
 				vMinObj->remove(bestMinObjValue, kPlusInf);
 
 				if( foundInconsistency )
-					if( !backtrack() )
+					if( !backtrack() ) {
 						return false;
+					}
 			}
 
 		}
@@ -945,8 +946,6 @@ bool Naxos::nextSolution() {
 
 
 		}  else if ( CurrGoal->isGoalOR())   {
-
-			// saveAll();
 
 			if( CurrGoal->isMandatoryParallelOR() ) {
 
@@ -1005,8 +1004,10 @@ bool Naxos::nextSolution() {
 				//cout << "<BACKTRACK>\n";
 				destroy_goal( NewGoal );
 
-				if ( ! backtrack() )
-					return  false;
+				if ( ! backtrack() ) {
+					return false;
+
+				}
 
 			} else if ( NewGoal  !=  0 )   {
 
@@ -1045,7 +1046,6 @@ bool Naxos::nextSolution() {
 			}
 		}
 	}
-
 	return  false;
 }
 
@@ -1124,12 +1124,13 @@ namespace {
 		constr->ArcCons();
 	}
 
-	void addArr(NsIntVarArray &arr, Ns_Constraint *constr) {
+	void addArr(NsIntVarArray &arr, UInt start, UInt length, Ns_Constraint *constr) {
 		NsIndex i = 0;
-		for(i = 0; i < arr.size(); i++)
+		for(i = start; i < start+length; i++)
 			arr[i].addConstraint(constr);
 		constr->ArcCons();
 	}
+
 
 }
 
@@ -1140,7 +1141,7 @@ Ns_Constraint* Naxos::addConstraint(const Constraint& con) {
 		case Constraints::AllDiff: {
 			const Constr_AllDiff &scon = static_cast<const Constr_AllDiff&>(con);
 			Ns_ConstrAllDiff *nscon = new Ns_ConstrAllDiff(vararrays[scon.fArr]);
-			addArr(*vararrays[scon.fArr], nscon);
+			addArr(*vararrays[scon.fArr], 0, (*vararrays[scon.fArr]).size(), nscon);
 			return nscon;
 		}
 

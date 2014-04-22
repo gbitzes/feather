@@ -2,7 +2,7 @@
 #include <feather/frontend/cpp/solver.h>
 #include <common/representation.h>
 #include <backend/naxos/naxos.h>
-#include <base/utils.h>
+#include <feather/utils.h>
 
 namespace feather {
 
@@ -25,8 +25,16 @@ IntVarArrayID Solver::makeIntVarArray() {
 	return repr->addArray();
 }
 
+IntDequeID Solver::makeIntDeque(UInt size) {
+	return repr->addDeque(size);
+}
+
 RepresentationIntVarArray& Solver::getArray(IntVarArrayID id) {
 	return *(repr->arrays[id]);
+}
+
+RepresentationIntDeque& Solver::getDeque(IntDequeID id) {
+	return *(repr->deques[id]);
 }
 
 IntDomain& Solver::getRepresentationDomain(IntVarID id) {

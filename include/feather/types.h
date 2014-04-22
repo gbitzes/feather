@@ -17,6 +17,7 @@ const UInt CHUNK_BITS = CHAR_BIT * sizeof(Chunk);
 typedef UInt IntVarID;
 typedef UInt IntVarArrayID;
 typedef UInt SolutionID;
+typedef UInt IntDequeID;
 
 const Int kPlusInf = LONG_MAX;
 const Int kMinusInf = LONG_MIN;

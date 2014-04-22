@@ -487,7 +487,7 @@ class Naxos : public ProblemManager {
 
 		void minimize (NsIntVar& VarObj) {
 			vMinObj          =  &VarObj;
-			bestMinObjValue  =   vMinObj->max();
+			bestMinObjValue  =  kPlusInf;
 		}
 
 

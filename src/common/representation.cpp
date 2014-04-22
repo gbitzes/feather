@@ -1,5 +1,5 @@
 #include "representation.h"
-#include <base/utils.h>
+#include <feather/utils.h>
 #include <vector>
 
 namespace feather {
@@ -25,6 +25,14 @@ IntVarArrayID Representation::addArray() {
 	return id;
 }
 
+IntDequeID Representation::addDeque(UInt size) {
+	IntDequeID id = deques.size();
+	RepresentationIntDeque *r = new RepresentationIntDeque(size);
+	r->id = id;
+	deques.push_back(r);
+	return id;
+}
+
 Representation::~Representation() {
 	/* Delete vars */
 	{
@@ -38,12 +46,19 @@ Representation::~Representation() {
 		for(it = constraints.begin(); it != constraints.end(); it++)
 			delete *it;
 	}
-	/* Delete arrays */
+	/* Delete var arrays */
 	{
 		std::vector<RepresentationIntVarArray*>::iterator it;
 		for(it = arrays.begin(); it != arrays.end(); it++)
 			delete *it;
 	}
+	/* Delete deques */
+	{
+		std::vector<RepresentationIntDeque*>::iterator it;
+		for(it = deques.begin(); it != deques.end(); it++)
+			delete *it;
+	}
+
 }
 
 } // namespace feather

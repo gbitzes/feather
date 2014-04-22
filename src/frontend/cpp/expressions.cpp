@@ -1,7 +1,8 @@
 #include <feather/frontend/cpp/expressions.h>
+#include <feather/frontend/cpp/int-deque.h>
 #include <common/constraints.h>
 #include <iostream>
-#include <base/utils.h>
+#include <feather/utils.h>
 #include <base/int-ranges.h>
 
 namespace feather {
@@ -84,9 +85,38 @@ namespace {
  * Y * Z
  */
 
+namespace {
+
+void product_min_max (IntVar &Y, IntVar &Z, Int& min, Int& max) {
+	Int  prod;
+	prod = Y.min() * Z.min();
+	min = max = prod;
+
+	prod = Y.max() * Z.min();
+	if (prod < min)
+		min = prod;
+	if (prod > max)
+		max = prod;
+
+	prod = Y.min() * Z.max();
+	if (prod < min)
+		min = prod;
+	if (prod > max)
+		max = prod;
+
+	prod = Y.max() * Z.max();
+	if (prod < min)
+		min = prod;
+	if (prod > max)
+		max = prod;
+}
+}
+
  	IntVar ExprYtimesZ::post() {
 		Solver &slv = Y.getSolver();
-		IntVarID id = slv.makeIntVar( Y.min()*Z.min(), Y.max()*Z.max() );
+		Int prodmin, prodmax;
+		product_min_max(Y, Z, prodmin, prodmax);
+		IntVarID id = slv.makeIntVar( prodmin, prodmax );
 		slv.add( new Constr_XeqYtimesZ(id, Y.getID(), Z.getID()) );
 
 		return IntVar(id, slv);
@@ -278,7 +308,7 @@ namespace {
    * alldiff
    */
 
-	Constraint const* AllDiff(IntVarArray VarArr, unsigned long Capacity) {
+	Constraint const* AllDiff(IntVarArray& VarArr, unsigned long Capacity) {
 		if(VarArr.size() <= Capacity || (Capacity == 0 && VarArr.size() <= 1))
 			return 0; // no constraint
 
@@ -290,5 +320,85 @@ namespace {
 
 		return newconstr;
 	}
+
+namespace {
+
+void array_sum_min_max(IntVarArray& arr, UInt start, UInt length,
+			Int& sumMin, Int& sumMax) {
+	sumMin = sumMax = 0;
+	for (UInt i=start; i < start+length; ++i) {
+		IntVar V = arr[i];
+		sumMin += V.min();
+		sumMax += V.max();
+	}
+}
+
+}
+  
+/*
+ * sum
+ */
+
+	IntVar ExprSum::post() {
+		if(Arr.empty())
+			FEATHER_THROW("Cannot get the sum of an empty array");
+
+		Solver &slv = Arr.getSolver();
+
+		Int summin = 0, summax = 0;
+		array_sum_min_max(Arr, start, length, summin, summax);
+		IntVarID id = slv.makeIntVar(summin, summax);
+		slv.add(new Constr_XeqSum(id, Arr.getID(), start, length));
+
+		return IntVar(id, slv);
+	}
+
+/*
+ * deque[index]
+ */
+
+namespace  {
+
+	void
+	array_elements_min_max (const IntDeque& intArray,
+			IntVar& VarIndex,
+			Int& minElement, Int& maxElement)
+	{
+		minElement  =  kPlusInf;
+		maxElement  =  kMinusInf;
+
+		for (IntVar::iterator index = VarIndex.begin();
+				index != VarIndex.end();
+				++index)
+		{
+			if ( 0 <= *index
+			&& static_cast<UInt>(*index) < intArray.size() )
+			{
+
+				if ( intArray[*index]  <  minElement )
+					minElement  =  intArray[*index];
+
+				if ( intArray[*index]  >  maxElement )
+					maxElement  =  intArray[*index];
+			}
+		}
+
+		if(minElement == kPlusInf)
+			FEATHER_THROW("Failed to index the integer array");
+	}
+}
+
+	IntVar IntDeque::operator[](IntVar index) {
+		if(&slv != &index.getSolver())
+			FEATHER_THROW("Attempted to post operator[] constraint on a deque of a different solver");
+		
+		Int minElement, maxElement;
+		array_elements_min_max(*this, index, minElement, maxElement);
+		IntVarID varid = slv.makeIntVar(minElement, maxElement);
+		slv.add(new Constr_XeqElement(varid, index.getID(), id));
+
+		return IntVar(varid, slv);
+	}
+
 
 }

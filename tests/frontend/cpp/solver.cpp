@@ -3,6 +3,7 @@
 #include <feather/frontend/cpp/expressions.h>
 #include <feather/frontend/cpp/int-var-array.h>
 #include <backend/naxos/naxos.h>
+#include <feather/feather.h>
 
 using namespace feather;
 using namespace std;
@@ -71,4 +72,36 @@ TEST(frontend_Solver, Basic2) {
 		ASSERT_TRUE(c.value() != 48);
 	}
 	ASSERT_EQ(nsolutions, 6);
+}
+
+TEST(frontend_Solver, IntDeque) {
+	Solver slv(new Naxos());
+	IntDeque deque(slv);
+
+	deque.push_back(5);
+	deque.push_back(3);
+	deque.push_back(1);
+	deque.push_back(4);
+
+	ASSERT_EQ(deque[0], 5);
+	ASSERT_EQ(deque[1], 3);
+	ASSERT_EQ(deque[2], 1);
+	ASSERT_EQ(deque[3], 4);
+
+	deque[2] = 50;
+	ASSERT_EQ(deque[2], 50);
+
+	ASSERT_FALSE(deque.empty());
+	ASSERT_EQ(deque.size(), 4);
+
+	IntDeque::iterator it = deque.begin();
+	ASSERT_EQ(*it, 5);
+	it++;
+	ASSERT_EQ(*it, 3);
+	it++;
+	ASSERT_EQ(*it, 50);
+	it++;
+	ASSERT_EQ(*it, 4);
+	it++;
+	ASSERT_TRUE(it == deque.end());
 }

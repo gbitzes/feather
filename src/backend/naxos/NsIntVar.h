@@ -167,13 +167,11 @@ class NsIntVar {
 		///  Adds a constraint to the collection of constraints of the variable.
 		void  addConstraint (Ns_Constraint* c);
 
-	private:
-
+	public:
 		/* 
 		 * Pair of a constraint and the 
 		 * inconsistencies that has provoked
 		 */
-
 		struct ConstraintAndFailure {
 
 			/* The constraint */
@@ -185,6 +183,7 @@ class NsIntVar {
 			}
 		};
 
+	private:
 		///  True, if the variable is involved in an `Inverse' constraint, or another constraint that needs to know the values that have been removed from the variable (the w 's in the AC-5 Algorithm).
 		bool  constraintNeedsRemovedValues;
 

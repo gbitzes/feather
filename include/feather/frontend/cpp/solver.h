@@ -9,6 +9,7 @@
 namespace feather {
 
 class RepresentationIntVarArray;
+class RepresentationIntDeque;
 class Goal;
 
 class Solver {
@@ -25,6 +26,7 @@ class Solver {
 		IntDomain& getRepresentationDomain(IntVarID);
 		IntDomain* getDomain(IntVarID);
 		RepresentationIntVarArray& getArray(IntVarArrayID);
+		RepresentationIntDeque& getDeque(IntDequeID);
 
 		Solver(ProblemManager*);
 		~Solver();
@@ -33,6 +35,7 @@ class Solver {
 
 		IntVarID makeIntVar(Int min, Int max);
 		IntVarArrayID makeIntVarArray();
+		IntDequeID makeIntDeque(UInt size);
 
 		void minimize(const IntVar);
 		void add(const Constraint *const constr);

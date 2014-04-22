@@ -1,5 +1,5 @@
 #include "bitset.h"
-#include "utils.h"
+#include <feather/utils.h>
 #include <stdio.h>
 
 using namespace std;

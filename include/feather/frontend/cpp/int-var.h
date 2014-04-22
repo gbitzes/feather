@@ -69,6 +69,14 @@ class IntVar {
 		bool equals(const IntVar other) const;
 		std::string toString();
 
+		/*
+		 * iterators
+		 */
+
+		typedef IntDomain::Iterator iterator;
+		iterator begin();
+		iterator end();
+
 };
 
 

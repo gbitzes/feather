@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <base/int-ranges.h>
 #include <iostream>
-#include <base/utils.h>
+#include <feather/utils.h>
 #include <backend/naxos/naxos.h>
 #include <backend/naxos/Ns_Constraint.h>
 #include <feather/frontend/cpp/int-var-array.h>
