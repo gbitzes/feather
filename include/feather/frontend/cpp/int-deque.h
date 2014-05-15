@@ -17,6 +17,8 @@ class IntDeque {
 
 		IntDeque(Solver &slv, UInt size = 0);
 
+		IntDequeID getID() const;
+
 		typename std::deque<Int>::reference 
 		operator[](const typename std::deque<Int>::size_type i);
 

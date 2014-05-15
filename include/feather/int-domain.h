@@ -136,6 +136,17 @@ class IntDomain {
 					return !(*this == b);
 				}
 
+				void operator=(const Iterator& b) {
+					if(pos != NULL)
+						delete pos;
+
+					domain = b.domain;
+					value = b.value;
+					pos = domain->getPosition(value);
+				}
+
+
+
 				// TODO: throw exception if Iterator has reached the end?
 				Int operator*() const {
 					return pos->value;

@@ -4,6 +4,7 @@
 #include <feather/types.h>
 #include <feather/frontend/cpp/int-var.h>
 #include <feather/frontend/cpp/int-var-array.h>
+#include <feather/frontend/cpp/int-deque.h>
 #include <feather/utils.h>
 
 
@@ -362,9 +363,9 @@ namespace feather {
     			flip();
     			return *this;
     		}
-			operator Constraint const*() {
-				return postConstraint();
-			}
+			// operator Constraint const*() {
+			// 	return postConstraint();
+			// }
     };
 
     // class ExprConstrNegation : public ExprConstr {
@@ -596,6 +597,34 @@ namespace feather {
 
 	Constraint const* AllDiff(IntVarArray&, unsigned long = 0);
 
+	/*
+	 * count 
+	 */
+
+	Constraint const* Count(IntVarArray& arr,
+							const IntDeque& values,
+							const IntDeque& occurences,
+							const std::deque<IntDeque>& splitPositions = std::deque<IntDeque>(),
+							const UInt split = 0,
+							const UInt dwin = 1);
+
+	/*
+	 * IfThen
+	 */
+
+	ExprConstrYorZ IfThen(const ExprConstr& Y, const ExprConstr& Z);
+
+	// class ExprConstrCount : public ExprConstr {
+	// 	private:
+	// 		IntVarArray arr;
+	// 		const IntDeque& values;
+	// 		const IntDeque& occurences;
+	// 		const std::deque< IntDeque >& splitPositions;
+	// 		const UInt split;
+	// 		const UInt dwin;
+	// 	public:
+
+	// };
 
 }
 

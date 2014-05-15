@@ -409,6 +409,9 @@ class Naxos : public ProblemManager {
 		
 		NsQueue<Ns_QueueItem>  Q;
 
+	public:
+		NsIntVar* makeVar(Int min, Int max);
+
 	private:
 		/* Specifies whether a representation has already been provided */
 		bool hasRepresentation;
@@ -417,10 +420,13 @@ class Naxos : public ProblemManager {
 		std::map<IntVarArrayID, NsIntVarArray*> vararrays;
 
 		std::vector<Ns_Constraint*> constraints;
+		std::map<IntDequeID, NsDeque<Int>*> deques; 
 
 		void addVar(const RepresentationIntVar&);
 		void addArray(const RepresentationIntVarArray&);
+		void addDeque(const RepresentationIntDeque&);
 		
+
 		Ns_Constraint* addConstraint(const Constraint&);
 		NsGoal* convertGoal(const Goal&);
 

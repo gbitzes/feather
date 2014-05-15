@@ -4,6 +4,8 @@
 #include <feather/utils.h>
 #include <cstdlib>
 #include <utility>
+#include <set>
+#include <algorithm>
 
 using namespace std;
 
@@ -819,7 +821,415 @@ Ns_ConstrXeqSum::LocalArcCons (Ns_QueueItem& Qitem)
 
 
 
+	void
+Ns_ConstrElement::ArcCons (void)
+{
+	if ( ! VarIndex->removeRange(kMinusInf, -1, this)
+	    || ! VarIndex->removeRange(intArray.size(), kPlusInf, this) )
+	{
+		return;
+	}
 
+	NsIntVar::const_iterator index, val;
+
+	/*
+	 * Remove all invalid values from VarIndex
+	 */
+
+	for(index = VarIndex->begin(); index != VarIndex->end(); ++index) {	
+		if( !VarValue->contains( intArray[*index] ))
+			VarIndex->removeSingle(*index, this);
+	}
+
+	/* 
+	 * Build a set with all valid values for VarValue
+	 * and then remove all those not in the set
+	 */
+
+	std::set<Int> varIndexSet;
+	for(index = VarIndex->begin(); index != VarIndex->end(); ++index)
+		varIndexSet.insert(intArray[*index]);
+
+	for (val = VarValue->begin();  val != VarValue->end();  ++val) {
+		if( varIndexSet.find(*val) == varIndexSet.end() )
+			VarValue->removeSingle(*val, this);
+	}
+}
+
+
+	void
+Ns_ConstrElement::LocalArcCons (Ns_QueueItem& Qitem)
+{
+	NsIntVar::const_iterator  index;
+
+
+	if ( VarIndex  ==  Qitem.getVarFired() )    {
+
+		if ( 0 <= Qitem.getW()
+				&&  static_cast<NsIndex>(Qitem.getW()) < intArray.size() )
+		{
+			Int  SupportVal = intArray[Qitem.getW()];
+
+			for (index = VarIndex->begin();
+					index != VarIndex->end();
+					++index)
+			{
+				if ( intArray[*index]  ==  SupportVal )
+					break;
+			}
+
+			if ( index  ==  VarIndex->end() )
+				VarValue->removeSingle(SupportVal, this);
+		}
+
+	}  else  {
+		assert_Ns( VarValue == Qitem.getVarFired() ,
+		"Ns_ConstrElement::LocalArcCons: Wrong getVarFired");
+
+		for (index = VarIndex->begin();
+				index != VarIndex->end();
+				++index)
+		{
+			if ( intArray[*index]  ==  Qitem.getW() )
+				VarIndex->removeSingle(*index, this);
+		}
+	}
+}
+
+
+Ns_ConstrCount::Ns_ConstrCount (NsIntVarArray *VarArr_init,
+			const NsDeque<Int>& Values,
+			const NsDeque<Int>& Occurrences,
+			const NsDeque< NsDeque<NsIndex> >& SplitPositions,
+			const NsIndex Split_init,
+			const NsIndex Dwin_init)
+	: VarArr(VarArr_init),
+	  //Values(Values_init), Occurrences(Occurrences_init),
+	  Split(Split_init),
+	  Dwin(Dwin_init)
+{
+	//assert_Ns( ! VarArr.empty() ,  "Ns_ConstrCount::Ns_ConstrCount: Empty `VarArr'");
+
+	Naxos  *pm=0;
+
+	NsIntVarArray::iterator  X = VarArr->begin();
+	if ( X  !=  VarArr->end() )   {
+		pm  =  &X->manager();
+		++X;
+
+		//vMinValueIndex = NsIntVar(*pm,0,Values.size());
+		//vMaxValueIndex = NsIntVar(*pm,-1,Values.size()-1);
+		////  vMinValueIndex and vMaxValueIndex domains are
+		////   respectively shifted left and right by 1, in
+		////   order to avoid provoking an inconsistency
+		////   when all the values have been assigned.
+	}
+
+	for ( ;   X != VarArr->end();   ++X)  {
+		assert_Ns( pm == &X->manager() ,  "Ns_ConstrCount::Ns_ConstrCount: All the variables of a constraint must belong to the same NsProblemManager");
+	}
+
+	NsIndex  i;
+	for (i=0;   i < VarArr->size();   ++i)   {
+
+		assert_Ns( VarIndex.count( (Ns_pointer_t)&(*VarArr)[i] ) == 0,
+			"Ns_ConstrCount::Ns_ConstrCount: Duplicate NsIntVar");
+
+		VarIndex.insert( make_pair( (Ns_pointer_t)&(*VarArr)[i]  ,  i ) );
+	}
+
+	assert_Ns( Values.size() == Occurrences.size() ,
+	"Ns_ConstrCount::Ns_ConstrCount: `Values' and `Occurrences' sizes should match");
+
+	//assert_Ns( Split >= 0 ,
+	//	"Ns_ConstrCount::Ns_ConstrCount: Negative `Split' value");
+
+	if ( Split )    {
+
+		assert_Ns( Values.size() == SplitPositions.size() ,
+		"Ns_ConstrCount::Ns_ConstrCount: `Values' and `SplitPositions' sizes should match");
+	}
+
+
+	//  Sort tuple <Value,Occurrence> by value.
+	//NsDeque<ValueOccurrence_t>  ValuesOccurrences;
+	NsIndex  occurrencesSum = 0;
+
+	for (i=0;  i < Values.size();  ++i)   {
+
+		if ( ! Split )    {
+
+			ValuesOccurrences.push_back(
+				ValueOccurrence_t(Values[i], Occurrences[i], *pm) );
+
+		}  else  {
+
+			ValuesOccurrences.push_back(
+				ValueOccurrence_t(Values[i], Occurrences[i],
+					*pm, SplitPositions[i], Split) );
+
+			assert_Ns( Occurrences[i] / Split == SplitPositions[i].size() ,
+			"Ns_ConstrCount::Ns_ConstrCount: `SplitPositions[i]' size should match `Occurrences[i] / Split'");
+
+			for (NsIndex j=0;  j < SplitPositions[i].size();  ++j)    {
+
+				assert_Ns( /*0 <= SplitPositions[i][j] &&*/
+				SplitPositions[i][j] < VarArr->size() ,
+				"Ns_ConstrCount::Ns_ConstrCount: Wrong `SplitPositions[i][j]'");
+			}
+		}
+
+		occurrencesSum  +=  Occurrences[i];
+	}
+	sort(ValuesOccurrences.begin(), ValuesOccurrences.end());
+
+	assert_Ns( occurrencesSum == VarArr->size() ,
+	"Ns_ConstrCount::Ns_ConstrCount: `Occurrences' sum does not match `VarArr' size");
+
+
+	for (i=0;  i < Values.size();  ++i)  {
+
+		assert_Ns( ValueIndex.count( ValuesOccurrences[i].value ) == 0,
+			"Ns_ConstrCount::Ns_ConstrCount: Duplicate value");
+
+		ValueIndex.insert( make_pair( ValuesOccurrences[i].value , i ) );
+
+		//vCount.push_back( NsIntVar(*pm, 0, ValuesOccurrences[i].occurrence) );
+	}
+
+	//countUpdateMinMax(vMinValueIndex, vMaxValueIndex, vCount);
+}
+
+
+
+namespace  {
+
+	//	void
+	//countReviseValue (NsIntVar& Var, const NsInt value,
+	//		NsIntVarArray& vCount,
+	//		const Ns_ConstrCount::ValueIndex_t& ValueIndex,
+	//		const Ns_Constraint *constraint)
+	//{
+	//	Ns_ConstrCount::ValueIndex_t::const_iterator  cit =
+	//		ValueIndex.find( value );
+
+	//	if ( cit == ValueIndex.end() ||
+	//			vCount[cit->second].max() == 0 )
+	//	{
+	//		Var.removeSingle(value, constraint);
+	//	}
+	//}
+
+
+		void
+	countBoundsCons (bool lowerBound,
+		NsIntVarArray& VarArr,
+		const NsIndex i,
+		//NsIntVarArray& vCount,
+		const Ns_ConstrCount::ValueIndex_t& ValueIndex,
+		NsDeque<Ns_ConstrCount::ValueOccurrence_t>& ValuesOccurrences,
+		const NsIndex Dwin,
+		const Ns_Constraint *constraint)
+	{
+		Int  val;
+		Int  index;
+
+
+		val  =  ( ( lowerBound ) ? VarArr[i].min() : VarArr[i].max() );
+
+		Ns_ConstrCount::ValueIndex_t::const_iterator  cit_ind =
+			ValueIndex.find( val );
+
+
+		if ( cit_ind  !=  ValueIndex.end() )    {
+
+			index  =  cit_ind->second;
+
+		}  else  {
+
+			Ns_ConstrCount::ValueOccurrence_t  val_occur(val);
+
+			NsDeque<Ns_ConstrCount::ValueOccurrence_t>::const_iterator
+				cit_val;
+
+			if ( lowerBound )   {
+
+				cit_val  =  lower_bound(
+						ValuesOccurrences.begin(),
+						ValuesOccurrences.end(),
+						val_occur);
+
+			}  else  {
+
+				cit_val  =  upper_bound(
+						ValuesOccurrences.begin(),
+						ValuesOccurrences.end(),
+						val_occur);
+
+				//  In order to put `cit_val' inside the range.
+				if ( cit_val  ==  ValuesOccurrences.end() )
+					--cit_val;
+			}
+
+			index  =  cit_val - ValuesOccurrences.begin();
+		}
+
+
+		NsIndex  splitIndex=0;
+
+		while ( 0 <= index  &&  static_cast<NsIndex>(index) < ValuesOccurrences.size() )   {
+
+			splitIndex  =  ValuesOccurrences[index].splitIndexForPosition(i / Dwin);
+
+			//cout << splitIndex << "," << ValuesOccurrences[index].vCount.size() << "\n";
+
+			if ( ValuesOccurrences[index].vCount[splitIndex].max() != 0  &&
+			VarArr[i].contains(ValuesOccurrences[index].value) )
+				break;
+
+
+			if ( lowerBound )
+				++index;
+			else
+				--index;
+		}
+
+
+		if ( ! ( 0 <= index && static_cast<NsIndex>(index) < ValuesOccurrences.size() ) )    {
+
+			VarArr[i].removeAll();
+
+		}  else  {
+
+			if ( lowerBound )   {
+
+				VarArr[i].removeRange(
+					kMinusInf,
+					ValuesOccurrences[index].value-1,
+					constraint);
+
+			}  else  {
+
+				VarArr[i].removeRange(
+					ValuesOccurrences[index].value+1,
+					kPlusInf,
+					constraint);
+			}
+
+			if ( VarArr[i].isBound() )
+				ValuesOccurrences[index].vCount[splitIndex].remove( ValuesOccurrences[index].vCount[splitIndex].max() );
+		}
+	}
+
+
+		void
+	countArcCons (NsIntVarArray& VarArr,
+		const NsIndex i,
+		//NsIntVarArray& vCount,
+		//NsIntVar& vMinValueIndex,
+		//NsIntVar& vMaxValueIndex,
+		const Ns_ConstrCount::ValueIndex_t& ValueIndex,
+		NsDeque<Ns_ConstrCount::ValueOccurrence_t>& ValuesOccurrences,
+		const NsIndex Dwin,
+		const Ns_Constraint *constraint)
+	{
+		//for (NsIntVar::const_iterator val=Var.begin();
+		//		val != Var.end();
+		//		++val)
+		//{
+		//	countReviseValue(Var, *val, vCount, ValueIndex, constraint);
+		//}
+
+
+
+
+		//NsInt  value;
+
+		//do  {
+		//	value  =  Var.min();
+
+		//	countReviseValue(Var, value, vCount, ValueIndex, constraint);
+
+		//} while ( Var.min()  !=  value );
+
+		//do  {
+		//	value  =  Var.max();
+
+		//	countReviseValue(Var, value, vCount, ValueIndex, constraint);
+
+		//} while ( Var.max()  !=  value );
+
+
+		countBoundsCons(true, VarArr, i, ValueIndex,
+				ValuesOccurrences, Dwin, constraint);
+
+		if ( ! VarArr[i].isBound() )    {
+
+			countBoundsCons(false, VarArr, i, ValueIndex,
+				ValuesOccurrences, Dwin, constraint);
+		}
+
+
+		//if ( vMinValueIndex.min()-1  >=  0 )   {
+
+		//	Var.removeRange(NsMINUS_INF,
+		//	ValuesOccurrences[vMinValueIndex.min()-1].value,
+		//	constraint);
+		//}
+
+		//if ( static_cast<NsIndex>(vMaxValueIndex.max()+1) <
+		//		ValuesOccurrences.size() )
+		//{
+		//	Var.removeRange(ValuesOccurrences[vMaxValueIndex.max()+1].value,
+		//	NsPLUS_INF, constraint);
+		//}
+
+
+
+		//if ( Var.isBound() )    {
+
+		//	Ns_ConstrCount::ValueIndex_t::const_iterator  cit =
+		//		ValueIndex.find( Var.value() );
+
+		//	if ( cit  ==  ValueIndex.end() )    {
+		//		vCount[0].removeAll();
+		//		return;
+		//	}
+
+		//	NsIndex  index = cit->second;
+		//	vCount[index].remove( vCount[index].max() );
+
+		//	//if ( vCount[index].max()  ==  0 )   {
+
+		//	//	countUpdateMinMax(vMinValueIndex,
+		//	//			vMaxValueIndex, vCount);
+		//	//}
+		//}
+	}
+
+} // namespace
+
+
+
+	void
+Ns_ConstrCount::ArcCons (void)
+{
+	for (NsIndex i=0;   i < VarArr->size();   ++i)   {
+
+		countArcCons(*VarArr, i, ValueIndex, ValuesOccurrences, Dwin, this);
+	}
+}
+
+
+	void
+Ns_ConstrCount::LocalArcCons (Ns_QueueItem& Qitem)
+{
+	VarIndex_t::const_iterator  cit = VarIndex.find( (Ns_pointer_t)Qitem.getVarFired() );
+	NsIndex  i = cit->second;
+
+
+	countArcCons(*VarArr, i, ValueIndex, ValuesOccurrences, Dwin, this);
+}
 
 
 }

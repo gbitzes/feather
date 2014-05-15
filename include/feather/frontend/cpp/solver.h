@@ -11,6 +11,7 @@ namespace feather {
 class RepresentationIntVarArray;
 class RepresentationIntDeque;
 class Goal;
+class ExprConstr;
 
 class Solver {
 
@@ -39,6 +40,7 @@ class Solver {
 
 		void minimize(const IntVar);
 		void add(const Constraint *const constr);
+		void add(const ExprConstr &expr);
 		bool isFinalized();
 		bool nextSolution();
 

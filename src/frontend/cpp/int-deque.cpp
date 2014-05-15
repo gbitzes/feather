@@ -41,6 +41,10 @@ IntDeque::iterator IntDeque::end() {
 	return deque.contents.end();
 }
 
+IntDequeID IntDeque::getID() const {
+	return id;
+}
+
 // IntDeque::IntDeque(Solver &solver, UInt size) : slv(Solver), id(slv.makeIntDeque(size)), 
 // 				  deque(slv.getDeque(id)) {
 

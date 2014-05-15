@@ -41,6 +41,14 @@ def define_XopY(name):
 				["IntVarID", ["x", "y"]]
 			])
 
+def define_XopYneg(name):
+	define(name,
+			[
+				["IntVarID", ["x", "y"]],
+				["bool", ["neg"]]
+			])
+
+
 def define_XeqYopC(name):
 	define(name, 
 		  	[ 
@@ -85,7 +93,9 @@ if __name__ == '__main__':
 	define_XopY("XeqAbsY")
 	define_XopY("XeqY")
 	define_XopY("XneqY")
-	define_XopY("XorY")
+
+	define_XopYneg("XorY")
+
 
 	define_XeqYopC("XeqYplusC")
 	define_XeqYopC("XeqYdivC")
@@ -110,9 +120,10 @@ if __name__ == '__main__':
 	define_XeqYopZ("MetaXeqYlessthanZ")
 	define_XeqYopZ("MetaXeqYlesseqthanZ")
 	define_XeqYopZ("MetaXeqYandZ")
-	define_XeqYopZ("MetaXeqYorZ")
 
 	define_XeqYopZneg("MetaXeqYeqZ")
+	define_XeqYopZneg("MetaXeqYorZ")
+
 
 	define("AllDiff", 
 		  	[ 
@@ -142,8 +153,15 @@ if __name__ == '__main__':
 		  	]
 		  )
 
-
-
+	define("Count",
+			[
+				["IntVarArrayID", ["arr"]],
+				["IntDequeID", ["values", "occurences"] ],
+				["std::vector<IntDequeID>", ["splitPositions"]],
+				["UInt", ["split"]],
+				["UInt", ["dwin"]]
+			]
+		  )
 
 
 	if len(sys.argv) > 1:

@@ -49,9 +49,10 @@ class Constr_XorY : public Constraint {
 	public:
 
 		const IntVarID fX, fY;
+		const bool fNeg;
 
-		Constr_XorY(IntVarID x, IntVarID y)
-			 : Constraint(Constraints::XorY), fX(x), fY(y) { } 
+		Constr_XorY(IntVarID x, IntVarID y, bool neg)
+			 : Constraint(Constraints::XorY), fX(x), fY(y), fNeg(neg) { } 
 };
 
 class Constr_XeqYplusC : public Constraint {
@@ -241,15 +242,6 @@ class Constr_MetaXeqYandZ : public Constraint {
 			 : Constraint(Constraints::MetaXeqYandZ), fX(x), fY(y), fZ(z) { } 
 };
 
-class Constr_MetaXeqYorZ : public Constraint {
-	public:
-
-		const IntVarID fX, fY, fZ;
-
-		Constr_MetaXeqYorZ(IntVarID x, IntVarID y, IntVarID z)
-			 : Constraint(Constraints::MetaXeqYorZ), fX(x), fY(y), fZ(z) { } 
-};
-
 class Constr_MetaXeqYeqZ : public Constraint {
 	public:
 
@@ -258,6 +250,16 @@ class Constr_MetaXeqYeqZ : public Constraint {
 
 		Constr_MetaXeqYeqZ(IntVarID x, IntVarID y, IntVarID z, bool neg)
 			 : Constraint(Constraints::MetaXeqYeqZ), fX(x), fY(y), fZ(z), fNeg(neg) { } 
+};
+
+class Constr_MetaXeqYorZ : public Constraint {
+	public:
+
+		const IntVarID fX, fY, fZ;
+		const bool fNeg;
+
+		Constr_MetaXeqYorZ(IntVarID x, IntVarID y, IntVarID z, bool neg)
+			 : Constraint(Constraints::MetaXeqYorZ), fX(x), fY(y), fZ(z), fNeg(neg) { } 
 };
 
 class Constr_AllDiff : public Constraint {
@@ -298,5 +300,18 @@ class Constr_XeqElement : public Constraint {
 
 		Constr_XeqElement(IntVarID x, IntVarID index, IntDequeID arr)
 			 : Constraint(Constraints::XeqElement), fX(x), fIndex(index), fArr(arr) { } 
+};
+
+class Constr_Count : public Constraint {
+	public:
+
+		const IntVarArrayID fArr;
+		const IntDequeID fValues, fOccurences;
+		const std::vector<IntDequeID> fSplitpositions;
+		const UInt fSplit;
+		const UInt fDwin;
+
+		Constr_Count(IntVarArrayID arr, IntDequeID values, IntDequeID occurences, std::vector<IntDequeID> splitPositions, UInt split, UInt dwin)
+			 : Constraint(Constraints::Count), fArr(arr), fValues(values), fOccurences(occurences), fSplitpositions(splitPositions), fSplit(split), fDwin(dwin) { } 
 };
 

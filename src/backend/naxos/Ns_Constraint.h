@@ -4,6 +4,7 @@
 #include <backend/naxos/NsIntVar.h>
 #include <feather/utils.h>
 #include "NsIntVarArray.h"
+#include "naxos.h"
 
 namespace feather {
 
@@ -721,6 +722,154 @@ class Ns_ConstrXeqSum : public Ns_Constraint  {
 		virtual void ArcCons();
 		virtual void LocalArcCons(Ns_QueueItem& Qitem);
 };
+
+
+class Ns_ConstrElement : public Ns_Constraint  {
+	private:
+		NsIntVar *VarIndex;
+		const NsDeque<Int>&  intArray;
+		NsIntVar  *VarValue;
+	public:
+		Ns_ConstrElement (NsIntVar *VarIndex_init,
+				const NsDeque<Int>& intArray_init,
+				NsIntVar *VarValue_init)
+			: VarIndex(VarIndex_init),
+			  intArray(intArray_init),
+			  VarValue(VarValue_init)
+		{
+			revisionType  =  VALUE_CONSISTENCY;
+			assert_Ns( &VarIndex->manager() == &VarValue->manager(),  "Ns_ConstrElement::Ns_ConstrElement: All the variables of a constraint must belong to the same NsProblemManager");
+			assert_Ns( ! intArray.empty() ,  "Ns_ConstrElement::Ns_ConstrElement: Empty element array" );
+		}
+	
+		virtual int   varsInvolvedIn (void)  const    {  return 2;  }
+
+		virtual void  ArcCons      (void);
+		virtual void  LocalArcCons (Ns_QueueItem& Qitem);
+};
+
+class Ns_ConstrCount : public Ns_Constraint  {
+	private:
+		NsIntVarArray  *VarArr;
+		//const NsDeque<NsInt>&  Values;
+		//const NsDeque<NsInt>&  Occurrences;
+
+		/////  vCount[i].max() is the number of the occurrences of Values[i] in VarArr.
+		//NsIntVarArray  vCount;
+
+		/////  vMinValueIndex.min() is the minimum index i in a sorted array Values[i], with the property that the occurrences of the corresponding value is greater than zero.
+		//NsIntVar  vMinValueIndex;
+
+		/////  vMaxValueIndex.max() is the vMinValueIndex.min() maximum equivalent.
+		//NsIntVar  vMaxValueIndex;
+
+		typedef  Ns_UNORDERED_MAP<Ns_pointer_t,NsIndex>  VarIndex_t;
+
+		VarIndex_t  VarIndex;
+
+
+	public:
+		typedef  Ns_UNORDERED_MAP<Int,NsIndex>  ValueIndex_t;
+
+	private:
+		ValueIndex_t  ValueIndex;
+
+
+	public:
+		struct  ValueOccurrence_t  {
+
+			Int  value;
+
+			Int  occurrence;
+
+			const NsDeque<NsIndex>  *split_positions;
+
+			NsIntVarArray  vCount;
+
+
+			ValueOccurrence_t (const Int value_init)
+				: value(value_init)
+			{
+			}
+
+
+			ValueOccurrence_t (const Int value_init,
+				const Int occurrence_init,
+				Naxos& pm)
+				: value(value_init),
+				  occurrence(occurrence_init),
+				  split_positions(0)
+			{
+				assert_Ns( occurrence >= 0 , "Ns_ConstrCount::ValueOccurrence_t::ValueOccurrence_t: negative value in `occurrence'");
+
+				vCount.push_back( *(pm.makeVar(0, occurrence)) );
+			}
+
+
+			ValueOccurrence_t (const Int value_init,
+				const Int occurrence_init,
+				Naxos& pm,
+				const NsDeque<NsIndex>& split_positions_init,
+				const NsIndex Split)
+				: value(value_init),
+				  occurrence(occurrence_init),
+				  split_positions(&split_positions_init)
+			{
+				assert_Ns( occurrence >= 0 , "Ns_ConstrCount::ValueOccurrence_t::ValueOccurrence_t: negative value in `occurrence'");
+
+				for (NsIndex i=0;  i < split_positions->size();  ++i)
+					vCount.push_back(  *(pm.makeVar(0, Split)) );
+
+				vCount.push_back(  *(pm.makeVar(0, occurrence%Split)) );
+
+				if ( split_positions->size()  ==  0 )
+					split_positions  =  0;
+			}
+
+
+				NsIndex
+			splitIndexForPosition (NsIndex i)
+			{
+				if ( split_positions  ==  0 )
+					return  0;
+
+				NsDeque<NsIndex>::const_iterator  cit =
+					lower_bound(
+						split_positions->begin(),
+						split_positions->end(),
+						i);
+
+				return  ( cit - split_positions->begin() );
+			}
+
+
+				bool
+			operator  <  (const ValueOccurrence_t& Y)  const
+			{
+				return  ( value  <  Y.value );
+			}
+		};
+
+
+	private:
+		NsDeque<ValueOccurrence_t>  ValuesOccurrences;
+		const NsIndex  Split;
+		const NsIndex  Dwin;
+	public:
+
+		Ns_ConstrCount (NsIntVarArray *VarArr_init,
+			const NsDeque<Int>& Values,
+			const NsDeque<Int>& Occurrences,
+			const NsDeque< NsDeque<NsIndex> >& SplitPositions,
+			const NsIndex Split_init,
+			const NsIndex Dwin_init);
+
+		virtual int   varsInvolvedIn (void)  const    {  return VarArr->size();  }
+
+		virtual void  ArcCons      (void);
+		virtual void  LocalArcCons (Ns_QueueItem& Qitem);
+};
+
 
 
 } // namespace feather

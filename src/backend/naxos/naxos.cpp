@@ -1056,8 +1056,23 @@ IntDomain* Naxos::getDomain(IntVarID id) {
 	return newdomain;
 }
 
+void Naxos::addDeque(const RepresentationIntDeque& dq) {
+	NsDeque<Int> *nsdq = new NsDeque<Int>();
+	for(int i = 0; i < dq.contents.size(); i++)
+		nsdq->push_back(dq.contents[i]);
+
+	FEATHER_ASSERT(deques.find(dq.id) == deques.end());
+	deques[dq.id] = nsdq;
+}
 
 void Naxos::supplyRepresentation(const Representation& repr) {
+	/* Add all IntDeques */
+	{
+		std::vector<RepresentationIntDeque*>::const_iterator it;
+		for(it = repr.deques.begin(); it != repr.deques.end(); it++) {
+			addDeque(*(*it));
+		}
+	}
 	/* Add all variables */
 	{
 		std::vector<RepresentationIntVar>::const_iterator it;
@@ -1144,9 +1159,37 @@ Ns_Constraint* Naxos::addConstraint(const Constraint& con) {
 			addArr(*vararrays[scon.fArr], 0, (*vararrays[scon.fArr]).size(), nscon);
 			return nscon;
 		}
+		case Constraints::XeqElement: {
+			const Constr_XeqElement &scon = static_cast<const Constr_XeqElement&>(con);
+			Ns_ConstrElement *nscon = new Ns_ConstrElement(vars[scon.fIndex], *deques[scon.fArr], vars[scon.fX]);
+			addTwoVars(vars[scon.fIndex], vars[scon.fX], nscon);
+			return nscon;
+		}
+		case Constraints::Count: {
+			const Constr_Count &scon = static_cast<const Constr_Count&>(con);
+			
+			NsDeque< NsDeque<NsIndex> > splitpositions;
+			for(int i = 0; i < scon.fSplitpositions.size(); i++) {
+				NsDeque<Int> *dq = deques[scon.fSplitpositions[i]];
+			
+				NsDeque<NsIndex> dqcopy;
+				for(int j = 0; j < dq->size(); j++)
+					dqcopy.push_back(dq->at(j));
+
+				splitpositions.push_back(dqcopy);
+			}
+
+			Ns_ConstrCount *nscon = new Ns_ConstrCount(
+						vararrays[scon.fArr],
+						*deques[scon.fValues], *deques[scon.fOccurences],
+						splitpositions, scon.fSplit, scon.fDwin);
+
+			addArr(*vararrays[scon.fArr], 0, (*vararrays[scon.fArr]).size(), nscon);
+			return nscon;
+		}
 
 		default:
-			FEATHER_THROW("Unrecognized constraint");
+			FEATHER_THROW("Unrecognized constraint: " << con.fType);
 	}
 }
 
@@ -1163,6 +1206,16 @@ NsGoal* Naxos::convertGoal(const Goal& goal) {
 		default:
 			FEATHER_THROW("Unrecognized goal with type " << goal.fType);
 	}
+}
+
+NsIntVar* Naxos::makeVar(Int min, Int max) {
+	IntDomain *domain = new Bitset(min, max);
+	NsIntVar *newvar = new NsIntVar(domain, *this);
+
+	// get largest key
+	IntVarID id = vars.rbegin()->first + 1;
+	vars[id] = newvar;
+	return newvar;
 }
 
 void Naxos::addVar(const RepresentationIntVar& var) {

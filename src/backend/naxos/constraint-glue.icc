@@ -90,6 +90,12 @@ case Constraints::XneqY: {
 	addTwoVars(vars[scon.fX], vars[scon.fY], nscon);
 	return nscon;
 }
+case Constraints::XorY: {
+	const Constr_XorY &scon = static_cast<const Constr_XorY&>(con);
+	Ns_ConstrXorY *nscon = new Ns_ConstrXorY (vars[scon.fX], vars[scon.fY], scon.fNeg);
+	addTwoVars(vars[scon.fX], vars[scon.fY], nscon);
+	return nscon;
+}
 case Constraints::XeqYplusZ: {
 	const Constr_XeqYplusZ &scon = static_cast<const Constr_XeqYplusZ&>(con);
 	Ns_ConstrXeqYplusZ *nscon = new Ns_ConstrXeqYplusZ (vars[scon.fX], vars[scon.fY], vars[scon.fZ]);
@@ -99,6 +105,18 @@ case Constraints::XeqYplusZ: {
 case Constraints::XeqYtimesZ: {
 	const Constr_XeqYtimesZ &scon = static_cast<const Constr_XeqYtimesZ&>(con);
 	Ns_ConstrXeqYtimesZ *nscon = new Ns_ConstrXeqYtimesZ (vars[scon.fX], vars[scon.fY], vars[scon.fZ]);
+	addThreeVars(vars[scon.fX], vars[scon.fY], vars[scon.fZ], nscon);
+	return nscon;
+}
+case Constraints::MetaXeqYlessthanZ: {
+	const Constr_MetaXeqYlessthanZ &scon = static_cast<const Constr_MetaXeqYlessthanZ&>(con);
+	Ns_ConstrMetaXeqYlessthanZ *nscon = new Ns_ConstrMetaXeqYlessthanZ (vars[scon.fX], vars[scon.fY], vars[scon.fZ]);
+	addThreeVars(vars[scon.fX], vars[scon.fY], vars[scon.fZ], nscon);
+	return nscon;
+}
+case Constraints::MetaXeqYlesseqthanZ: {
+	const Constr_MetaXeqYlesseqthanZ &scon = static_cast<const Constr_MetaXeqYlesseqthanZ&>(con);
+	Ns_ConstrMetaXeqYlesseqthanZ *nscon = new Ns_ConstrMetaXeqYlesseqthanZ (vars[scon.fX], vars[scon.fY], vars[scon.fZ]);
 	addThreeVars(vars[scon.fX], vars[scon.fY], vars[scon.fZ], nscon);
 	return nscon;
 }

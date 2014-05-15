@@ -7,6 +7,7 @@
  * object
  */
 
+#include <vector>
 #include <feather/types.h>
 
 namespace feather {
@@ -43,7 +44,8 @@ namespace Constraints {
 		AllDiff,
 		AllDiffStrong,
 		XeqSum,
-		XeqElement
+		XeqElement,
+		Count
 	};
 };
 

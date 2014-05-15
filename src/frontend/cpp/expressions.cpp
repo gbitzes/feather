@@ -193,6 +193,7 @@ void product_min_max (IntVar &Y, IntVar &Z, Int& min, Int& max) {
  			id = slv.makeIntVar(Y.min() > C, Y.max() > C);
  			slv.add( new Constr_MetaXeqYgreaterthanC(id, Y.getID(), C));
  		}
+ 		return IntVar(id, slv);
  	}
 
 	Constraint const* ExprConstrYlesseqthanC::postConstraint() {
@@ -218,6 +219,7 @@ void product_min_max (IntVar &Y, IntVar &Z, Int& min, Int& max) {
 			id = slv.makeIntVar(!Y.contains(C), (Y.min()!=C || Y.max()!=C) );
 			slv.add( new Constr_MetaXeqYneqC(id, Y.getID(), C));
 		}
+		return IntVar(id, slv);
 	}
 
 	Constraint const* ExprConstrYeqC::postConstraint() {
@@ -271,6 +273,7 @@ void product_min_max (IntVar &Y, IntVar &Z, Int& min, Int& max) {
   			id = slv.makeIntVar(Z.max() < Y.min(), Z.min() < Y.max());
 			slv.add( new Constr_MetaXeqYlessthanZ(id, Z.getID(), Y.getID() ));
   		}
+  		return IntVar(id, slv);
   	}
 
   	Constraint const* ExprConstrYlesseqthanZ::postConstraint() {
@@ -295,6 +298,7 @@ void product_min_max (IntVar &Y, IntVar &Z, Int& min, Int& max) {
   			id = slv.makeIntVar(intersectionEmpty(Y, Z), !(Y.max()==Z.min() && Y.min()==Z.max()) );
 			slv.add( new Constr_MetaXeqYeqZ(id, Z.getID(), Y.getID(), true));
   		}
+  		return IntVar(id, slv);
   	}
 
   	Constraint const* ExprConstrYeqZ::postConstraint() {
@@ -303,6 +307,25 @@ void product_min_max (IntVar &Y, IntVar &Z, Int& min, Int& max) {
   		else
   			return new Constr_XneqY(Z.getID(), Y.getID());
   	}
+  
+  /*
+   * Y or Z
+   */
+
+  IntVar ExprConstrYorZ::postC() {
+      Solver &slv = Y.getSolver();
+      IntVarID id;
+      if(isPositive)
+          id = slv.makeIntVar(Y.min()+Z.min()!=0, Y.max()+Z.max()!=0);
+      else
+      	  id = slv.makeIntVar(!(Y.max() + Z.max() != 0), !(Y.min() + Z.min() != 0));
+      slv.add( new Constr_MetaXeqYorZ(id, Y.getID(), Z.getID(), isPositive));
+      return IntVar(id, slv);
+  }
+
+  Constraint const* ExprConstrYorZ::postConstraint() {
+  	  return new Constr_XorY(Y.getID(), Z.getID(), isPositive);
+  }
 
   /*
    * alldiff
@@ -399,6 +422,44 @@ namespace  {
 
 		return IntVar(varid, slv);
 	}
+
+/*
+ * count
+ */
+
+	Constraint const* Count(IntVarArray& arr,
+							const IntDeque& values,
+							const IntDeque& occurences,
+							const std::deque<IntDeque>& splitPositions,
+							const UInt split,
+							const UInt dwin) {
+
+		/* 
+		 * Convert from std::deque<IntDeque> into
+		 * std::vector<IntDequeID>
+		 */
+
+		std::vector<IntDequeID> spositions;
+		for(int i = 0; i < splitPositions.size(); i++)
+			spositions.push_back(i);
+
+		return new Constr_Count(arr.getID(), values.getID(), occurences.getID(),
+							spositions, split, dwin);
+	}
+
+/*
+ * IfThen
+ */
+
+ExprConstrYorZ IfThen(const ExprConstr& Y, const ExprConstr& Z) {
+	ExprConstr& Ync = const_cast<ExprConstr&>(Y);
+	ExprConstr& Znc = const_cast<ExprConstr&>(Z);
+
+	return !Ync || Znc;
+}
+
+
+
 
 
 }

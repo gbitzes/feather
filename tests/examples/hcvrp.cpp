@@ -98,7 +98,7 @@ int hcvrp(string filename, unsigned NCl, unsigned NVe, unsigned Timeout) {
 	//  Compute all the distances.
 	unsigned  i, j;
 	std::deque< std::deque<Int> >  edge_weight(clientX.size());
-	std::deque<Int> distancesList;
+	IntDeque distancesList(slv);
 	for (i=0;  i < edge_weight.size();  ++i)    {
 		for (j=0;  j < edge_weight.size();  ++j)   {
 			edge_weight[i].push_back( sqrt(
@@ -185,73 +185,72 @@ int hcvrp(string filename, unsigned NCl, unsigned NVe, unsigned Timeout) {
 	values[0] = 0;
 	occurrences[0] = (NVe)*(NCl+1) - NCl;
 	
-	// pm.add( NsCount( FSolList, values, occurrences ) );
+	slv.add( Count( FSolList, values, occurrences ) );
+
+	/* post zeroes at end */
+	count = 0;
+	for(i = 0; i < NVe; i++)
+		for(j = 0; j < NCl+1; j++) {
+			if( j != NCl)
+				slv.add( IfThen( FSolList[count] == 0, FSolList[count+1] == 0 ) );
+
+			count++;
+		}
 	
-	// /* post zeroes at end */
-	// count = 0;
-	// for(i = 0; i < NVe; i++)
-	// 	for(j = 0; j < NCl+1; j++) {
-	// 		if( j != NCl)
-	// 			pm.add( NsIfThen( FSolList[count] == 0, FSolList[count+1] == 0 ) );
-			
-			
-	// 		count++;
-	// 	}
-	
-	// /* eliminiate symmetries */
-	// int first;
-	// count = 0;
-	// for(i = 0; i < NVe; i++) {
-	// 	first = count;
+	/* eliminiate symmetries */
+	int first;
+	count = 0;
+	for(i = 0; i < NVe; i++) {
+		first = count;
 		
-	// 	for(j = 0; j < NCl+1; j++) {
+		for(j = 0; j < NCl+1; j++) {
 			
-	// 		if( j != NCl && count != first) 
-	// 		    pm.add( NsIfThen( FSolList[count+1] == 0, FSolList[first] >= FSolList[count]) );
+			if( j != NCl && count != first) 
+			    slv.add( IfThen( FSolList[count+1] == 0, FSolList[first] >= FSolList[count]) );
 			
-	// 		count++;
-	// 	}
-	// }
+			count++;
+		}
+	}
 	
-	// // cout << "in create cost" << endl;
+	// cout << "in create cost" << endl;
 	
 	// /* create cost */
-	// NsIntVarArray costList;
+	IntVarArray costList(slv);
 	
-	// count = 0;
-	// for(i = 0; i < NVe; i++)
-	// 	for(j = 0; j < NCl+1; j++) {
-	// 		if( count == 0 )
-	// 			costList.push_back( distancesList[ (FSolList[count]*(NCl+1)) + 0 ]  );
-	// 		else				
-	// 			costList.push_back( distancesList[ (FSolList[count]*(NCl+1)) + FSolList[count-1] ] + costList[count-1] );
+	count = 0;
+	for(i = 0; i < NVe; i++)
+		for(j = 0; j < NCl+1; j++) {
+			if( count == 0 )
+				costList.push_back( distancesList[ (FSolList[count]*(NCl+1)) + 0 ]  );
+			else				
+				costList.push_back( distancesList[ (FSolList[count]*(NCl+1)) + FSolList[count-1] ] + costList[count-1] );
 				
-	// 		count++;
-	// 	} 
+			count++;
+		} 
 		
-	// pm.minimize( costList[count-1] );  
+	slv.minimize( costList[count-1] );  
 	
 	// // cout << "Done putting constraints. Searching for solution..." << endl;
-	// pm.addGoal( new NsgLabeling(FSolList) );
+	slv.addGoal(Labeling(FSolList));
 	
-	// int *BestSolution = (int*) malloc( sizeof(int)*(FSolList.size()+1) );
-	// int bestCost;
-	// bool foundSolution = false;
+	int *BestSolution = (int*) malloc( sizeof(int)*(FSolList.size()+1) );
+	int bestCost;
+	bool foundSolution = false;
 	
-	// while (pm.nextSolution() != false) {
-	// 	foundSolution = true;
- //        for(i = 0; i < FSolList.size(); i++)
-	// 		BestSolution[i] = FSolList[i].value();
+	while (slv.nextSolution() != false) {
+		foundSolution = true;
+        for(i = 0; i < FSolList.size(); i++)
+			BestSolution[i] = FSolList[i].value();
 		
-	// 	bestCost = costList[count-1].value();
+		bestCost = costList[count-1].value();
 	// 	// cout << "Found a solution with cost " << costList[count-1].value() << endl; 
 	// 	//cout << "Solution with cost" << costList[count-1] << " :" << FSolList << "\n";
 	// 	//cout << costList << endl;
 	// 	//cout << weightList << endl;
-	// }
+	}
 	
-	// /* formidate solution */
-	// if(foundSolution) {
+	/* formidate solution */
+	if(foundSolution) {
 	// 	// cout << "Best solution: " << endl;
 	// 	// i = 0;
 	// 	// bool f = true;
@@ -281,12 +280,12 @@ int hcvrp(string filename, unsigned NCl, unsigned NVe, unsigned Timeout) {
 	// 	// }
 	// 	// cout << "] " << endl;
 	// 	// cout << "Cost = " << bestCost << endl;
-	// 	return bestCost;
-	// }
-	// else {
+		return bestCost;
+	}
+	else {
 	// 	// cout << "No solution" << endl;
-	// 	return -1;
-	// }
+		return -1;
+	}
 	
 	// // cout << "Time = " << (double)clock() / CLOCKS_PER_SEC << "\n";
 	

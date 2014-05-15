@@ -3,6 +3,7 @@
 #include <common/representation.h>
 #include <backend/naxos/naxos.h>
 #include <feather/utils.h>
+#include <feather/frontend/cpp/expressions.h>
 
 namespace feather {
 
@@ -46,6 +47,11 @@ IntDomain* Solver::getDomain(IntVarID id) {
 		return repr->vars[id].domain;
 	else 
 		return fPM->getDomain(id);
+}
+
+void Solver::add(const ExprConstr& expr) {
+	ExprConstr& noconst_expr = const_cast<ExprConstr&>(expr);
+	this->add(noconst_expr.postConstraint());
 }
 
 void Solver::add(const Constraint *const constr) {

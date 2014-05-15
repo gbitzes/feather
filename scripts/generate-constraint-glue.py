@@ -24,6 +24,14 @@ def gen_XopY(name):
 	print("\taddTwoVars(vars[scon.fX], vars[scon.fY], nscon);")
 	gen_return()
 
+def gen_XopYneg(name):
+	gen_case(name)
+	gen_static_cast(name)
+	print("\tNs_Constr"+name+" *nscon = new Ns_Constr"+name+" (vars[scon.fX], vars[scon.fY], scon.fNeg);")
+	print("\taddTwoVars(vars[scon.fX], vars[scon.fY], nscon);")
+	gen_return()
+
+
 def gen_XeqYopZ(name):
 	gen_case(name)
 	gen_static_cast(name)
@@ -37,6 +45,14 @@ def gen_XeqArrOp(name):
 	print("\tNs_Constr"+name+" *nscon = new Ns_Constr"+name+" (vars[scon.fX], vararrays[scon.fArr]);")
 	print("\taddArr(*vararrays[scon.fArr], scon.fStart, scon.fLength, nscon);")
 	gen_return()
+
+def gen_XeqYopZneg(name):
+	gen_case(name)
+	gen_static_cast(name)
+	print("\tNs_Constr"+name+" *nscon = new Ns_Constr"+name+" (vars[scon.fX], vars[scon.fY], vars[scon.fZ], scon.fNeg);")
+	print("\taddThreeVars(vars[scon.fX], vars[scon.fY], vars[scon.fZ], nscon);")
+	gen_return()
+
 
 		# XeqCminusZ,
 		# XeqCdivZ,
@@ -69,10 +85,15 @@ def main():
 	gen_XopY("XeqAbsY")
 	gen_XopY("XeqY")
 	gen_XopY("XneqY")
-	# gen_XopY("XorY")
+	gen_XopYneg("XorY")
 
 	gen_XeqYopZ("XeqYplusZ")
 	gen_XeqYopZ("XeqYtimesZ")
+	gen_XeqYopZ("MetaXeqYlessthanZ")
+	gen_XeqYopZ("MetaXeqYlesseqthanZ")
+
+
+	# gen_XeqYopZneg("XeqYorZ")
 	# gen_XeqYopZ("XeqYdivZ")
 	# gen_XeqYopZ("XeqYmodZ")
 
