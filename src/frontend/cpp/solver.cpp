@@ -95,6 +95,10 @@ bool Solver::isFinalized() {
 	return finalized;
 }
 
+bool Solver::isSolving() {
+	return solving;
+}
+
 void Solver::addGoal(Goal *goal) {
 	repr->goals.push_back(goal);
 }

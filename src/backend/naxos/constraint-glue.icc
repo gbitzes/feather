@@ -120,6 +120,12 @@ case Constraints::MetaXeqYlesseqthanZ: {
 	addThreeVars(vars[scon.fX], vars[scon.fY], vars[scon.fZ], nscon);
 	return nscon;
 }
+case Constraints::MetaXeqYeqZ: {
+	const Constr_MetaXeqYeqZ &scon = static_cast<const Constr_MetaXeqYeqZ&>(con);
+	Ns_ConstrMetaXeqYeqZ *nscon = new Ns_ConstrMetaXeqYeqZ (vars[scon.fX], vars[scon.fY], vars[scon.fZ], scon.fNeg);
+	addThreeVars(vars[scon.fX], vars[scon.fY], vars[scon.fZ], nscon);
+	return nscon;
+}
 case Constraints::XeqSum: {
 	const Constr_XeqSum &scon = static_cast<const Constr_XeqSum&>(con);
 	Ns_ConstrXeqSum *nscon = new Ns_ConstrXeqSum (vars[scon.fX], vararrays[scon.fArr]);

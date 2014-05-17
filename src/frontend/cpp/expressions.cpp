@@ -249,6 +249,7 @@ void product_min_max (IntVar &Y, IntVar &Z, Int& min, Int& max) {
   			id = slv.makeIntVar(Z.max() <= Y.min(), Z.min() <= Y.max());
 			slv.add( new Constr_MetaXeqYlesseqthanZ(id, Z.getID(), Y.getID() ));
   		}
+  		return IntVar(id, slv);
   	}
 
   	Constraint const* ExprConstrYlessthanZ::postConstraint() {
@@ -292,11 +293,11 @@ void product_min_max (IntVar &Y, IntVar &Z, Int& min, Int& max) {
   		IntVarID id;
   		if(isPositive) {
   			id = slv.makeIntVar(Y.max()==Z.min() && Y.min()==Z.max(), !intersectionEmpty(Y, Z) );
-  			slv.add( new Constr_MetaXeqYeqZ(id, Y.getID(), Z.getID(), false));
+  			slv.add( new Constr_MetaXeqYeqZ(id, Y.getID(), Z.getID(), isPositive));
   		}
   		else {
   			id = slv.makeIntVar(intersectionEmpty(Y, Z), !(Y.max()==Z.min() && Y.min()==Z.max()) );
-			slv.add( new Constr_MetaXeqYeqZ(id, Z.getID(), Y.getID(), true));
+			slv.add( new Constr_MetaXeqYeqZ(id, Z.getID(), Y.getID(), isPositive));
   		}
   		return IntVar(id, slv);
   	}

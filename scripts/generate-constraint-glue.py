@@ -57,8 +57,6 @@ def gen_XeqYopZneg(name):
 		# XeqCminusZ,
 		# XeqCdivZ,
 		# XeqCmodZ,
-		# MetaXeqYlessthanZ,
-		# MetaXeqYlesseqthanZ,
 		# MetaXeqYeqZ,
 		# MetaXeqYandZ,
 		# MetaXeqYorZ
@@ -92,6 +90,7 @@ def main():
 	gen_XeqYopZ("MetaXeqYlessthanZ")
 	gen_XeqYopZ("MetaXeqYlesseqthanZ")
 
+	gen_XeqYopZneg("MetaXeqYeqZ")
 
 	# gen_XeqYopZneg("XeqYorZ")
 	# gen_XeqYopZ("XeqYdivZ")

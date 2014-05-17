@@ -124,3 +124,17 @@ TEST(frontend_Expressions, T3 ) {
 	ASSERT_THROW(slv.add(d==5), FeatherException);
 }
 
+TEST(frontend_Expressions, MetaXeqYeqZ) {
+	Solver slv( new Naxos() );
+	IntVar a(slv, 0, 10);
+	IntVar b(slv, 0, 10);
+	IntVar c = (a == b);
+
+	IntVarArray arr(slv);
+	arr.push_back(a); arr.push_back(b); arr.push_back(c);
+	slv.addGoal(Labeling(arr));
+
+	while(slv.nextSolution()) {
+		ASSERT_EQ(c.value(), a.value() == b.value());
+	}
+}

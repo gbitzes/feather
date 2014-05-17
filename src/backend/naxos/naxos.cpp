@@ -459,7 +459,6 @@ Ns_GoalStack::~Ns_GoalStack (void)
 ///  Imposes arc consistency.
 
 bool Naxos::imposeArcConsistency() {
-
 	if ( foundInconsistency )   {
 
 		foundInconsistency  =  false;
@@ -661,14 +660,14 @@ void Naxos::start() {
 
 /* Prunes the search tree using these decisions */
 pruneResult_t Naxos::prune(std::vector<bool> *decisions) {
-
 	if( firstNextSolution ) {
 		/* Search has not started yet - initialize it */
 		start();
 
 		/* Is the initial state inconsistent? Don't even bother - the search has already failed */
-		if( !imposeArcConsistency() )
+		if( !imposeArcConsistency() ) {
 			return NO_SOLUTIONS;
+		}
 
 		/* .. no goals to execute? Don't even bother - just return a single solution, the current state of the variables */
 		if ( searchNodes.top().stackAND.empty() && searchNodes.top().delayedGoal == searchNodes.gend() )
@@ -846,8 +845,9 @@ bool Naxos::nextSolution() {
 		 //TODO: get decision vector from Solver
 		 pruneResult_t result = prune(&initialDecisions);
 
-		 if( result == NO_SOLUTIONS )
+		 if( result == NO_SOLUTIONS ) {
 		 	return false;
+		 }
 		 if ( result == ONLY_ONE_SOLUTION )
 		 	return true;
 		 if ( result != OK )

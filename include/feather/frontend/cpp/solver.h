@@ -42,6 +42,7 @@ class Solver {
 		void add(const Constraint *const constr);
 		void add(const ExprConstr &expr);
 		bool isFinalized();
+		bool isSolving();
 		bool nextSolution();
 
 		SolutionID getSolutionID();		
