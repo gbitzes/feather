@@ -387,7 +387,7 @@ typedef enum { OK=1, NO_SOLUTIONS, ONLY_ONE_SOLUTION  } pruneResult_t;
 ///  A problem manager keeps information for the constrained variables, the
 ///   constraints network, and the goal that will be executed.
 
-class Naxos : public ProblemManager {
+class Naxos : public ChildManager {
 
 	private:
 		/* The stack that contains the choice points that have appeared during search
@@ -467,7 +467,7 @@ class Naxos : public ProblemManager {
 					   backtrackLim;
 
 	private:
-		IntermediateManager *parent;
+		ParentManager *parent;
 
 		UInt iterations;
 		UInt donatedGoals;
@@ -501,10 +501,16 @@ class Naxos : public ProblemManager {
 		virtual void supplyRepresentation(const Representation&);
 		virtual void clearRepresentation();	
 
+		int nsolutions = 0;
+		void printState();
+
 		Naxos();
 		virtual ~Naxos();
 		virtual bool nextSolution();
 		virtual IntDomain* getDomain(IntVarID);
+
+		virtual void setParent(ParentManager*);
+		virtual void setInitialDecisions(std::vector<bool>);
 
 		///  True, if an inconsistency has been found.
 		bool foundInconsistency;

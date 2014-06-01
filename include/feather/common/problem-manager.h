@@ -9,11 +9,10 @@ namespace feather {
 class Representation;
 
 /*
- * The basic interface from which middle managers 
- * and backends inherit
- *
- * It defines methods with which to supply the representation
- * of the problem and receive all results
+ * The basic interface for an object that
+ * declares "Hey, I can solve a CSP problem"
+ * but no guarantees that can have a parent
+ * or children
  */
 
 class ProblemManager {
@@ -27,18 +26,35 @@ class ProblemManager {
 		virtual IntDomain* getDomain(IntVarID) = 0;
 };
 
-/*
- * A special case of ProblemManager that
- * manages other ProblemManagers
- */
 
-class IntermediateManager : public ProblemManager {
+class ChildManager;
+
+/*
+ * A ProblemManager that can manage chlidren
+ */
+class ParentManager : public virtual ProblemManager {
 	public:
 		virtual Int getMinObjValue() = 0;
 		virtual void updateMinObjValue(Int) = 0;
 		virtual void newInstance(std::vector<bool> decisions) = 0;
 		virtual bool needMoreWork() = 0;
 };
+
+/*
+ * A ProblemManager that can be managed by parents
+ */
+class ChildManager : public virtual ProblemManager {
+	public:
+		virtual void setParent(ParentManager*) = 0;
+		virtual void setInitialDecisions(std::vector<bool>) = 0;
+};
+
+/*
+ * A problem manager that can act both as a child
+ * and parent
+ */
+
+class IntermediateManagerAsdf : public ParentManager, public ChildManager { };
 
 
 } // namespace feather

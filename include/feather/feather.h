@@ -6,3 +6,5 @@
 #include <feather/frontend/cpp/int-deque.h>
 
 #include <backend/naxos/naxos.h>
+#include <feather/management/manager-generator.h>
+#include <feather/management/thread-manager.h>

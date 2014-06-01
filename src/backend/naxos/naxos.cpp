@@ -870,6 +870,8 @@ bool Naxos::nextSolution() {
 	}
 
 
+
+
 	if ( ( ! imposeArcConsistency() )
 			|| (searchNodes.top().stackAND.empty()
 				&&  searchNodes.top().delayedGoal == searchNodes.gend()) )
@@ -890,35 +892,37 @@ bool Naxos::nextSolution() {
 		iterations++;
 
 		/* Should I give up some of my work to another thread? */
-		if( parent != NULL && iterations > 20000 && iterations%256 == 0) {
+		if(parent != NULL && parent->needMoreWork() && iterations > 2000)
+			giveupWork();
 
-			if( searchNodes.size() - donatedGoals >= 8 && parent->needMoreWork() )
-				giveupWork();
+		// if( parent != NULL && iterations > 20000 && iterations%256 == 0) {
 
-		}
+		// 	if(parent->needMoreWork())
+		// 	// if( searchNodes.size() - donatedGoals >= 8 && parent->needMoreWork() )
+		// 		giveupWork();
+		// }
 
 		/* Is there a better global min value? */
-		if( parent != NULL && iterations%8 == 0 ) {
+		// if( parent != NULL && iterations%8 == 0 ) {
 
-			Int globalBest = parent->getMinObjValue();
+		// 	Int globalBest = parent->getMinObjValue();
 
-			if(globalBest < bestMinObjValue) {
-				bestMinObjValue = globalBest;
+		// 	if(globalBest < bestMinObjValue) {
+		// 		bestMinObjValue = globalBest;
 				
 				/*				
 				 * Remove all values worse than the global minimum and
 				 * check if state is still consistent
 				 */ 
 				
-				vMinObj->remove(bestMinObjValue, kPlusInf);
+		// 		vMinObj->remove(bestMinObjValue, kPlusInf);
 
-				if( foundInconsistency )
-					if( !backtrack() ) {
-						return false;
-					}
-			}
-
-		}
+		// 		if( foundInconsistency )
+		// 			if( !backtrack() ) {
+		// 				return false;
+		// 			}
+		// 	}
+		// }
 
 		popped_a_goal  =  false;
 
@@ -1041,6 +1045,7 @@ bool Naxos::nextSolution() {
 				// if( estimateSearchSpace() != 1)
 				// 	throw NsException("search space not 1");
 
+				// printState();
 				return  true;
 
 			}
@@ -1063,6 +1068,15 @@ void Naxos::addDeque(const RepresentationIntDeque& dq) {
 
 	FEATHER_ASSERT(deques.find(dq.id) == deques.end());
 	deques[dq.id] = nsdq;
+}
+
+void Naxos::printState() {
+	for(int i = 0; i < initialDecisions.size(); i++)
+		std::cout << initialDecisions[i];
+	std::cout << "  - ";
+	for(int i = 0; i < decisions.size(); i++)
+		std::cout << decisions[i];
+	std::cout << std::endl;
 }
 
 void Naxos::supplyRepresentation(const Representation& repr) {
@@ -1105,6 +1119,15 @@ void Naxos::supplyRepresentation(const Representation& repr) {
 	if(repr.minObj != -1) {
 		minimize( *vars[repr.minObj] );
 	}
+}
+
+void Naxos::setParent(ParentManager *parent) {
+	this->parent = parent;
+}
+
+void Naxos::setInitialDecisions(std::vector<bool> decisions) {
+	initialDecisions.insert(initialDecisions.begin(), decisions.begin(), decisions.end());
+	this->decisions.insert(this->decisions.begin(), decisions.begin(), decisions.end());
 }
 
 Naxos::Naxos()
