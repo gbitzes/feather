@@ -27,7 +27,7 @@ class NsGoal {
 			return false;
 		}
 
-		virtual bool isMandatoryParallelOR() const {
+		virtual bool isParallelOR() const {
 			return false;
 		}
 
@@ -103,6 +103,44 @@ class NsgOR : public NsGoal {
 			FEATHER_THROW("This is a meta-goal (i.e. not a real goal");
 		}
 };
+
+class NsgParallelOR : public NsGoal  {
+
+	private:
+
+		NsGoal  *firstSubGoal;
+		NsGoal  *secondSubGoal;
+
+	public:
+
+		NsgParallelOR (NsGoal *firstSubGoal_init, NsGoal *secondSubGoal_init)
+		 : firstSubGoal(firstSubGoal_init), secondSubGoal(secondSubGoal_init)
+		{
+			assert_Ns( firstSubGoal != 0  &&  secondSubGoal != 0 ,  "NsgOR::NsgOR: A subgoal is zero");
+		}
+
+
+		virtual bool  isGoalOR (void)  const
+			{  return  true;  }
+
+		virtual bool isParallelOR() const {
+			return true;
+		}
+
+		virtual NsGoal*  getFirstSubGoal  (void)  const
+			{  return  firstSubGoal;  }
+
+		virtual NsGoal*  getSecondSubGoal (void)  const
+			{  return  secondSubGoal;  }
+
+
+		NsGoal*  GOAL (void) {
+			FEATHER_THROW("NsgOR::GOAL: This is a meta-goal (i.e. not a real goal)");
+		}
+};
+
+
+
 
 /* A simple goal that assigns a value to a constrained variable */
 class NsgSetValue : public NsGoal  {
@@ -200,6 +238,84 @@ class NsgLabeling : public NsGoal {
 			return (new NsgAND(new NsgInDomain(VarArr[index]), new NsgLabeling(*this) ));
 		}
 };
+
+class NsgInDomainParallel : public NsGoal  {
+
+	private:
+
+		NsIntVar&  Var;
+		Int limit;
+
+	public:
+
+		NsgInDomainParallel (NsIntVar& Var_init, Int limit_init)
+			: Var(Var_init), limit(limit_init)    {    }
+
+
+		NsGoal*  GOAL (void)
+		{
+			//std::cout << "  NsgInDomain:    ";
+			if (Var.isBound())
+				return  0;
+
+			Int value = Var.min();
+
+			/* limit has been reached! Don't parallelize any more */
+			if(limit == 0)
+				return  ( new NsgOR( new NsgSetValue(Var,value) ,
+			                     new NsgAND( new NsgRemoveValue(Var,value) ,
+			                                 new NsgInDomain(Var) ) ) );
+
+
+			return  ( new NsgParallelOR( new NsgSetValue(Var,value) ,
+			                     new NsgAND( new NsgRemoveValue(Var,value) ,
+			                                 new NsgInDomainParallel(Var, limit-1) ) ) );
+		}
+};
+
+class NsgLabelingParallel : public NsGoal  {
+
+	private:
+
+		NsIntVarArray&  VarArr;
+		Int varlimit, valuelimit;
+
+	public:
+
+		NsgLabelingParallel (NsIntVarArray& VarArr_init, Int varlim, Int valuelim)
+			: VarArr(VarArr_init), varlimit(varlim), valuelimit(valuelim) {    }
+
+
+		NsGoal*  GOAL (void)
+		{
+			//std::cout << "  NsgLabeling:       ";
+			// NsIndex  index = NsINDEX_INF;
+			bool flag = false;
+		    Int index = 0;
+			UInt  minDom = kPlusInf;
+
+			for (NsIndex i = 0;   i < VarArr.size();   ++i)  {
+				if ( !VarArr[i].isBound()   &&   VarArr[i].size() < minDom )   {
+					minDom = VarArr[i].size();
+					index = i;
+					flag = true;
+				}
+			}
+
+			if(flag == false)
+				return 0;
+
+			// if (index == NsINDEX_INF)
+				// return  0;
+
+			/* limit has been reached! do not parallelize any more */
+			if(varlimit <= 0)
+				return  ( new NsgAND( new NsgInDomain(VarArr[index]) , new NsgLabeling(VarArr) ) );
+
+			return  ( new NsgAND( new NsgInDomainParallel(VarArr[index], valuelimit) , new NsgLabelingParallel(VarArr, varlimit-1, valuelimit) ) );
+		}
+};
+
 
 /* 
  * Normally used for describing the stack 

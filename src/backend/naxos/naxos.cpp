@@ -951,10 +951,10 @@ bool Naxos::nextSolution() {
 
 		}  else if ( CurrGoal->isGoalOR())   {
 
-			if( CurrGoal->isMandatoryParallelOR() ) {
+			if( CurrGoal->isParallelOR() ) {
 
 				if( parent == NULL ) {
-					FEATHER_THROW("Error: Encountered mandatory parallel or but no solver has been defined");
+					FEATHER_THROW("Error: Encountered mandatory parallel or but no parent has been defined");
 				}
 
 				/* 
@@ -1226,6 +1226,14 @@ NsGoal* Naxos::convertGoal(const Goal& goal) {
 			const Goal_Labeling &sgoal = static_cast<const Goal_Labeling&>(goal);
 			return new NsgLabeling( *vararrays[sgoal.fArr] );
 		}
+        case Goals::ParallelInDomain: {
+            const Goal_ParallelInDomain &sgoal = static_cast<const Goal_ParallelInDomain&>(goal);
+            return new NsgInDomainParallel( *vars[sgoal.fVar], sgoal.fLimit);
+        }
+        case Goals::ParallelLabeling: {
+            const Goal_ParallelLabeling &sgoal = static_cast<const Goal_ParallelLabeling&>(goal);
+            return new NsgLabelingParallel( *vararrays[sgoal.fArr], sgoal.fVarlimit, sgoal.fValuelimit);
+        }
 		default:
 			FEATHER_THROW("Unrecognized goal with type " << goal.fType);
 	}

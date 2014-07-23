@@ -5,7 +5,7 @@ using namespace std;
 using namespace feather;
 
 int nqueens(int N) {
-	Solver slv( new Naxos() );
+	Solver slv( new ThreadManager(new NaxosGenerator(), 1, 1000) );
 	
 	IntVarArray var(slv), varPlus(slv), varMinus(slv);	
 
@@ -19,7 +19,7 @@ int nqueens(int N) {
 	slv.add(AllDiff(varPlus));
 	slv.add(AllDiff(varMinus));
 
-	slv.addGoal(Labeling(var));
+	slv.addGoal(ParallelLabeling(var, 1, 1));
 
 	Int nsolutions = 0;
 	while(slv.nextSolution() ) {

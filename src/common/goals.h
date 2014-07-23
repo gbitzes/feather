@@ -14,7 +14,9 @@ namespace feather {
 namespace Goals {
 	enum Type {
 		InDomain = 0,
-		Labeling
+		Labeling,
+        ParallelInDomain,
+        ParallelLabeling
 	};
 };
 
@@ -38,6 +40,24 @@ class Goal_Labeling : public Goal {
 
 		Goal_Labeling(const IntVarArrayID arr)
 			 : Goal(Goals::Labeling), fArr(arr) {} 
+};
+
+class Goal_ParallelInDomain : public Goal {
+    public:
+        const IntVarID fVar;
+        const Int fLimit;
+
+        Goal_ParallelInDomain(const IntVarID var, const Int limit) 
+            : Goal(Goals::ParallelInDomain), fVar(var), fLimit(limit) {}
+};
+
+class Goal_ParallelLabeling : public Goal {
+    public:
+        const IntVarArrayID fArr;
+        const Int fVarlimit, fValuelimit;
+        
+        Goal_ParallelLabeling(const IntVarArrayID arr, const Int varlimit, const Int valuelimit)
+            : Goal(Goals::ParallelLabeling), fArr(arr), fVarlimit(varlimit), fValuelimit(valuelimit) {}
 };
 
 

@@ -15,5 +15,14 @@ Goal* Labeling(IntVarArray &arr) {
 	return ret;
 }
 
+Goal* ParallelInDomain(IntVar &var, Int limit) {
+    Goal_ParallelInDomain* ret = new Goal_ParallelInDomain(var.getID(), limit);
+    return ret;
+}
+
+Goal* ParallelLabeling(IntVarArray &arr, Int varlimit, Int valuelimit) {
+    Goal_ParallelLabeling* ret = new Goal_ParallelLabeling(arr.getID(), varlimit, valuelimit);
+    return ret;
+}
 
 }
