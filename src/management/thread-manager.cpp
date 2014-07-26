@@ -33,6 +33,7 @@ ThreadManager::ThreadManager(ChildGenerator *generator, Int target, Int loggingL
 	this->generator = generator;
 	this->loggingLevel = loggingLevel;
 	targetThreads = target;
+    activeThreads = 0;
 
 	representation = NULL;
 	activeManager = NULL;
