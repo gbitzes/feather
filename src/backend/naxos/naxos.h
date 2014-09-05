@@ -476,7 +476,7 @@ class Naxos : public ChildManager {
 		std::vector<bool> initialDecisions;
 
 		bool backtrack();
-		void restart();
+		virtual void restart();
 		void start();
 
 		pruneResult_t prune(std::vector<bool> *decisions);

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <base/int-ranges.h>
 #include <base/bitset.h>
+#include <common/util.h>
 #include <iostream>
 
 using namespace feather;
@@ -534,4 +535,19 @@ TYPED_TEST(base_IntDomain, Stress18) {
 	ASSERT_EQ(iter, domain->end());
 
 	delete domain;
+}
+
+TEST(base_IntDomain, Serialization1) {
+    std::string s;
+    IntDomain *d;
+    s = "[10..20 23 28 30..40 42..43 45]";
+    d = deserializeDomain(s);
+    ASSERT_EQ(d->toString(), s);
+    delete d;
+
+    s = "[0..1]";
+    d = deserializeDomain(s);
+    ASSERT_EQ(d->toString(), s);
+    delete d;
+
 }

@@ -892,7 +892,7 @@ bool Naxos::nextSolution() {
 		iterations++;
 
 		/* Should I give up some of my work to another thread? */
-		if(parent != NULL && parent->needMoreWork() && iterations > 2000)
+		if(parent != NULL && parent->needMoreWork() && iterations > 5000)
 			giveupWork();
 
 		// if( parent != NULL && iterations > 20000 && iterations%256 == 0) {

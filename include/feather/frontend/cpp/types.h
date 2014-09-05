@@ -4,7 +4,7 @@
 #include <feather/types.h>
 
 namespace feather {
-	typedef UInt IntVarID;
+	typedef Int IntVarID;
 
 	class Representation;
 	class Solver;

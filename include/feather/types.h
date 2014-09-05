@@ -14,7 +14,7 @@ typedef unsigned long UInt;
 typedef unsigned long long Chunk;
 const UInt CHUNK_BITS = CHAR_BIT * sizeof(Chunk);
 
-typedef UInt IntVarID;
+typedef Int IntVarID;
 typedef UInt IntVarArrayID;
 typedef UInt SolutionID;
 typedef UInt IntDequeID;

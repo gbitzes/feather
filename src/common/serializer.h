@@ -3,10 +3,9 @@
 
 namespace feather {
 class RepresentationSerializer {
-	
 	public:
-		static std::string serialize(Representation&);
-		static Representation* unserialize(std::string&);
+		static std::string serialize(const Representation&);
+		static Representation* deserialize(std::string&);
 
 };
 } // namespace feather

@@ -8,6 +8,7 @@
  */
 
 #include <feather/types.h>
+#include <sstream>
 
 namespace feather {
 
@@ -24,6 +25,7 @@ class Goal {
 	public:
 		const Goals::Type fType;
 		Goal(Goals::Type type) : fType(type) {}
+        virtual std::string serialize() const = 0;
 };
 
 class Goal_InDomain : public Goal {
@@ -32,6 +34,17 @@ class Goal_InDomain : public Goal {
 
 		Goal_InDomain(const IntVarID var)
 			: Goal(Goals::InDomain), fVar(var) {}
+        virtual std::string serialize() const {
+            std::ostringstream ss;
+            ss << "GOAL " << fType << " " << fVar;
+            return ss.str();
+        }
+        static Goal* deserialize(std::string s) {
+            std::stringstream ss(s);
+            IntVarID var;
+            ss >> var;
+            return new Goal_InDomain(var);
+        }
 };
 
 class Goal_Labeling : public Goal {
@@ -40,6 +53,17 @@ class Goal_Labeling : public Goal {
 
 		Goal_Labeling(const IntVarArrayID arr)
 			 : Goal(Goals::Labeling), fArr(arr) {} 
+        virtual std::string serialize() const {
+            std::ostringstream ss;
+            ss << "GOAL " << fType << " " << fArr;
+            return ss.str();
+        }
+        static Goal* deserialize(std::string s) {
+            std::stringstream ss(s);
+            IntVarArrayID arr;
+            ss >> arr;
+            return new Goal_Labeling(arr);
+        }
 };
 
 class Goal_ParallelInDomain : public Goal {
@@ -49,6 +73,19 @@ class Goal_ParallelInDomain : public Goal {
 
         Goal_ParallelInDomain(const IntVarID var, const Int limit) 
             : Goal(Goals::ParallelInDomain), fVar(var), fLimit(limit) {}
+        virtual std::string serialize() const {
+            std::ostringstream ss;
+            ss << "GOAL " << fType << " " << fVar << " " << fLimit;
+            return ss.str();
+        }
+        static Goal* deserialize(std::string s) {
+            std::stringstream ss(s);
+            IntVarID var;
+            ss >> var;
+            Int limit;
+            ss >> limit;
+            return new Goal_ParallelInDomain(var, limit);
+        }
 };
 
 class Goal_ParallelLabeling : public Goal {
@@ -58,6 +95,21 @@ class Goal_ParallelLabeling : public Goal {
         
         Goal_ParallelLabeling(const IntVarArrayID arr, const Int varlimit, const Int valuelimit)
             : Goal(Goals::ParallelLabeling), fArr(arr), fVarlimit(varlimit), fValuelimit(valuelimit) {}
+        virtual std::string serialize() const {
+            std::ostringstream ss;
+            ss << "GOAL " << fType << " " << fArr << " " << fVarlimit << " " << fValuelimit;
+            return ss.str();
+        }
+        static Goal* deserialize(std::string s) {
+            std::stringstream ss(s);
+            IntVarArrayID arr;
+            ss >> arr;
+            Int varlimit;
+            ss >> varlimit;
+            Int valuelimit;
+            ss >> valuelimit;
+            return new Goal_ParallelLabeling(arr, varlimit, valuelimit);
+        }
 };
 
 

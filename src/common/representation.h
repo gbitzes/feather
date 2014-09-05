@@ -27,6 +27,7 @@ struct RepresentationIntDeque {
 	IntDequeID id;
 
 	RepresentationIntDeque(UInt size) : contents(size) {}
+	RepresentationIntDeque() {}
 };
 
 class Representation {

@@ -33,6 +33,24 @@ def define(name, contents):
 	initializer_list = ", ".join(["{}({})".format(fieldstyle(var), var) for var in allvars ]   )
 
 	print("\t\t\t : Constraint(Constraints::{}), ".format(name) + initializer_list) + " { } "
+
+        print("\t\tvirtual std::string serialize() const {")
+        print("\t\t\tstd::ostringstream os;")
+        print("\t\t\tos << \"CONSTR \" << Constraints::" + name + " << \" \" << "),
+        print("\n\t\t\t   << \" \" << ".join([fieldstyle(v) for v in allvars]) + ";")
+        print("\t\t\treturn os.str();")
+        print("\t\t}")
+
+        print("\t\tstatic Constraint* deserialize(std::string s) {")
+        print("\t\t\tstd::stringstream ss(s);")
+        for t in contents:
+                for var in t[1]:
+                        print("\t\t\t{} {};".format(t[0], var))
+                        print("\t\t\tss >> {};".format(var))
+
+        print("\t\t\treturn new Constr_{}(".format(name)),
+        print(",".join(allvars) + ");")
+        print("\t\t}")
 	print("};\n")
 
 def define_XopY(name):
@@ -153,16 +171,16 @@ if __name__ == '__main__':
 		  	]
 		  )
 
-	define("Count",
-			[
-				["IntVarArrayID", ["arr"]],
-				["IntDequeID", ["values", "occurences"] ],
-				["std::vector<IntDequeID>", ["splitPositions"]],
-				["UInt", ["split"]],
-				["UInt", ["dwin"]]
-			]
-		  )
-
+	# define("Count",
+	# 		[
+	# 			["IntVarArrayID", ["arr"]],
+	# 			["IntDequeID", ["values", "occurences"] ],
+	# 			["std::vector<IntDequeID>", ["splitPositions"]],
+	# 			["UInt", ["split"]],
+	# 			["UInt", ["dwin"]]
+	# 		]
+	# 	  )
+        #
 
 	if len(sys.argv) > 1:
 		print ",\n".join(allConstraints)

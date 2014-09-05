@@ -21,6 +21,7 @@ class ProblemManager {
 		virtual void supplyRepresentation(const Representation &) = 0;
 		virtual void clearRepresentation() = 0;
 		virtual bool nextSolution() = 0;
+        virtual void restart() = 0;
 
 		/* Caller responsible to delete given object */
 		virtual IntDomain* getDomain(IntVarID) = 0;
@@ -54,7 +55,7 @@ class ChildManager : public virtual ProblemManager {
  * and parent
  */
 
-class IntermediateManagerAsdf : public ParentManager, public ChildManager { };
+class IntermediateManager : public ParentManager, public ChildManager { };
 
 
 } // namespace feather

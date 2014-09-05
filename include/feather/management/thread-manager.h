@@ -27,7 +27,7 @@ struct ThreadInfo {
 	sem_t *waiting;
 };
 
-class ThreadManager : public ParentManager {
+class ThreadManager : public IntermediateManager {
 	private:
 		ThreadManagerState::State state;
 
@@ -40,6 +40,8 @@ class ThreadManager : public ParentManager {
 		ChildGenerator *generator;
 
 		std::vector<ThreadInfo> threads;
+        std::vector<bool> decisions;
+        ParentManager* parent;
 
 		// std::vector<ProblemManager*> pms;
 		// std::vector<pthread_t*> threads;
@@ -58,6 +60,8 @@ class ThreadManager : public ParentManager {
 
 		pthread_mutex_t objValueMutex, pendingSolutionsMutex, loggingMutex;
 		pthread_mutex_t newInstanceMutex, activeThreadsMutex;
+
+        void cleanup();
 	public:
 		ThreadManager(ChildGenerator*, Int target, Int loggingLevel = 0);
 		~ThreadManager();
@@ -72,7 +76,10 @@ class ThreadManager : public ParentManager {
 		virtual Int getMinObjValue();
 		virtual void updateMinObjValue(Int);
 		virtual void newInstance(std::vector<bool> decisions);
+		virtual void setInitialDecisions(std::vector<bool> decisions);
+        virtual void setParent(ParentManager*);
 		virtual bool needMoreWork();
+        virtual void restart();
 
 		void runThread(ChildManager &pm, ProblemManagerID id);
 		void log(int, std::string);

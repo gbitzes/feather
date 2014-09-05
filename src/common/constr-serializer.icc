@@ -1,0 +1,64 @@
+	if(id == Constraints::XlessthanY)
+		return Constr_XlessthanY::deserialize(s);
+	if(id == Constraints::XlesseqthanY)
+		return Constr_XlesseqthanY::deserialize(s);
+	if(id == Constraints::XeqAbsY)
+		return Constr_XeqAbsY::deserialize(s);
+	if(id == Constraints::XeqY)
+		return Constr_XeqY::deserialize(s);
+	if(id == Constraints::XneqY)
+		return Constr_XneqY::deserialize(s);
+	if(id == Constraints::XorY)
+		return Constr_XorY::deserialize(s);
+	if(id == Constraints::XeqYplusC)
+		return Constr_XeqYplusC::deserialize(s);
+	if(id == Constraints::XeqYdivC)
+		return Constr_XeqYdivC::deserialize(s);
+	if(id == Constraints::XeqYtimesC)
+		return Constr_XeqYtimesC::deserialize(s);
+	if(id == Constraints::XeqYmodC)
+		return Constr_XeqYmodC::deserialize(s);
+	if(id == Constraints::XeqYplusZ)
+		return Constr_XeqYplusZ::deserialize(s);
+	if(id == Constraints::XeqYtimesZ)
+		return Constr_XeqYtimesZ::deserialize(s);
+	if(id == Constraints::XeqYmodZ)
+		return Constr_XeqYmodZ::deserialize(s);
+	if(id == Constraints::XeqCminusZ)
+		return Constr_XeqCminusZ::deserialize(s);
+	if(id == Constraints::XeqCdivZ)
+		return Constr_XeqCdivZ::deserialize(s);
+	if(id == Constraints::XeqCmodZ)
+		return Constr_XeqCmodZ::deserialize(s);
+	if(id == Constraints::MetaXeqYlessthanC)
+		return Constr_MetaXeqYlessthanC::deserialize(s);
+	if(id == Constraints::MetaXeqYlesseqthanC)
+		return Constr_MetaXeqYlesseqthanC::deserialize(s);
+	if(id == Constraints::MetaXeqYgreaterthanC)
+		return Constr_MetaXeqYgreaterthanC::deserialize(s);
+	if(id == Constraints::MetaXeqYgreatereqthanC)
+		return Constr_MetaXeqYgreatereqthanC::deserialize(s);
+	if(id == Constraints::MetaXeqYeqC)
+		return Constr_MetaXeqYeqC::deserialize(s);
+	if(id == Constraints::MetaXeqYneqC)
+		return Constr_MetaXeqYneqC::deserialize(s);
+	if(id == Constraints::MetaXeqYlessthanZ)
+		return Constr_MetaXeqYlessthanZ::deserialize(s);
+	if(id == Constraints::MetaXeqYlesseqthanZ)
+		return Constr_MetaXeqYlesseqthanZ::deserialize(s);
+	if(id == Constraints::MetaXeqYeqZ)
+		return Constr_MetaXeqYeqZ::deserialize(s);
+	if(id == Constraints::MetaXeqYandZ)
+		return Constr_MetaXeqYandZ::deserialize(s);
+	if(id == Constraints::MetaXeqYorZ)
+		return Constr_MetaXeqYorZ::deserialize(s);
+	if(id == Constraints::AllDiff)
+		return Constr_AllDiff::deserialize(s);
+	if(id == Constraints::AllDiffStrong)
+		return Constr_AllDiffStrong::deserialize(s);
+	if(id == Constraints::XeqSum)
+		return Constr_XeqSum::deserialize(s);
+	if(id == Constraints::XeqElement)
+		return Constr_XeqElement::deserialize(s);
+	if(id == Constraints::Count)
+		return Constr_Count::deserialize(s);

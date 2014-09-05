@@ -36,8 +36,12 @@ ThreadManager::ThreadManager(ChildGenerator *generator, Int target, Int loggingL
     activeThreads = 0;
 
 	representation = NULL;
-	activeManager = NULL;
+    cleanup();
+	this->log(10, "ThreadManager constructed");
+}
 
+void ThreadManager::cleanup() {
+    activeManager = NULL;
 	pthread_mutex_init(&objValueMutex, NULL);
 	pthread_mutex_init(&pendingSolutionsMutex, NULL);
 	pthread_mutex_init(&loggingMutex, NULL);
@@ -45,8 +49,14 @@ ThreadManager::ThreadManager(ChildGenerator *generator, Int target, Int loggingL
 	pthread_mutex_init(&activeThreadsMutex, NULL);
 
 	this->state = ThreadManagerState::UNINITIALIZED;
-	this->log(10, "ThreadManager constructed");
 	sem_init(&pending, 0, 0);
+}
+
+void ThreadManager::restart() {
+    if(state != ThreadManagerState::INITIALIZED_SEARCH_FINISHED)
+        FEATHER_THROW("Cannot do a restart at this point");
+    cleanup();
+    state = ThreadManagerState::INITIALIZED_NOT_SEARCHING;
 }
 
 void ThreadManager::supplyRepresentation(const Representation &representation) {
@@ -94,8 +104,22 @@ Int ThreadManager::getMinObjValue() {
 	return minObjValue;
 }
 
+void ThreadManager::setInitialDecisions(std::vector<bool> decisions) {
+	if(state != ThreadManagerState::UNINITIALIZED && state != ThreadManagerState::INITIALIZED_NOT_SEARCHING)
+		FEATHER_THROW("Cannot set initial decisions at this point");
+
+    this->decisions = decisions;
+}
+
+void ThreadManager::setParent(ParentManager *parent) {
+    if(state != ThreadManagerState::UNINITIALIZED && state != ThreadManagerState::INITIALIZED_NOT_SEARCHING)
+		FEATHER_THROW("Cannot set initial decisions at this point");
+
+    this->parent = parent;
+}
+
 bool ThreadManager::needMoreWork() {
-	return activeThreads < targetThreads;
+	return activeThreads < targetThreads || (parent != NULL && parent->needMoreWork());
 }
 
 void ThreadManager::log(int level, std::string msg) {
@@ -154,7 +178,7 @@ bool ThreadManager::nextSolution() {
 		return false;
 	if(state == ThreadManagerState::INITIALIZED_NOT_SEARCHING) {
 		/* Launch the first thread */
-		newInstance(std::vector<bool> () );
+		newInstance(decisions);
 		state = ThreadManagerState::INITIALIZED_SEARCHING;
 	}
 	FEATHER_ASSERT(representation != NULL);
@@ -195,9 +219,19 @@ Int ThreadManager::addToActiveThreads(Int n) {
 }
 
 void ThreadManager::newInstance(std::vector<bool> decisions) {
-	addToActiveThreads(+1);
+    /* Parent needs work? */
+    if(parent != NULL && state == ThreadManagerState::INITIALIZED_SEARCHING && parent->needMoreWork()) {
+        if(loggingLevel >= 2) {
+            std::stringstream ss;
+            for(int i = 0; i < decisions.size(); i++)
+                ss << decisions[i];
+            this->log(2, "Donating " + ss.str() + " to parent");
+        }
+        parent->newInstance(decisions);
+        return;
+    }
 
-	// here's where I should check whether MY parent needs more work
+	addToActiveThreads(+1);
 	pthread_mutex_lock(&newInstanceMutex);
 
 	ThreadInfo info;
@@ -220,10 +254,12 @@ void ThreadManager::newInstance(std::vector<bool> decisions) {
 	arguments->pm = pm;
 	arguments->id = threads.size()-1;
 
-	std::stringstream ss;
-	for(int i = 0; i < decisions.size(); i++)
-		ss << decisions[i];
-	this->log(2, "About to create new thread with decisions = " + ss.str() );
+    if(loggingLevel >= 2) {
+        std::stringstream ss;
+        for(int i = 0; i < decisions.size(); i++)
+	       	ss << decisions[i];
+	    this->log(2, "About to create new thread with decisions = " + ss.str() );
+    }
 
 	pthread_create(info.handle, &attr, spawn_thread, arguments);
 	pthread_attr_destroy(&attr);
