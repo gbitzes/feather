@@ -682,6 +682,7 @@ pruneResult_t Naxos::prune(std::vector<bool> *decisions) {
 	bool  popped_a_goal;
 	std::vector<bool>::iterator it = decisions->begin();
 
+    int currentdecision = 0;
 	while ( it != decisions->end() )
 	{
 
@@ -722,6 +723,7 @@ pruneResult_t Naxos::prune(std::vector<bool> *decisions) {
 				searchNodes.top().stackAND.push( CurrGoal->getSecondSubGoal() );
 
 			it++;
+            currentdecision++;
 
 			if ( popped_a_goal )
 				delete  CurrGoal;
@@ -736,8 +738,9 @@ pruneResult_t Naxos::prune(std::vector<bool> *decisions) {
 				delete  CurrGoal;
 
 			if ( ! imposeArcConsistency() )   {
-                std::cout << "WARNING: An invalid desicion vector was given to Naxos::prune that results in an inconsistent state" << std::endl;
-                destroy_goal(NewGoal);
+
+                LOG("Warning: Received inconsistent initial decisions");
+                //FEATHER_THROW("Inconsistency when processing " << currentdecision << " decision out of " << decisions->size());
                 return NO_SOLUTIONS;
 				//FEATHER_THROW("Error: An invalid decision vector was given to NsProblemManager::prune that results in an inconsistent state");
 
@@ -788,8 +791,20 @@ void Naxos::giveupWork() {
 
 	Int decisionCount = initialDecisions.size();
 	std::vector<Ns_SearchNode*>::reverse_iterator it = nodes.rbegin();
+    int totalnodes = nodes.size();
+    int currentnode = 0;
 
 	while(it != nodes.rend() ) {
+        currentnode++;
+
+        /* Careful now.. don't want to mess with the top nodes, close to the
+         * one being solved by the current solver.. 
+         */
+        
+        //if(currentnode >= totalnodes) {
+        //   std::cout << "bailing out of giveupwork" << std::endl;
+        //   break;
+        //}
 
 		/*
 		 * We found an unused goalNextChoice! Produce a vector
@@ -845,7 +860,11 @@ bool Naxos::nextSolution() {
 		 */
 
 		 //TODO: get decision vector from Solver
-		 pruneResult_t result = prune(&initialDecisions);
+         pruneResult_t result;
+         if(initialDecisions.empty())
+             result = prune(NULL);
+         else
+             result = prune(&initialDecisions);
 
 		 if( result == NO_SOLUTIONS ) {
 		 	return false;
@@ -894,15 +913,17 @@ bool Naxos::nextSolution() {
 		iterations++;
 
 		/* Should I give up some of my work to another thread? */
-		if(parent != NULL && parent->needMoreWork() && iterations > 5000)
-			giveupWork();
+		//if(parent != NULL && parent->needMoreWork()) // && iterations > 5000)
+	    //		giveupWork();
 
-		// if( parent != NULL && iterations > 20000 && iterations%256 == 0) {
+		if( parent != NULL && iterations > 5000 && iterations%256==0 && parent->needMoreWork()) {
+            giveupWork();
+        }
 
-		// 	if(parent->needMoreWork())
-		// 	// if( searchNodes.size() - donatedGoals >= 8 && parent->needMoreWork() )
+		 	//if(parent->needMoreWork())
+		 	  //if( searchNodes.size() - donatedGoals >= 3 )
 		// 		giveupWork();
-		// }
+		//}
 
 		/* Is there a better global min value? */
 		if( parent != NULL && iterations%16 == 0 ) {
