@@ -7,6 +7,7 @@
 
 #include <feather/types.h>
 #include <feather/int-domain.h>
+#include <base/bitset.h>
 #include <sstream>
 
 namespace feather {

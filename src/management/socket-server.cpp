@@ -12,8 +12,10 @@ SocketServer::SocketServer(ChildManager* child, Int loggingLevel) {
     this->child = child;
     child->setParent(this);
     state = SocketServerState::UNINITIALIZED;
+    minObjValue = kPlusInf;
 
 	pthread_mutex_init(&socketWriteMutex, NULL);
+	pthread_mutex_init(&minObjMutex, NULL);
 }
 SocketServer::~SocketServer() {
 }
@@ -42,8 +44,10 @@ Int SocketServer::getMinObjValue() {
 }
 
 void SocketServer::updateMinObjValue(Int newBestValue) {
+     pthread_mutex_lock(&minObjMutex);
 	 if(newBestValue < minObjValue)
 	 	minObjValue = newBestValue;
+     pthread_mutex_unlock(&minObjMutex);
 }
 
 bool SocketServer::needMoreWork() {

@@ -26,6 +26,7 @@ SocketClient::SocketClient(std::vector<SolverAddress*> addresses) {
     sem_init(&pendingSolutions, 0, 0);
     activeServers = 0;
     //currentSolution = NULL;
+    minObjValue = kPlusInf;
 
     pthread_mutex_init(&solutionMutex, NULL);
     pthread_mutex_init(&activeServersMutex, NULL);
@@ -125,6 +126,20 @@ void SocketClient::broadcastNeedMoreWork() {
     }
 }
 
+void SocketClient::broadcastBetterObjective(Int objective) {
+    pthread_mutex_lock(&waitingMutex);
+    pthread_mutex_lock(&activeServersMutex);
+    for(int i = 0; i < servers.size(); i++) {
+        if(servers[i]->currentlyBusy) {
+            std::cout << "Sending better objective = " << objective << std::endl;
+            fprintf(servers[i]->out, "UPDATEOBJ %d\n", objective);
+            fflush(servers[i]->out);
+        }
+    }
+    pthread_mutex_unlock(&activeServersMutex);
+    pthread_mutex_unlock(&waitingMutex);
+}
+
 namespace {
 
 struct thread_args {
@@ -188,6 +203,7 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
     pthread_mutex_lock(&waitingMutex);
     s.currentlyBusy = true;
     pthread_mutex_unlock(&waitingMutex);
+    dispatchWork();
     while(1) {
         char* res = fgets(buf, BUFLEN-1, s.in);
         std::stringstream ss(res);
@@ -198,6 +214,7 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
         if(msg == "SOLUTION") {
             std::map<IntVarID, IntDomain*> solution;
 
+            Int objval = kPlusInf;
             while(1) {
                 IntVarID id;
                 char *res = fgets(buf, BUFLEN-1, s.in);
@@ -213,11 +230,28 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
                 // std::cout << "-" << tmp << "-" << std::endl;
                 IntDomain *domain = deserializeDomain(tmp);
                 solution[id] = domain;
+
+                // std::cout << "Received variable: " << id << " " << tmp << std::endl;
+                // std::cout << "Deserialization: " << domain->toString() << std::endl;
+
+                if(id == representation->minObj) {
+                    objval = domain->min();
+                    // std::cout << "received objective = " << domain->toString() << std::endl;
+                }
             }
+            // std::cout << "end solution" << std::endl;
             pthread_mutex_lock(&solutionMutex);
-            solutions.push(solution);
+            // if solution is worse than current best, ignore.. it's due to races
+            if(representation->minObj == -1 || objval < minObjValue) {
+                if(representation->minObj != -1) {
+                    minObjValue = objval;
+                    broadcastBetterObjective(minObjValue);
+                }
+                solutions.push(solution);
+                sem_post(&pendingSolutions);
+            }
             pthread_mutex_unlock(&solutionMutex);
-            sem_post(&pendingSolutions);
+            // std::cout << "all done inserting solution" << std::endl;
         }
         else if(msg == "NO-MORE-SOLUTIONS") {
             pthread_mutex_lock(&waitingMutex);
@@ -317,31 +351,25 @@ bool SocketClient::nextSolution() {
         initializeSessions();
 
         /* Fire up the first */
-        {
-            std::vector<bool> empty;
-            empty.push_back(0);
-            empty.push_back(1);
-            waitingJobs.push(empty);
-        }
-        {
-            std::vector<bool> empty;
-            empty.push_back(0);
-            empty.push_back(0);
-            waitingJobs.push(empty);
-        }
-        {
-            std::vector<bool> empty;
-            empty.push_back(1);
-            empty.push_back(0);
-            waitingJobs.push(empty);
-        }
-        {
-            std::vector<bool> empty;
-            empty.push_back(1);
-            empty.push_back(1);
-            waitingJobs.push(empty);
-        }
+        {std::vector<bool> empty;
+         // empty.push_back(false);
+         // empty.push_back(false);
+         waitingJobs.push(empty);}
 
+        // {std::vector<bool> empty;
+        //  empty.push_back(false);
+        //  empty.push_back(true);
+        //  waitingJobs.push(empty);}
+        //
+        // {std::vector<bool> empty;
+        //  empty.push_back(true);
+        //  empty.push_back(false);
+        //  waitingJobs.push(empty);}
+        //
+        // {std::vector<bool> empty;
+        //  empty.push_back(true);
+        //  empty.push_back(true);
+        //  waitingJobs.push(empty);}
 
         dispatchWork();
         state = SocketClientState::INITIALIZED_SEARCHING;
@@ -367,7 +395,17 @@ bool SocketClient::nextSolution() {
 }
 
 IntDomain* SocketClient::getDomain(IntVarID id) {
-    return currentSolution[id];
+    // std::cout << "requested SocketClient::getDomain " << id << std::endl;
+    // std::cout << currentSolution[id] << std::endl;
+    // std::cout << "max value of requested domain: " << currentSolution[id]->max() << std::endl;
+    // std::cout << "serialization of requested domain: " << currentSolution[id]->toString() << std::endl;
+
+    IntDomain const* domain = currentSolution[id];
+    IntDomain *newdomain = new IntRanges(domain->min(), domain->max() );
+    newdomain->removeAllBut(domain);
+    return newdomain;
+
+    //return new IntRanges(currentSolution[id]);
 }
 
 }

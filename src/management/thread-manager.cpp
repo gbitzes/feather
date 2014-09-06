@@ -32,8 +32,10 @@ const std::string currentDateTime() {
 ThreadManager::ThreadManager(ChildGenerator *generator, Int target, Int loggingLevel) {
 	this->generator = generator;
 	this->loggingLevel = loggingLevel;
+    parent = NULL;
 	targetThreads = target;
     activeThreads = 0;
+    minObjValue = kPlusInf;
 
 	representation = NULL;
     cleanup();
@@ -81,7 +83,13 @@ ThreadManager::~ThreadManager() {
 }
 
 void ThreadManager::updateMinObjValue(Int newBestValue) {
-	pthread_mutex_lock(&objValueMutex);
+    if(parent) {
+        parent->updateMinObjValue(newBestValue);
+        return;
+    }
+	
+    pthread_mutex_lock(&objValueMutex);
+    std::cout << "min obj value updated to " << newBestValue << std::endl;
 
 	/* It's possible that due to races, the given newBestValue is
 	 * not actually better compared to what I have already. Maybe
@@ -101,6 +109,7 @@ IntDomain* ThreadManager::getDomain(IntVarID var) {
 }
 
 Int ThreadManager::getMinObjValue() {
+    if(parent) return parent->getMinObjValue();
 	return minObjValue;
 }
 

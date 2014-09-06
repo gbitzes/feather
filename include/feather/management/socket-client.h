@@ -57,6 +57,7 @@ class SocketClient : public ProblemManager {
         void initializeSessions();
         void broadcastRepresentation(const SolverAddress&);
         void broadcastNeedMoreWork();
+        void broadcastBetterObjective(Int);
         void dispatchWork();
 
         std::map<IntVarID, IntDomain* > currentSolution;

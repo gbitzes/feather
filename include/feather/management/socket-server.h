@@ -31,6 +31,8 @@ class SocketServer : public ParentManager {
         int fd;
         FILE *in, *out;
 		pthread_mutex_t socketWriteMutex;
+		pthread_mutex_t minObjMutex;
+
         void safeWrite(char*);
         void handleRound();
     public:

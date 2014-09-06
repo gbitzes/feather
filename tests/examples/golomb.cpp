@@ -5,8 +5,22 @@ using namespace std;
 using namespace feather;
 
 int golomb(int N) {
+    std::vector<SolverAddress*> addresses;
 
-	Solver slv(new Naxos() );
+    { SolverAddress *addr = new SolverAddress("localhost", "7875");
+    addresses.push_back(addr); }
+    { SolverAddress *addr = new SolverAddress("localhost", "7876");
+    addresses.push_back(addr); }
+    { SolverAddress *addr = new SolverAddress("localhost", "7877");
+    addresses.push_back(addr); }
+    { SolverAddress *addr = new SolverAddress("localhost", "7878");
+    addresses.push_back(addr); }
+    { SolverAddress *addr = new SolverAddress("localhost", "7879");
+    addresses.push_back(addr); }
+
+    //Solver slv(new SocketClient(addresses));
+
+	Solver slv(new ThreadManager(new NaxosGenerator(), 2, 1000) );
 	IntVarArray ruler(slv), diffs(slv);
 
 	ruler.push_back( IntVar(slv, 0, 0) );
@@ -26,17 +40,20 @@ int golomb(int N) {
 	slv.minimize(ruler[N-1]);
 
 	slv.addGoal(Labeling(ruler));
-
+    
+    int solution = -1;
 	while( slv.nextSolution() ) {
 		cout << "Found solution with length " << ruler[N-1].value() << ": ";
+        solution = ruler[N-1].value();
 
 		for(int i = 0; i < N; i++)
 			cout << ruler[i].value() << " ";
 
 		cout << endl;
 	}
+    return solution;
 }
 
 TEST(Examples, golomb10) {
-	golomb(10);
+    ASSERT_EQ(golomb(10), 55);
 }

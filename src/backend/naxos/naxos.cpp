@@ -736,8 +736,10 @@ pruneResult_t Naxos::prune(std::vector<bool> *decisions) {
 				delete  CurrGoal;
 
 			if ( ! imposeArcConsistency() )   {
-
-				FEATHER_THROW("Error: An invalid decision vector was given to NsProblemManager::prune that results in an inconsistent state");
+                std::cout << "WARNING: An invalid desicion vector was given to Naxos::prune that results in an inconsistent state" << std::endl;
+                destroy_goal(NewGoal);
+                return NO_SOLUTIONS;
+				//FEATHER_THROW("Error: An invalid decision vector was given to NsProblemManager::prune that results in an inconsistent state");
 
 				// destroy_goal( NewGoal );
 
@@ -903,26 +905,26 @@ bool Naxos::nextSolution() {
 		// }
 
 		/* Is there a better global min value? */
-		// if( parent != NULL && iterations%8 == 0 ) {
+		if( parent != NULL && iterations%16 == 0 ) {
 
-		// 	Int globalBest = parent->getMinObjValue();
+		    Int globalBest = parent->getMinObjValue();
 
-		// 	if(globalBest < bestMinObjValue) {
-		// 		bestMinObjValue = globalBest;
-				
+		 	if(globalBest < bestMinObjValue) {
+		 		bestMinObjValue = globalBest;
+
 				/*				
 				 * Remove all values worse than the global minimum and
 				 * check if state is still consistent
 				 */ 
-				
-		// 		vMinObj->remove(bestMinObjValue, kPlusInf);
 
-		// 		if( foundInconsistency )
-		// 			if( !backtrack() ) {
-		// 				return false;
-		// 			}
-		// 	}
-		// }
+		 		vMinObj->remove(bestMinObjValue, kPlusInf);
+
+		 		if( foundInconsistency )
+		 			if( !backtrack() ) {
+		 				return false;
+		 			}
+		 	}
+		}
 
 		popped_a_goal  =  false;
 
