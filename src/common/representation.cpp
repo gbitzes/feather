@@ -35,11 +35,11 @@ IntDequeID Representation::addDeque(UInt size) {
 }
 
 Representation::~Representation() {
-    RepresentationSerializer ser;
-    std::string s = ser.serialize(*this);
-    std::cout << s << std::endl;
-    std::cout << "SECOND PASS" << std::endl;
-    std::cout << ser.serialize(*ser.deserialize(s)) << std::endl;
+    //RepresentationSerializer ser;
+    //std::string s = ser.serialize(*this);
+    //std::cout << s << std::endl;
+    //std::cout << "SECOND PASS" << std::endl;
+    //std::cout << ser.serialize(*ser.deserialize(s)) << std::endl;
 	/* Delete vars */
 	{
 		std::vector<RepresentationIntVar>::iterator it;
