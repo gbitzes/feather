@@ -24,7 +24,7 @@ class SocketServer : public ParentManager {
 		Representation const* representation;
 		ChildGenerator *generator;
 		Int minObjValue;
-        ChildManager* child = NULL;
+        ChildManager* child; 
         bool needwork;
         Representation* receiveRepresentation();
         std::vector<bool> receiveDecisions();

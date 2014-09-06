@@ -7,13 +7,13 @@ namespace feather {
 IntDeque::IntDeque(Solver &solver, UInt size)
 	: slv(solver), id(slv.makeIntDeque(size)), deque(slv.getDeque(id)) {}
 
-typename std::deque<Int>::reference 
-IntDeque::operator[](const typename std::deque<Int>::size_type i) {
+std::deque<Int>::reference 
+IntDeque::operator[](const std::deque<Int>::size_type i) {
 	return deque.contents[i];
 }
 
-typename std::deque<Int>::const_reference
-IntDeque::operator[](const typename std::deque<Int>::size_type i) const {
+std::deque<Int>::const_reference
+IntDeque::operator[](const std::deque<Int>::size_type i) const {
 	return deque.contents[i];
 }
 

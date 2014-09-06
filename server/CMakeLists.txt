@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-add_definitions("-std=c++11 -pthread")
+add_definitions("-std=c++0x -pthread")
 
 # Fetch all cpp files in all files and folders
 file(GLOB_RECURSE sources "*.cpp")

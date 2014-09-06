@@ -3,6 +3,7 @@
 
 #include <backend/naxos/NsIntVar.h>
 #include <feather/utils.h>
+#include <algorithm>
 #include "NsIntVarArray.h"
 #include "naxos.h"
 

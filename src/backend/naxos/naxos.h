@@ -501,7 +501,7 @@ class Naxos : public ChildManager {
 		virtual void supplyRepresentation(const Representation&);
 		virtual void clearRepresentation();	
 
-		int nsolutions = 0;
+		int nsolutions;
 		void printState();
 
 		Naxos();

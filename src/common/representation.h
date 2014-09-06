@@ -45,11 +45,15 @@ class Representation {
 		std::vector<const Goal*> goals;
 		std::vector<RepresentationIntVarArray*> arrays;
 		std::vector<RepresentationIntDeque*> deques;
-		IntVarID minObj = -1;
+		IntVarID minObj;
 
 		IntVarID addVar(Int min, Int max);
 		IntVarArrayID addArray();
 		IntDequeID addDeque(UInt size = 0);
+
+        Representation() {
+            minObj = -1;
+        }
 
 		~Representation();
 };

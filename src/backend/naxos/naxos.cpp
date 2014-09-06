@@ -1139,6 +1139,7 @@ Naxos::Naxos()
 			   nFailures(0),
 			   nBacktracks(0),
 			   nGoals(0),
+               nsolutions(0),
 			   nConstraintChecks(0),
 			   backtrackLim(0),
 			   parent(NULL),

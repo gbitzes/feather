@@ -19,11 +19,11 @@ class IntDeque {
 
 		IntDequeID getID() const;
 
-		typename std::deque<Int>::reference 
-		operator[](const typename std::deque<Int>::size_type i);
+		std::deque<Int>::reference 
+		operator[](const std::deque<Int>::size_type i);
 
-		typename std::deque<Int>::const_reference
-		operator[](const typename std::deque<Int>::size_type i) const;
+		std::deque<Int>::const_reference
+		operator[](const std::deque<Int>::size_type i) const;
 
 		void push_front(const Int&);
 		void push_back(const Int&);
