@@ -25,6 +25,7 @@ SocketClient::SocketClient(std::vector<SolverAddress*> addresses) {
     state = SocketClientState::UNINITIALIZED;
     sem_init(&pendingSolutions, 0, 0);
     activeServers = 0;
+    //currentSolution = NULL;
 
     pthread_mutex_init(&solutionMutex, NULL);
     pthread_mutex_init(&activeServersMutex, NULL);
@@ -190,7 +191,7 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
     while(1) {
         char* res = fgets(buf, BUFLEN-1, s.in);
         std::stringstream ss(res);
-        std::cout << ss.str() << std::endl;
+        // std::cout << ss.str() << std::endl;
         std::string msg;
         ss >> msg;
 
@@ -201,7 +202,7 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
                 IntVarID id;
                 char *res = fgets(buf, BUFLEN-1, s.in);
                 std::stringstream ss(res);
-                std::cout << ss.str() << std::endl;
+                // std::cout << ss.str() << std::endl;
                 std::string tmp(res);
                 tmp = tmp.substr(0, tmp.length()-1);
                 if(tmp == "END SOLUTION") break;
@@ -263,6 +264,8 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
             waitingJobs.push(donation);
             std::cout << "size of waiting jobs: " << waitingJobs.size() << std::endl;
             pthread_mutex_unlock(&waitingMutex);
+
+            dispatchWork();
         }
         else {
             std::cout << "WARNING: unrecognized message " << msg << std::endl;
@@ -348,6 +351,13 @@ bool SocketClient::nextSolution() {
     if(state == SocketClientState::INITIALIZED_SEARCH_FINISHED) {
         return false;
     }
+
+    //if(currentSolution != NULL) {
+        typedef std::map<IntVarID, IntDomain*>::iterator it_type;
+        for(it_type iterator = currentSolution.begin(); iterator != currentSolution.end(); iterator++) {
+            delete (iterator->second);
+        }
+    //}
     
     pthread_mutex_lock(&solutionMutex);
     currentSolution = solutions.front();
