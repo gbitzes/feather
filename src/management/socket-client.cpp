@@ -20,7 +20,7 @@
 
 namespace feather {
 
-SocketClient::SocketClient(std::vector<SolverAddress> addresses) {
+SocketClient::SocketClient(std::vector<SolverAddress*> addresses) {
     this->servers = addresses;
     state = SocketClientState::UNINITIALIZED;
     sem_init(&pendingSolutions, 0, 0);
@@ -103,12 +103,12 @@ int SocketClient::establishConnection(const SolverAddress &address) {
 
 void SocketClient::initializeSessions() {
     for(int i = 0; i < servers.size(); i++) {
-        int fd = establishConnection(servers[i]);
-        servers[i].fd = fd;
-        servers[i].in = fdopen(fd, "r");
-        servers[i].out = fdopen(fd, "w");
+        int fd = establishConnection(*servers[i]);
+        servers[i]->fd = fd;
+        servers[i]->in = fdopen(fd, "r");
+        servers[i]->out = fdopen(fd, "w");
 
-        broadcastRepresentation(servers[i]);
+        broadcastRepresentation(*servers[i]);
         waitingServers.push(servers[i]);
     }
 }
@@ -116,9 +116,10 @@ void SocketClient::initializeSessions() {
 void SocketClient::broadcastNeedMoreWork() {
     //needsWork = true;
     for(int i = 0; i < servers.size(); i++) {
-        if(servers[i].currentlyBusy) {
-            fprintf(servers[i].out, "NEEDWORK\n");
-            fflush(servers[i].out);
+        if(servers[i]->currentlyBusy) {
+            std::cout << "Sending NEEDWORK" << std::endl;
+            fprintf(servers[i]->out, "NEEDWORK\n");
+            fflush(servers[i]->out);
         }
     }
 }
@@ -127,14 +128,14 @@ namespace {
 
 struct thread_args {
     SocketClient *sc;
-    SolverAddress s;
+    SolverAddress *s;
     std::vector<bool> decisions;
 };
 
 void* spawn_thread(void *args) {
     std::cout << "spawning thread" << std::endl;
     thread_args *ta = (thread_args*) args;
-    ta->sc->monitorServer(ta->s, ta->decisions);
+    ta->sc->monitorServer(*(ta->s), ta->decisions);
     delete ta;
 } 
 
@@ -150,9 +151,6 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
     // waitingJobs.pop();
     // pthread_mutex_unlock(&waitingMutex);
     //
-    pthread_mutex_lock(&activeServersMutex);
-    activeServers++;
-    pthread_mutex_unlock(&activeServersMutex);
 
     std::cout << "in monitor server" << std::endl;
 
@@ -186,9 +184,13 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
     } }
     
     /* Collect solutions and/or other messages */
+    pthread_mutex_lock(&waitingMutex);
+    s.currentlyBusy = true;
+    pthread_mutex_unlock(&waitingMutex);
     while(1) {
         char* res = fgets(buf, BUFLEN-1, s.in);
         std::stringstream ss(res);
+        std::cout << ss.str() << std::endl;
         std::string msg;
         ss >> msg;
 
@@ -199,6 +201,7 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
                 IntVarID id;
                 char *res = fgets(buf, BUFLEN-1, s.in);
                 std::stringstream ss(res);
+                std::cout << ss.str() << std::endl;
                 std::string tmp(res);
                 tmp = tmp.substr(0, tmp.length()-1);
                 if(tmp == "END SOLUTION") break;
@@ -216,12 +219,13 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
             sem_post(&pendingSolutions);
         }
         else if(msg == "NO-MORE-SOLUTIONS") {
+            pthread_mutex_lock(&waitingMutex);
+            s.currentlyBusy = false;
+            waitingServers.push(&s);
+            pthread_mutex_unlock(&waitingMutex);
+
             fprintf(s.out, "RESTART\n");
             fflush(s.out);
-
-            pthread_mutex_lock(&waitingMutex);
-            waitingServers.push(s);
-            pthread_mutex_unlock(&waitingMutex);
 
             dispatchWork();
 
@@ -272,8 +276,11 @@ void SocketClient::restart() {
 
 void SocketClient::dispatchWork() {
     pthread_mutex_lock(&waitingMutex);
-    if(waitingServers.size() > waitingJobs.size())
+    pthread_mutex_lock(&activeServersMutex);
+    if(waitingServers.size() > waitingJobs.size()) {
+        std::cout << "Asking for more work.." << std::endl;
         broadcastNeedMoreWork();
+    }
 
     int dispatch = waitingServers.size();
     if(dispatch > waitingJobs.size()) dispatch = waitingJobs.size();
@@ -291,9 +298,11 @@ void SocketClient::dispatchWork() {
         ta->s = waitingServers.front();
         waitingServers.pop();
         
+        activeServers++;
         pthread_create(&handle, &attr, spawn_thread, ta);
         pthread_attr_destroy(&attr);
     }
+    pthread_mutex_unlock(&activeServersMutex);
     pthread_mutex_unlock(&waitingMutex);
 }
 

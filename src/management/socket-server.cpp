@@ -24,7 +24,7 @@ void SocketServer::supplyRepresentation(const Representation &representation) {
 
 	this->representation = &representation;
 	state = SocketServerState::INITIALIZED_NOT_SEARCHING;
-    needwork = true;
+    needwork = false;
 
     child->supplyRepresentation(representation);
 }
@@ -47,7 +47,6 @@ void SocketServer::updateMinObjValue(Int newBestValue) {
 }
 
 bool SocketServer::needMoreWork() {
-    return true;
     return needwork;
 }
 
@@ -56,7 +55,7 @@ void SocketServer::setNeedMoreWork(bool val) {
 }
 
 void SocketServer::newInstance(std::vector<bool> decisions) {
-    needwork = false;
+    setNeedMoreWork(false);
 	pthread_mutex_lock(&socketWriteMutex);
     fprintf(out, "DONATION ");
     std::cout << "donating.. ";
@@ -156,6 +155,7 @@ void SocketServer::monitorIncoming() {
             updateMinObjValue(objval);
         }
         else if(command == "NEEDWORK") {
+            std::cout << "Received request to offload to parent" << std::endl;
             setNeedMoreWork(true);
         }
         else if(command == "RESTART") {

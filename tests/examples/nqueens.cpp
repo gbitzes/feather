@@ -5,22 +5,22 @@ using namespace std;
 using namespace feather;
 
 int nqueens(int N) {
-    std::vector<SolverAddress> addresses;
-    { SolverAddress addr("localhost", "7879");
+    std::vector<SolverAddress*> addresses;
+    // { SolverAddress *addr = new SolverAddress("localhost", "7879");
+    // addresses.push_back(addr); }
+    //
+    // { SolverAddress *addr = new SolverAddress("localhost", "7878");
+    // addresses.push_back(addr); }
+    //
+    // { SolverAddress *addr = new SolverAddress("localhost", "7877");
+    // addresses.push_back(addr); }
+    //
+    { SolverAddress *addr = new SolverAddress("localhost", "7876");
     addresses.push_back(addr); }
-    
-    { SolverAddress addr("localhost", "7878");
-    addresses.push_back(addr); }
-
-    { SolverAddress addr("localhost", "7877");
-    addresses.push_back(addr); }
-
-    { SolverAddress addr("localhost", "7876");
-    addresses.push_back(addr); }
-
+    //
     Solver slv(new SocketClient(addresses));
-	//Solver slv( new ThreadManager(new NaxosGenerator(), 1, 1000) );
-    //Solver slv( new SocketHelper(new Naxos(), 5));
+	// Solver slv( new ThreadManager(new NaxosGenerator(), 2, 1000) );
+    // Solver slv(new Naxos());
 	
 	IntVarArray var(slv), varPlus(slv), varMinus(slv);	
 
@@ -39,7 +39,6 @@ int nqueens(int N) {
 
 	Int nsolutions = 0;
 	while(slv.nextSolution() ) {
-        std::cout << "WE HAVE A SOLUTION, BITCHES" << std::endl;
 		nsolutions++;
 	}
 	return nsolutions;
