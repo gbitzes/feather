@@ -124,25 +124,32 @@ void SocketClient::broadcastNeedMoreWork() {
 }
 
 namespace {
+
+struct thread_args {
+    SocketClient *sc;
+    SolverAddress s;
+    std::vector<bool> decisions;
+};
+
 void* spawn_thread(void *args) {
     std::cout << "spawning thread" << std::endl;
-    SocketClient *sc = (SocketClient*) args;
-    sc->monitorServer();
+    thread_args *ta = (thread_args*) args;
+    ta->sc->monitorServer(ta->s, ta->decisions);
+    delete ta;
 } 
 
 }
 
-
-void SocketClient::monitorServer() {
+void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions) {
     char buf[BUFLEN];
-    pthread_mutex_lock(&waitingMutex);
-    SolverAddress s = waitingServers.front();
-    waitingServers.pop();
-
-    std::vector<bool> decisions = waitingJobs.front();
-    waitingJobs.pop();
-    pthread_mutex_unlock(&waitingMutex);
-
+    // pthread_mutex_lock(&waitingMutex);
+    // SolverAddress s = waitingServers.front();
+    // waitingServers.pop();
+    //
+    // std::vector<bool> decisions = waitingJobs.front();
+    // waitingJobs.pop();
+    // pthread_mutex_unlock(&waitingMutex);
+    //
     pthread_mutex_lock(&activeServersMutex);
     activeServers++;
     pthread_mutex_unlock(&activeServersMutex);
@@ -276,8 +283,15 @@ void SocketClient::dispatchWork() {
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
         pthread_t handle;
+
+        thread_args *ta = new thread_args();
+        ta->sc = this;
+        ta->decisions = waitingJobs.front();
+        waitingJobs.pop();
+        ta->s = waitingServers.front();
+        waitingServers.pop();
         
-        pthread_create(&handle, &attr, spawn_thread, this);
+        pthread_create(&handle, &attr, spawn_thread, ta);
         pthread_attr_destroy(&attr);
     }
     pthread_mutex_unlock(&waitingMutex);

@@ -6,11 +6,17 @@ using namespace feather;
 
 int nqueens(int N) {
     std::vector<SolverAddress> addresses;
-    SolverAddress addr1("localhost", "7879");
-    addresses.push_back(addr1);
+    { SolverAddress addr("localhost", "7879");
+    addresses.push_back(addr); }
     
-    SolverAddress addr2("localhost", "7878");
-    addresses.push_back(addr2);
+    { SolverAddress addr("localhost", "7878");
+    addresses.push_back(addr); }
+
+    { SolverAddress addr("localhost", "7877");
+    addresses.push_back(addr); }
+
+    { SolverAddress addr("localhost", "7876");
+    addresses.push_back(addr); }
 
     Solver slv(new SocketClient(addresses));
 	//Solver slv( new ThreadManager(new NaxosGenerator(), 1, 1000) );

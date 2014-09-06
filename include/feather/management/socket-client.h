@@ -18,6 +18,7 @@ struct SolverAddress {
     SolverAddress(std::string host_, std::string port_) : hostname(host_), port(port_) {
         currentlyBusy = false;
     }
+    SolverAddress() { currentlyBusy = true; }
 };
 
 namespace SocketClientState {
@@ -61,7 +62,7 @@ class SocketClient : public ProblemManager {
         std::map<IntVarID, IntDomain* > currentSolution;
         
     public:
-        void monitorServer();
+        void monitorServer(SolverAddress &, std::vector<bool> &); 
         SocketClient(std::vector<SolverAddress>);
 		virtual void supplyRepresentation(const Representation &);
 		virtual void clearRepresentation();
