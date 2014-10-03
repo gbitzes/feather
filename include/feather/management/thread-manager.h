@@ -33,6 +33,7 @@ class ThreadManager : public IntermediateManager {
 
 		Int loggingLevel;
 		Int minObjValue;
+        Int prevObjValue;
 		Int activeThreads;
 		Int targetThreads;
 

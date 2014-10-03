@@ -1,5 +1,6 @@
 #include <feather/management/thread-manager.h>
 #include <feather/utils.h>
+#include <common/representation.h>
 
 namespace feather {
 
@@ -36,6 +37,7 @@ ThreadManager::ThreadManager(ChildGenerator *generator, Int target, Int loggingL
 	targetThreads = target;
     activeThreads = 0;
     minObjValue = kPlusInf;
+    prevObjValue = kPlusInf;
 
 	representation = NULL;
     cleanup();
@@ -150,6 +152,7 @@ void ThreadManager::runThread(ChildManager &pm, ProblemManagerID id) {
 	/* Let's get to work.. */
 	Int nsolutions = 0;
 	while( pm.nextSolution() ) {
+
 		/* 
 		 * We have a solution.. Add me to the pending
 		 * solutions
@@ -215,6 +218,15 @@ bool ThreadManager::nextSolution() {
 	activeManager = threads[activeID].pm;
 	pendingSolutions.pop();
 	pthread_mutex_unlock(&pendingSolutionsMutex);
+
+    /* Worse solution due to races? */
+    if(representation->minObj != -1) {
+        IntDomain *obj = getDomain(representation->minObj);
+        Int objval = obj->max();
+        delete obj;
+        if(objval > prevObjValue) return nextSolution(); /* discard solution */
+        prevObjValue = objval;
+    }
 
 	return true;
 }
