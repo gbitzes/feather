@@ -32,6 +32,7 @@ class IntVar {
 		IntVar(Solver&, Int min, Int max);
 		IntVar(IntVarID id, Solver& slv);
 		IntVar();
+        ~IntVar();
 
 		void remove(Int, Int);
 		void remove(Int);

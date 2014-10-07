@@ -11,9 +11,11 @@ Solver::Solver(ProblemManager *pm) : fPM(pm) {
 	repr = new Representation();
 	finalized = false;
 	solving = false;
+    currentSolutionID = 0;
 }
 
 Solver::~Solver() {
+    std::cout << "destructor of solver" << std::endl;
 	delete repr;
 	delete fPM;
 }
@@ -73,8 +75,9 @@ bool Solver::nextSolution() {
 
 	solving = true;
 	bool ret = fPM->nextSolution();
-	if(ret)
+	if(ret) {
 		currentSolutionID++;
+    }
 
 	return ret;
 }

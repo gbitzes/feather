@@ -45,6 +45,11 @@ IntVar::IntVar(IntVarID id, Solver& slv) {
 	initialize(slv, id);
 }
 
+IntVar::~IntVar() {
+    if(domain != representationDomain)
+		delete domain;
+}
+
 /*
  * Provide an empty constructor for creating an uninitialized
  * IntVar. Otherwise, we wouldn't be able to do IntVar a = b + c

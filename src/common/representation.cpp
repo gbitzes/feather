@@ -64,6 +64,12 @@ Representation::~Representation() {
 		for(it = deques.begin(); it != deques.end(); it++)
 			delete *it;
 	}
+    /* Delete goals */
+    {
+        std::vector<const Goal*>::iterator it;
+        for(it = goals.begin(); it != goals.end(); it++)
+            delete *it;
+    }
 
 }
 

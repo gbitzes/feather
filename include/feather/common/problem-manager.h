@@ -18,6 +18,7 @@ class Representation;
 class ProblemManager {
 
 	public:
+        virtual ~ProblemManager() {} 
 		virtual void supplyRepresentation(const Representation &) = 0;
 		virtual void clearRepresentation() = 0;
 		virtual bool nextSolution() = 0;

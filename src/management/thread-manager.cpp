@@ -15,6 +15,7 @@ struct arg_struct {
 void* spawn_thread(void *arguments) {
 	arg_struct *args = (arg_struct*) arguments;
 	args->threadmanager->runThread(*(args->pm), args->id);
+    delete args->pm;
 	free(arguments);
 }
 
