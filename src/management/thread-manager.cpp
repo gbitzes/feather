@@ -15,7 +15,7 @@ struct arg_struct {
 void* spawn_thread(void *arguments) {
 	arg_struct *args = (arg_struct*) arguments;
 	args->threadmanager->runThread(*(args->pm), args->id);
-    delete args->pm;
+    //delete args->pm;
 	free(arguments);
 }
 
@@ -54,7 +54,7 @@ void ThreadManager::cleanup() {
 	pthread_mutex_init(&activeThreadsMutex, NULL);
 
 	this->state = ThreadManagerState::UNINITIALIZED;
-	sem_init(&pending, 0, 0);
+	FEATHER_ASSERT(sem_init(&pending, 0, 0) != -1);
 }
 
 void ThreadManager::restart() {
@@ -77,11 +77,12 @@ void ThreadManager::clearRepresentation() {
 }
 
 ThreadManager::~ThreadManager() {
+    std::cout << "destructor of thread-manager" << std::endl;
 	/* Cleanup */
 	for(int i = 0; i < threads.size(); i++ ) {
 		delete threads[i].handle;
 		delete threads[i].waiting;
-		delete threads[i].pm;
+		//delete threads[i].pm;
 	}
 }
 
@@ -108,6 +109,7 @@ void ThreadManager::updateMinObjValue(Int newBestValue) {
 
 IntDomain* ThreadManager::getDomain(IntVarID var) {
 	FEATHER_ASSERT(activeManager != NULL);
+    if(activeManager == NULL) std::cout << "Good bye cruel word, for it is time to segfault" << std::endl;
 	return activeManager->getDomain(var);
 }
 
@@ -149,6 +151,7 @@ void ThreadManager::runThread(ChildManager &pm, ProblemManagerID id) {
 
 	pm.setParent(this);
 	pm.supplyRepresentation(*representation);
+    sem_t *waiting = threads[id].waiting;
 
 	/* Let's get to work.. */
 	Int nsolutions = 0;
@@ -168,8 +171,10 @@ void ThreadManager::runThread(ChildManager &pm, ProblemManagerID id) {
 		sem_post(&pending);
 
 		/* Sleep until the main thread has processed my solution */
-		sem_wait(threads[id].waiting);
+		sem_wait(waiting);
 	}
+
+    sem_destroy(waiting);
 
 	/* No more solutions from me.. has the search ended? */
 	Int n = addToActiveThreads(-1);
@@ -178,6 +183,7 @@ void ThreadManager::runThread(ChildManager &pm, ProblemManagerID id) {
 		sem_post(&pending);
 	}
 
+    delete &pm;
 }
 
 Int ThreadManager::getActiveThreads() {
@@ -200,8 +206,10 @@ bool ThreadManager::nextSolution() {
 	 * need to tell it to start searching
 	 */
 	if(activeManager != NULL) {
-		activeManager = NULL;
+		//activeManager = NULL;
+	    pthread_mutex_lock(&newInstanceMutex);
 		sem_post(threads[activeID].waiting);
+        pthread_mutex_unlock(&newInstanceMutex);
 	}
 
 	/* Wait until a solution is available */
@@ -217,16 +225,20 @@ bool ThreadManager::nextSolution() {
 	pthread_mutex_lock(&pendingSolutionsMutex);
 	activeID = pendingSolutions.front();
 	activeManager = threads[activeID].pm;
+    if(activeManager == NULL) std::cout << "nooo.. active manager is null, although it got assigned a value" << std::endl;
 	pendingSolutions.pop();
 	pthread_mutex_unlock(&pendingSolutionsMutex);
 
     /* Worse solution due to races? */
     if(representation->minObj != -1) {
+        std::cout << "wat" << std::endl;
         IntDomain *obj = getDomain(representation->minObj);
         Int objval = obj->max();
         delete obj;
-        if(objval > prevObjValue) return nextSolution(); /* discard solution */
-        prevObjValue = objval;
+        if(objval > prevObjValue) {
+            prevObjValue = objval;
+            return nextSolution(); /* discard solution */
+        }
     }
 
 	return true;
@@ -259,7 +271,7 @@ void ThreadManager::newInstance(std::vector<bool> decisions) {
 	ThreadInfo info;
 	info.handle = new pthread_t;
 	info.waiting = new sem_t;
-	sem_init(info.waiting, 0, 0);
+	FEATHER_ASSERT(sem_init(info.waiting, 0, 0) != -1);
 
 	/* Detached thread attribute */
 	pthread_attr_t attr;

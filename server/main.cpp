@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
             s, sizeof s);
         printf("server: got connection from %s\n", s);
 
-        ThreadManager *tm = new ThreadManager(new NaxosGenerator(), 2, 1000);
+        ThreadManager *tm = new ThreadManager(new NaxosGenerator(), 48, 1000);
         SocketServer socketserver(tm, 5);
         socketserver.handleSession(new_fd);
     }

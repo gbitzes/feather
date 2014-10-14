@@ -7,20 +7,28 @@ using namespace feather;
 int golomb(int N) {
     std::vector<SolverAddress*> addresses;
 
-    { SolverAddress *addr = new SolverAddress("localhost", "7875");
-    addresses.push_back(addr); }
-    { SolverAddress *addr = new SolverAddress("localhost", "7876");
-    addresses.push_back(addr); }
-    { SolverAddress *addr = new SolverAddress("localhost", "7877");
-    addresses.push_back(addr); }
-    { SolverAddress *addr = new SolverAddress("localhost", "7878");
-    addresses.push_back(addr); }
-    { SolverAddress *addr = new SolverAddress("localhost", "7879");
+    { SolverAddress *addr = new SolverAddress("localhost", "7575");
     addresses.push_back(addr); }
 
-    //Solver slv(new SocketClient(addresses));
+    { SolverAddress *addr = new SolverAddress("olwork12", "7575");
+    addresses.push_back(addr); }
 
-	Solver slv(new ThreadManager(new NaxosGenerator(), 2, 1000) );
+    { SolverAddress *addr = new SolverAddress("olwork16", "7575");
+    addresses.push_back(addr); }
+
+    { SolverAddress *addr = new SolverAddress("olwork24", "7575");
+    addresses.push_back(addr); }
+    
+    { SolverAddress *addr = new SolverAddress("olwork06", "7575");
+    addresses.push_back(addr); }
+    
+    { SolverAddress *addr = new SolverAddress("olwork04", "7575");
+    addresses.push_back(addr); }
+
+
+    Solver slv(new SocketClient(addresses));
+
+	//Solver slv(new ThreadManager(new NaxosGenerator(), 2, 1000) );
 	IntVarArray ruler(slv), diffs(slv);
 
 	ruler.push_back( IntVar(slv, 0, 0) );
@@ -56,4 +64,8 @@ int golomb(int N) {
 
 TEST(Examples, golomb10) {
     ASSERT_EQ(golomb(10), 55);
+}
+
+TEST(Examples, golomb13) {
+    ASSERT_EQ(golomb(13), 106);
 }

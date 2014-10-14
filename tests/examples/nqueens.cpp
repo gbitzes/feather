@@ -6,17 +6,33 @@ using namespace feather;
 
 int nqueens(int N) {
     std::vector<SolverAddress*> addresses;
-    // { SolverAddress *addr = new SolverAddress("localhost", "7879");
-    // addresses.push_back(addr); }
-    //
-    // { SolverAddress *addr = new SolverAddress("localhost", "7878");
-    // addresses.push_back(addr); }
-    //
+    { SolverAddress *addr = new SolverAddress("localhost", "7575");
+    addresses.push_back(addr); }
+
+    { SolverAddress *addr = new SolverAddress("olwork12", "7575");
+    addresses.push_back(addr); }
+
+    { SolverAddress *addr = new SolverAddress("olwork16", "7575");
+    addresses.push_back(addr); }
+
+    { SolverAddress *addr = new SolverAddress("olwork24", "7575");
+    addresses.push_back(addr); }
+
+    { SolverAddress *addr = new SolverAddress("olwork06", "7575");
+    addresses.push_back(addr); }
+
+    { SolverAddress *addr = new SolverAddress("olwork04", "7575");
+    addresses.push_back(addr); }
+
+
+
+ 
+    
     // { SolverAddress *addr = new SolverAddress("localhost", "7877");
     // addresses.push_back(addr); }
     //
-    { SolverAddress *addr = new SolverAddress("localhost", "7876");
-    addresses.push_back(addr); }
+    //{ SolverAddress *addr = new SolverAddress("localhost", "7876");
+    //addresses.push_back(addr); }
     //
     Solver slv(new SocketClient(addresses));
 	// Solver slv( new ThreadManager(new NaxosGenerator(), 2, 1000) );
@@ -62,4 +78,8 @@ TEST(Examples, nqueens11) {
 
 TEST(Examples, nqueens12) {
 	ASSERT_EQ(nqueens(12), 14200);
+}
+
+TEST(Examples, nqueens15) {
+    ASSERT_EQ(nqueens(15), 2279184);
 }
