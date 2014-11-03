@@ -5,30 +5,11 @@ using namespace std;
 using namespace feather;
 
 int golomb(int N) {
-    std::vector<SolverAddress*> addresses;
+	char *cnthreads = getenv("NTHREADS");
+    if(cnthreads == NULL) FEATHER_THROW("NTHREADS not set");
+    int nthreads = atoi(cnthreads);
+	Solver slv( new ThreadManager(new NaxosGenerator(), nthreads, 1000) );
 
-    { SolverAddress *addr = new SolverAddress("localhost", "7575");
-    addresses.push_back(addr); }
-
-    { SolverAddress *addr = new SolverAddress("olwork12", "7575");
-    addresses.push_back(addr); }
-
-    { SolverAddress *addr = new SolverAddress("olwork16", "7575");
-    addresses.push_back(addr); }
-
-    { SolverAddress *addr = new SolverAddress("olwork24", "7575");
-    addresses.push_back(addr); }
-    
-    { SolverAddress *addr = new SolverAddress("olwork06", "7575");
-    addresses.push_back(addr); }
-    
-    { SolverAddress *addr = new SolverAddress("olwork04", "7575");
-    addresses.push_back(addr); }
-
-
-    Solver slv(new SocketClient(addresses));
-
-	//Solver slv(new ThreadManager(new NaxosGenerator(), 2, 1000) );
 	IntVarArray ruler(slv), diffs(slv);
 
 	ruler.push_back( IntVar(slv, 0, 0) );
@@ -64,6 +45,14 @@ int golomb(int N) {
 
 TEST(Examples, golomb10) {
     ASSERT_EQ(golomb(10), 55);
+}
+
+TEST(Examples, golomb11) {
+    ASSERT_EQ(golomb(11), 72);
+}
+
+TEST(Examples, golomb12) {
+    ASSERT_EQ(golomb(12), 85);
 }
 
 TEST(Examples, golomb13) {

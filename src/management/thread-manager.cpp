@@ -15,7 +15,7 @@ struct arg_struct {
 void* spawn_thread(void *arguments) {
 	arg_struct *args = (arg_struct*) arguments;
 	args->threadmanager->runThread(*(args->pm), args->id);
-    //delete args->pm;
+    delete args->pm;
 	free(arguments);
 }
 
@@ -40,6 +40,7 @@ ThreadManager::ThreadManager(ChildGenerator *generator, Int target, Int loggingL
     minObjValue = kPlusInf;
     prevObjValue = kPlusInf;
 
+    threads.reserve(100); // TODO: get rid of this array entirely
 	representation = NULL;
     cleanup();
 	this->log(10, "ThreadManager constructed");
@@ -54,7 +55,7 @@ void ThreadManager::cleanup() {
 	pthread_mutex_init(&activeThreadsMutex, NULL);
 
 	this->state = ThreadManagerState::UNINITIALIZED;
-	FEATHER_ASSERT(sem_init(&pending, 0, 0) != -1);
+	sem_init(&pending, 0, 0);
 }
 
 void ThreadManager::restart() {
@@ -77,7 +78,6 @@ void ThreadManager::clearRepresentation() {
 }
 
 ThreadManager::~ThreadManager() {
-    std::cout << "destructor of thread-manager" << std::endl;
 	/* Cleanup */
 	for(int i = 0; i < threads.size(); i++ ) {
 		delete threads[i].handle;
@@ -109,7 +109,6 @@ void ThreadManager::updateMinObjValue(Int newBestValue) {
 
 IntDomain* ThreadManager::getDomain(IntVarID var) {
 	FEATHER_ASSERT(activeManager != NULL);
-    if(activeManager == NULL) std::cout << "Good bye cruel word, for it is time to segfault" << std::endl;
 	return activeManager->getDomain(var);
 }
 
@@ -182,8 +181,6 @@ void ThreadManager::runThread(ChildManager &pm, ProblemManagerID id) {
 	if(n == 0) {
 		sem_post(&pending);
 	}
-
-    delete &pm;
 }
 
 Int ThreadManager::getActiveThreads() {
@@ -225,13 +222,11 @@ bool ThreadManager::nextSolution() {
 	pthread_mutex_lock(&pendingSolutionsMutex);
 	activeID = pendingSolutions.front();
 	activeManager = threads[activeID].pm;
-    if(activeManager == NULL) std::cout << "nooo.. active manager is null, although it got assigned a value" << std::endl;
 	pendingSolutions.pop();
 	pthread_mutex_unlock(&pendingSolutionsMutex);
 
     /* Worse solution due to races? */
     if(representation->minObj != -1) {
-        std::cout << "wat" << std::endl;
         IntDomain *obj = getDomain(representation->minObj);
         Int objval = obj->max();
         delete obj;
@@ -271,7 +266,7 @@ void ThreadManager::newInstance(std::vector<bool> decisions) {
 	ThreadInfo info;
 	info.handle = new pthread_t;
 	info.waiting = new sem_t;
-	FEATHER_ASSERT(sem_init(info.waiting, 0, 0) != -1);
+	sem_init(info.waiting, 0, 0);
 
 	/* Detached thread attribute */
 	pthread_attr_t attr;

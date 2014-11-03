@@ -15,7 +15,6 @@ Solver::Solver(ProblemManager *pm) : fPM(pm) {
 }
 
 Solver::~Solver() {
-    std::cout << "destructor of solver" << std::endl;
 	delete repr;
 	delete fPM;
 }
