@@ -777,7 +777,7 @@ pruneResult_t Naxos::prune(std::vector<bool> *decisions) {
 
 /* Give up a part of your search space to another, new thread */
 void Naxos::giveupWork() {
-	LOG("Giving up a part of my search space to a new thread");
+	//LOG("Giving up a part of my search space to a new thread");
 
 	/* Build a vector out of the stack since it doesn't allow to access it backwards >.< */
 	std::vector<Ns_SearchNode*> nodes;

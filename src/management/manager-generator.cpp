@@ -4,7 +4,15 @@
 namespace feather {
 
 ChildManager* NaxosGenerator::generate() {
-	return new Naxos();
+  return new Naxos();
+}  
+
+ChildManager* BufferedNaxosGenerator::generate() {
+  ChildManager *naxos = new Naxos();
+  BufferManager *buffer = new BufferManager(bufsize, naxos);
+  return buffer;
 }
+
+
 
 } // namespace feather

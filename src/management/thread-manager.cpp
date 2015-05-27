@@ -43,7 +43,7 @@ ThreadManager::ThreadManager(ChildGenerator *generator, Int target, Int loggingL
     threads.reserve(100); // TODO: get rid of this array entirely
 	representation = NULL;
     cleanup();
-	this->log(10, "ThreadManager constructed");
+	//this->log(10, "ThreadManager constructed");
 }
 
 void ThreadManager::cleanup() {
@@ -146,7 +146,7 @@ void ThreadManager::log(int level, std::string msg) {
 }
 
 void ThreadManager::runThread(ChildManager &pm, ProblemManagerID id) {
-	this->log(3, STR("New thread spawned with id = " << id << ". Active threads: " << activeThreads));
+	//this->log(3, STR("New thread spawned with id = " << id << ". Active threads: " << activeThreads));
 
 	pm.setParent(this);
 	pm.supplyRepresentation(*representation);
@@ -177,7 +177,7 @@ void ThreadManager::runThread(ChildManager &pm, ProblemManagerID id) {
 
 	/* No more solutions from me.. has the search ended? */
 	Int n = addToActiveThreads(-1);
-	this->log(3, STR("#" << id << ": Terminating after finding " << nsolutions << " solutions - active threads " << n));
+	//this->log(3, STR("#" << id << ": Terminating after finding " << nsolutions << " solutions - active threads " << n));
 	if(n == 0) {
 		sem_post(&pending);
 	}
@@ -254,7 +254,7 @@ void ThreadManager::newInstance(std::vector<bool> decisions) {
             std::stringstream ss;
             for(int i = 0; i < decisions.size(); i++)
                 ss << decisions[i];
-            this->log(2, "Donating " + ss.str() + " to parent");
+            //this->log(2, "Donating " + ss.str() + " to parent");
         }
         parent->newInstance(decisions);
         return;
@@ -287,7 +287,7 @@ void ThreadManager::newInstance(std::vector<bool> decisions) {
         std::stringstream ss;
         for(int i = 0; i < decisions.size(); i++)
 	       	ss << decisions[i];
-	    this->log(2, "About to create new thread with decisions = " + ss.str() );
+	    //this->log(2, "About to create new thread with decisions = " + ss.str() );
     }
 
 	pthread_create(info.handle, &attr, spawn_thread, arguments);
