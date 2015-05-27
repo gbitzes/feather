@@ -9,7 +9,7 @@ int nqueens(int N) {
     char *cnthreads = getenv("NTHREADS");
     if(cnthreads == NULL) FEATHER_THROW("NTHREADS not set");
     int nthreads = atoi(cnthreads);
-	Solver slv( new ThreadManager(new BufferedNaxosGenerator(1000), nthreads, 1000) );
+	Solver slv( new ThreadManager(new NaxosGenerator(), nthreads, 1000) );
     // Solver slv(new Naxos());
 	
 	IntVarArray var(slv), varPlus(slv), varMinus(slv);	
