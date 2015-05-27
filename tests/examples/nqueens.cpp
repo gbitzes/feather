@@ -85,3 +85,7 @@ TEST(Examples, nqueens14) {
 TEST(Examples, nqueens15) {
     ASSERT_EQ(nqueens(15), 2279184);
 }
+
+TEST(Examples, nqueens16) {
+    ASSERT_EQ(nqueens(16), 14772512);
+}
