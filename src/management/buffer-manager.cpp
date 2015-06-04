@@ -44,7 +44,6 @@ void BufferManager::updateMinObjValue(Int newBestValue) {
         parent->updateMinObjValue(newBestValue);
         return;
     }
-	
 }
 
 IntDomain* BufferManager::getDomain(IntVarID var) {
@@ -52,7 +51,7 @@ IntDomain* BufferManager::getDomain(IntVarID var) {
   IntDomain *newdomain = new IntRanges(domain->min(), domain->max() );
   newdomain->removeAllBut(domain);
   return newdomain;
-  
+
   //return new IntRanges(safe.back()[var]);
 }
 
@@ -76,7 +75,7 @@ bool BufferManager::needMoreWork() {
 bool BufferManager::nextSolution() {
   if(!firstSolution) {
     for(auto var : safe.back() ) {
-      delete var.second;
+		 delete var.second;
     }
     safe.pop_back();
   }

@@ -3,11 +3,13 @@
 
 #include <feather/common/problem-manager.h>
 #include <feather/management/manager-generator.h>
+#include <feather/utils.h>
 #include <queue>
 #include <semaphore.h>
 #include <map>
+#include <algorithm>
 
-namespace feather { 
+namespace feather {
 
 struct SolverAddress {
     std::string hostname;
@@ -18,6 +20,13 @@ struct SolverAddress {
     SolverAddress(std::string host_, std::string port_) : hostname(host_), port(port_) {
         currentlyBusy = false;
     }
+	 SolverAddress(std::string _host) {
+		 currentlyBusy = false;
+		 std::size_t index = _host.find(":");
+		 if(index == std::string::npos) FEATHER_THROW("Unvalid host:" << _host);
+		 hostname = _host.substr(0, index);
+		 port = _host.substr(index+1, _host.size());
+	}
     SolverAddress() { currentlyBusy = true; }
 };
 
@@ -27,7 +36,7 @@ namespace SocketClientState {
         INITIALIZED_NOT_SEARCHING,
         INITIALIZED_SEARCHING,
         INITIALIZED_SEARCH_FINISHED
-    };  
+    };
 };
 
 class Representation;

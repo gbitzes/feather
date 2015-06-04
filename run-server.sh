@@ -18,13 +18,4 @@ then
 fi
 
 export LD_PRELOAD=$JEMALLOC:$LD_PRELOAD
-
-# If an argument has been supplied, run only those tests
-if [ $# == 1 ] 
-then
-        bin/tests --gtest_filter="*$1*"
-else
-        # Otherwise, run everything
-        bin/tests
-fi
-
+bin/server $1

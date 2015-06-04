@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     int sockfd, new_fd; // listen on sockfd, new connection on newfd
     struct addrinfo hints, *servinfo, *p;
     struct sockaddr_storage their_addr; // connector's address information
-    std::cout << "hallo" << std::endl;
+    std::cout << "Initializing server.." << std::endl;
     socklen_t sin_size;
     struct sigaction sa;
     int yes=1;
@@ -99,7 +99,12 @@ int main(int argc, char *argv[]) {
             s, sizeof s);
         printf("server: got connection from %s\n", s);
 
-        ThreadManager *tm = new ThreadManager(new NaxosGenerator(), 48, 1000);
+		  char *cnthreads = getenv("NTHREADS");
+		  if(cnthreads == NULL) FEATHER_THROW("NTHREADS not set");
+		  int nthreads = atoi(cnthreads);
+
+        ThreadManager *tm = new ThreadManager(new NaxosGenerator(), nthreads, 1000);
+		  //BufferManager *bf = new BufferManager(10000, bf);
         SocketServer socketserver(tm, 5);
         socketserver.handleSession(new_fd);
     }

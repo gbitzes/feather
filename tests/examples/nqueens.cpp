@@ -6,13 +6,13 @@ using namespace std;
 using namespace feather;
 
 int nqueens(int N) {
-    char *cnthreads = getenv("NTHREADS");
-    if(cnthreads == NULL) FEATHER_THROW("NTHREADS not set");
-    int nthreads = atoi(cnthreads);
-	Solver slv( new ThreadManager(new NaxosGenerator(), nthreads, 1000) );
-    // Solver slv(new Naxos());
-	
-	IntVarArray var(slv), varPlus(slv), varMinus(slv);	
+	//char *cnthreads = getenv("NTHREADS");
+	//if(cnthreads == NULL) FEATHER_THROW("NTHREADS not set");
+	//int nthreads = atoi(cnthreads);
+	//Solver slv( new ThreadManager(new NaxosGenerator(), nthreads, 1000) );
+	Solver slv( buildEnvManager() );
+
+	IntVarArray var(slv), varPlus(slv), varMinus(slv);
 
 	for (int i=0;  i<N;  ++i)   {
 		var.push_back( IntVar(slv, 0, N-1) );

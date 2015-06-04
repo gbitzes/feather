@@ -10,3 +10,4 @@
 #include <feather/management/thread-manager.h>
 #include <feather/management/socket-server.h>
 #include <feather/management/socket-client.h>
+#include <feather/management/build-env-manager.h>
