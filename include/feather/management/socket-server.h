@@ -35,6 +35,11 @@ class SocketServer : public ParentManager {
 
         void safeWrite(char*);
         void handleRound();
+
+		  pthread_mutex_t vaultMutex;
+		  sem_t vaultSem;
+        std::vector< std::map<Int, IntDomain* >* > solutionvault;
+		  bool roundFinished;
     public:
 		SocketServer(ChildManager* child, Int loggingLevel = 0);
 		~SocketServer();
@@ -56,6 +61,8 @@ class SocketServer : public ParentManager {
         void setNeedMoreWork(bool);
         void handleSession(int);
         void solveRound();
+
+		  void collectSolutions();
 };
 
 }

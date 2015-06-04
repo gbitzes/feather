@@ -16,6 +16,8 @@ SocketServer::SocketServer(ChildManager* child, Int loggingLevel) {
 
 	pthread_mutex_init(&socketWriteMutex, NULL);
 	pthread_mutex_init(&minObjMutex, NULL);
+	pthread_mutex_init(&vaultMutex, NULL);
+	sem_init(&vaultSem, 0, 0);
 }
 SocketServer::~SocketServer() {
 }
@@ -135,7 +137,12 @@ namespace {
 void* spawn_thread(void *args) {
     SocketServer *ss = (SocketServer*) args;
     ss->solveRound();
-} }
+}
+void* spawn_thread2(void *args) {
+    SocketServer *ss = (SocketServer*) args;
+    ss->collectSolutions();
+}
+}
 
 void SocketServer::monitorIncoming() {
     char buf[BUFLEN];
@@ -181,14 +188,69 @@ void SocketServer::restart() {
     FEATHER_THROW("NIY");
 }
 
+void SocketServer::collectSolutions() {
+	int nsolutions = 0;
+	while(nextSolution()) {
+		nsolutions++;
+		std::map<Int, IntDomain*> *solution = new std::map<Int, IntDomain*>();
+		for(auto var : representation->vars)
+			(*solution)[var.id] = child->getDomain(var.id);
+
+		pthread_mutex_lock(&vaultMutex);
+		solutionvault.push_back(solution);
+		pthread_mutex_unlock(&vaultMutex);
+		sem_post(&vaultSem);
+	}
+	sem_post(&vaultSem);
+	//roundFinished = true;
+}
+
 void SocketServer::solveRound() {
-    int nsolutions = 0;
+   /* launch a separate thread to do the actual solving for performance and blocking reasons */
+	//roundFinished = false;
+
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+   pthread_t handle;
+	pthread_create(&handle, &attr, spawn_thread2, this);
+	pthread_attr_destroy(&attr);
+
+	while(true) {
+		sem_wait(&vaultSem);
+		pthread_mutex_lock(&vaultMutex);
+		if(solutionvault.size() == 0) {
+			pthread_mutex_unlock(&vaultMutex);
+			break;
+		}
+		std::map<Int, IntDomain*> *solution = solutionvault.back();
+		solutionvault.pop_back();
+		pthread_mutex_unlock(&vaultMutex);
+
+	   pthread_mutex_lock(&socketWriteMutex);
+		fprintf(out, "SOLUTION\n");
+		for(auto var : *solution) {
+		   fprintf(out, "%d ", var.first);
+         fprintf(out, "%s\n", var.second->toString().c_str());
+			delete var.second;
+		}
+		fprintf(out, "END SOLUTION\n");
+		delete solution;
+      pthread_mutex_unlock(&socketWriteMutex);
+	}
+
+	pthread_mutex_lock(&socketWriteMutex);
+	fprintf(out, "NO-MORE-SOLUTIONS\n");
+   fflush(out);
+   pthread_mutex_unlock(&socketWriteMutex);
+	return;
+
     while(nextSolution()) {
 	    pthread_mutex_lock(&socketWriteMutex);
-        nsolutions++;
+		 //nsolutions++;
         fprintf(out, "SOLUTION\n");
         for(int i = 0; i < representation->vars.size(); i++) {
-            fprintf(out, "%d ", representation->vars[i].id);
+			   fprintf(out, "%d ", representation->vars[i].id);
             IntDomain *domain = getDomain(representation->vars[i].id);
             fprintf(out, "%s\n", domain->toString().c_str());
             delete domain;
