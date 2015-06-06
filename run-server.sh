@@ -2,11 +2,14 @@
 set -e
 set -x
 
-mkdir -p build
-cd build
-cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. 
-make -j4
-cd ..
+if [ -z "$NOCOMPILE" ];
+then
+    mkdir -p build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. 
+    make -j4
+    cd ..
+fi
 
 export GTEST_COLOR=yes
 JEMALLOC=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
