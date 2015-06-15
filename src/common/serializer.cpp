@@ -6,7 +6,7 @@
 
 namespace {
     using namespace feather;
-    struct SimpleRange { 
+    struct SimpleRange {
         Int a, b;
     };
     Constraint* deserializeConstraint(int id, std::string s) {
@@ -55,6 +55,14 @@ namespace feather {
             ss << repr.goals[i]->serialize() << std::endl;
         }
         ss << "MINOBJ " << repr.minObj << std::endl;
+        if(repr.limitedReporting) {
+            ss << "LIMITEDREPORT " << repr.reportedVars.size() << " ";
+            std::set<IntVarID>::iterator iter;
+            for(iter = repr.reportedVars.begin(); iter != repr.reportedVars.end(); ++iter) {
+                ss << *iter << " ";
+            }
+            ss << std::endl;
+        }
         ss << "END REPRESENTATION" << std::endl;
         return ss.str();
     }
@@ -134,8 +142,18 @@ namespace feather {
                 ssline >> id;
                 repr->minObj = id;
             }
+            if(type == "LIMITEDREPORT") {
+                repr->limitedReporting = true;
+                int size;
+                ssline >> size;
+                for(int i = 0; i < size; i++) {
+                    IntVarID reportid;
+                    ssline >> reportid;
+                    repr->reportedVars.insert(reportid);
+                }
+
+            }
         }
         return repr;
     }
 }
-

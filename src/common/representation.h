@@ -12,36 +12,36 @@
 
 namespace feather {
 
-struct RepresentationIntVar {
-	IntRanges *domain;
-	IntVarID id;
-};
+    struct RepresentationIntVar {
+        IntRanges *domain;
+        IntVarID id;
+    };
 
-class RepresentationIntVarArray {
+    class RepresentationIntVarArray {
 	public:
 		std::deque<IntVarID> vars;
 		IntVarArrayID id;
-};
+    };
 
-struct RepresentationIntDeque {
-	std::deque<Int> contents;
-	IntDequeID id;
+    struct RepresentationIntDeque {
+        std::deque<Int> contents;
+        IntDequeID id;
 
 	RepresentationIntDeque(UInt size) : contents(size) {}
-	RepresentationIntDeque() {}
-};
+        RepresentationIntDeque() {}
+    };
 
-class Representation {
+    class Representation {
 
-	public:
-		/*
-		 * The variables are represented as a set
-		 * of ranges that specify their domain.
-		 * The index of them inside the vector is very
-		 * important as it defines their ID.
-		 */
+    public:
+        /*
+         * The variables are represented as a set
+         * of ranges that specify their domain.
+         * The index of them inside the vector is very
+         * important as it defines their ID.
+         */
 
-		std::vector<RepresentationIntVar> vars;
+        std::vector<RepresentationIntVar> vars;
 		std::vector<const Constraint*> constraints;
 		std::vector<const Goal*> goals;
 		std::vector<RepresentationIntVarArray*> arrays;
@@ -56,11 +56,12 @@ class Representation {
 		IntDequeID addDeque(UInt size = 0);
 
         Representation() {
+            limitedReporting = false;
             minObj = -1;
         }
 
 		~Representation();
-};
+    };
 
 
 
