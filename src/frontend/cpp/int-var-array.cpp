@@ -23,7 +23,7 @@ void IntVarArray::push_back(const IntVar& var) {
 	if( &var.getSolver() != &slv )
 		FEATHER_THROW("Attempted to insert variable of a different solver");
 
-	array.vars.push_back(var.getID());		
+	array.vars.push_back(var.getID());
 }
 
 IntVarArray::iterator IntVarArray::begin() {

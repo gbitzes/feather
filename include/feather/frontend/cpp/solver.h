@@ -45,7 +45,11 @@ class Solver {
 		bool isSolving();
 		bool nextSolution();
 
-		SolutionID getSolutionID();		
+        void setLimitedReporting(bool);
+        void addReported(IntVar&);
+        void addReported(IntVarArray&);
+
+		SolutionID getSolutionID();
 
 };
 

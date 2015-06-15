@@ -8,6 +8,7 @@
 #include <base/int-ranges.h>
 
 #include <vector>
+#include <set>
 
 namespace feather {
 
@@ -34,7 +35,7 @@ class Representation {
 
 	public:
 		/*
-		 * The variables are represented as a set 
+		 * The variables are represented as a set
 		 * of ranges that specify their domain.
 		 * The index of them inside the vector is very
 		 * important as it defines their ID.
@@ -46,6 +47,9 @@ class Representation {
 		std::vector<RepresentationIntVarArray*> arrays;
 		std::vector<RepresentationIntDeque*> deques;
 		IntVarID minObj;
+
+        bool limitedReporting;
+        std::set<IntVarID> reportedVars;
 
 		IntVarID addVar(Int min, Int max);
 		IntVarArrayID addArray();
