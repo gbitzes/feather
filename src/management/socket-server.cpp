@@ -14,20 +14,20 @@ SocketServer::SocketServer(ChildManager* child, Int loggingLevel) {
     state = SocketServerState::UNINITIALIZED;
     minObjValue = kPlusInf;
 
-	pthread_mutex_init(&socketWriteMutex, NULL);
-	pthread_mutex_init(&minObjMutex, NULL);
-	pthread_mutex_init(&vaultMutex, NULL);
-	sem_init(&vaultSem, 0, 0);
+    pthread_mutex_init(&socketWriteMutex, NULL);
+    pthread_mutex_init(&minObjMutex, NULL);
+    pthread_mutex_init(&vaultMutex, NULL);
+    sem_init(&vaultSem, 0, 0);
 }
 SocketServer::~SocketServer() {
 }
 
 void SocketServer::supplyRepresentation(const Representation &representation) {
-	if(state != SocketServerState::UNINITIALIZED)
-		FEATHER_THROW("SocketServer has already been initialized!");
+    if(state != SocketServerState::UNINITIALIZED)
+        FEATHER_THROW("SocketServer has already been initialized!");
 
-	this->representation = &representation;
-	state = SocketServerState::INITIALIZED_NOT_SEARCHING;
+    this->representation = &representation;
+    state = SocketServerState::INITIALIZED_NOT_SEARCHING;
     needwork = false;
 
     child->supplyRepresentation(representation);
@@ -38,18 +38,18 @@ void SocketServer::clearRepresentation() {
 }
 
 IntDomain* SocketServer::getDomain(IntVarID var) {
-	return child->getDomain(var);
+    return child->getDomain(var);
 }
 
 Int SocketServer::getMinObjValue() {
-	return minObjValue;
+    return minObjValue;
 }
 
 void SocketServer::updateMinObjValue(Int newBestValue) {
-     pthread_mutex_lock(&minObjMutex);
-	 if(newBestValue < minObjValue)
-	 	minObjValue = newBestValue;
-     pthread_mutex_unlock(&minObjMutex);
+    pthread_mutex_lock(&minObjMutex);
+    if(newBestValue < minObjValue)
+        minObjValue = newBestValue;
+    pthread_mutex_unlock(&minObjMutex);
 }
 
 bool SocketServer::needMoreWork() {
@@ -62,7 +62,7 @@ void SocketServer::setNeedMoreWork(bool val) {
 
 void SocketServer::newInstance(std::vector<bool> decisions) {
     setNeedMoreWork(false);
-	pthread_mutex_lock(&socketWriteMutex);
+    pthread_mutex_lock(&socketWriteMutex);
     fprintf(out, "DONATION ");
     std::cout << "donating.. ";
     for(int i = 0; i < decisions.size(); i++) {
@@ -128,7 +128,7 @@ std::vector<bool> SocketServer::receiveDecisions() {
 }
 
 void SocketServer::safeWrite(char* msg) {
-	pthread_mutex_lock(&socketWriteMutex);
+    pthread_mutex_lock(&socketWriteMutex);
     fprintf(out, msg);
     pthread_mutex_unlock(&socketWriteMutex);
 }
@@ -189,68 +189,74 @@ void SocketServer::restart() {
 }
 
 void SocketServer::collectSolutions() {
-	int nsolutions = 0;
-	while(nextSolution()) {
-		nsolutions++;
-		std::map<Int, IntDomain*> *solution = new std::map<Int, IntDomain*>();
-		for(auto var : representation->vars)
-			(*solution)[var.id] = child->getDomain(var.id);
+    int nsolutions = 0;
+    while(nextSolution()) {
+        nsolutions++;
+        std::map<Int, IntDomain*> *solution = new std::map<Int, IntDomain*>();
+        for(auto var : representation->vars)
+            (*solution)[var.id] = child->getDomain(var.id);
 
-		pthread_mutex_lock(&vaultMutex);
-		solutionvault.push_back(solution);
-		pthread_mutex_unlock(&vaultMutex);
-		sem_post(&vaultSem);
-	}
-	sem_post(&vaultSem);
-	//roundFinished = true;
+        pthread_mutex_lock(&vaultMutex);
+        solutionvault.push_back(solution);
+        pthread_mutex_unlock(&vaultMutex);
+        sem_post(&vaultSem);
+    }
+    sem_post(&vaultSem);
+    //roundFinished = true;
 }
 
 void SocketServer::solveRound() {
-   /* launch a separate thread to do the actual solving for performance and blocking reasons */
-	//roundFinished = false;
+    /* launch a separate thread to do the actual solving for performance and blocking reasons */
+    //roundFinished = false;
 
-	pthread_attr_t attr;
-	pthread_attr_init(&attr);
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-   pthread_t handle;
-	pthread_create(&handle, &attr, spawn_thread2, this);
-	pthread_attr_destroy(&attr);
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_t handle;
+    pthread_create(&handle, &attr, spawn_thread2, this);
+    pthread_attr_destroy(&attr);
 
-	while(true) {
-		sem_wait(&vaultSem);
-		pthread_mutex_lock(&vaultMutex);
-		if(solutionvault.size() == 0) {
-			pthread_mutex_unlock(&vaultMutex);
-			break;
-		}
-		std::map<Int, IntDomain*> *solution = solutionvault.back();
-		solutionvault.pop_back();
-		pthread_mutex_unlock(&vaultMutex);
+    while(true) {
+        sem_wait(&vaultSem);
+        pthread_mutex_lock(&vaultMutex);
+        if(solutionvault.size() == 0) {
+            pthread_mutex_unlock(&vaultMutex);
+            break;
+        }
+        std::map<Int, IntDomain*> *solution = solutionvault.back();
+        solutionvault.pop_back();
+        pthread_mutex_unlock(&vaultMutex);
 
-	   pthread_mutex_lock(&socketWriteMutex);
-		fprintf(out, "SOLUTION\n");
-		for(auto var : *solution) {
-		   fprintf(out, "%d ", var.first);
-         fprintf(out, "%s\n", var.second->toString().c_str());
-			delete var.second;
-		}
-		fprintf(out, "END SOLUTION\n");
-		delete solution;
-      pthread_mutex_unlock(&socketWriteMutex);
-	}
+        pthread_mutex_lock(&socketWriteMutex);
+        fprintf(out, "SOLUTION\n");
+        for(auto var : *solution) {
+            if(representation->limitedReporting && representation->reportedVars.count(var.first) == 0)
+                continue;
 
-	pthread_mutex_lock(&socketWriteMutex);
-	fprintf(out, "NO-MORE-SOLUTIONS\n");
-   fflush(out);
-   pthread_mutex_unlock(&socketWriteMutex);
-	return;
+            fprintf(out, "%d ", var.first);
+            fprintf(out, "%s\n", var.second->toString().c_str());
+            delete var.second;
+        }
+        fprintf(out, "END SOLUTION\n");
+        delete solution;
+        pthread_mutex_unlock(&socketWriteMutex);
+    }
+
+    pthread_mutex_lock(&socketWriteMutex);
+    fprintf(out, "NO-MORE-SOLUTIONS\n");
+    fflush(out);
+    pthread_mutex_unlock(&socketWriteMutex);
+    return;
 
     while(nextSolution()) {
-	    pthread_mutex_lock(&socketWriteMutex);
-		 //nsolutions++;
+        pthread_mutex_lock(&socketWriteMutex);
+        //nsolutions++;
         fprintf(out, "SOLUTION\n");
         for(int i = 0; i < representation->vars.size(); i++) {
-			   fprintf(out, "%d ", representation->vars[i].id);
+            if(representation->limitedReporting && representation->reportedVars.count(representation->vars[i].id) == 0)
+                continue;
+
+            fprintf(out, "%d ", representation->vars[i].id);
             IntDomain *domain = getDomain(representation->vars[i].id);
             fprintf(out, "%s\n", domain->toString().c_str());
             delete domain;
@@ -273,13 +279,13 @@ void SocketServer::handleRound() {
     fflush(out);
 
     /* Start solving */
-	pthread_attr_t attr;
-	pthread_attr_init(&attr);
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
     pthread_t handle;
 
-	pthread_create(&handle, &attr, spawn_thread, this);
-	pthread_attr_destroy(&attr);
+    pthread_create(&handle, &attr, spawn_thread, this);
+    pthread_attr_destroy(&attr);
 
     /* Careful now.. there might be multiple threads in Child,
      * which might attempt to do socket-writing things
