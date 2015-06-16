@@ -70,13 +70,13 @@ namespace {
  	}
 
 /*
- * C - Z
+ * C - Y
  */
 
- 	IntVar ExprCminusZ::post() {
-		Solver &slv = Z.getSolver();
-		IntVarID id = slv.makeIntVar( C-Z.max(), C-Z.min() );
-		slv.add( new Constr_XeqCminusZ(id, C, Z.getID()) );
+ 	IntVar ExprCminusY::post() {
+		Solver &slv = Y.getSolver();
+		IntVarID id = slv.makeIntVar( C-Y.max(), C-Y.min() );
+		slv.add( new Constr_XeqCminusY(id, C, Y.getID()) );
 
 		return IntVar(id, slv);
  	}

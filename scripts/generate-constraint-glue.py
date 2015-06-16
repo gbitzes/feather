@@ -53,8 +53,14 @@ def gen_XeqYopZneg(name):
 	print("\taddThreeVars(vars[scon.fX], vars[scon.fY], vars[scon.fZ], nscon);")
 	gen_return()
 
+def gen_XeqCopY(name):
+        gen_case(name)
+        gen_static_cast(name)
+	print("\tNs_Constr"+name+" *nscon = new Ns_Constr"+name+" (vars[scon.fX], scon.fC, vars[scon.fY]);")
+	print("\taddTwoVars(vars[scon.fX], vars[scon.fY], nscon);")
+        gen_return()
 
-		# XeqCminusZ,
+
 		# XeqCdivZ,
 		# XeqCmodZ,
 		# MetaXeqYeqZ,
@@ -70,6 +76,8 @@ def main():
 	gen_XeqYopC("XeqYdivC")
 	gen_XeqYopC("XeqYtimesC")
 	gen_XeqYopC("XeqYmodC")
+
+        gen_XeqCopY("XeqCminusY")
 
 	gen_XeqYopC("MetaXeqYlessthanC")
 	gen_XeqYopC("MetaXeqYlesseqthanC")
@@ -101,17 +109,3 @@ def main():
 
 if __name__ == '__main__':
 	main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-

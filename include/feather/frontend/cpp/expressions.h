@@ -123,23 +123,23 @@ namespace feather {
 	}
 
 	/*
-	 * C - Z
+	 * C - Y
 	 */
 
-	class ExprCminusZ : public Expression {
+	class ExprCminusY : public Expression {
 		private:
 			Int C;
-			IntVar Z;
+			IntVar Y;
 		public:
-			ExprCminusZ(Int C_, IntVar Z_) : C(C_), Z(Z_) {}
+			ExprCminusY(Int C_, IntVar Y_) : C(C_), Y(Y_) {}
 			virtual IntVar post();
 	};
 
-	inline ExprCminusZ operator- (Int C, IntVar Z) {
-		return ExprCminusZ(C, Z);
+	inline ExprCminusY operator- (Int C, IntVar Y) {
+		return ExprCminusY(C, Y);
 	}
-	inline ExprCminusZ operator- (IntVar Z) {
-		return 0 - Z;
+	inline ExprCminusY operator- (IntVar Y) {
+		return 0 - Y;
 	}
 
 	/*

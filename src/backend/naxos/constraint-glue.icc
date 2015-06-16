@@ -24,6 +24,12 @@ case Constraints::XeqYmodC: {
 	addTwoVars(vars[scon.fX], vars[scon.fY], nscon);
 	return nscon;
 }
+case Constraints::XeqCminusY: {
+	const Constr_XeqCminusY &scon = static_cast<const Constr_XeqCminusY&>(con);
+	Ns_ConstrXeqCminusY *nscon = new Ns_ConstrXeqCminusY (vars[scon.fX], scon.fC, vars[scon.fY]);
+	addTwoVars(vars[scon.fX], vars[scon.fY], nscon);
+	return nscon;
+}
 case Constraints::MetaXeqYlessthanC: {
 	const Constr_MetaXeqYlessthanC &scon = static_cast<const Constr_MetaXeqYlessthanC&>(con);
 	Ns_ConstrMetaXeqYlessthanC *nscon = new Ns_ConstrMetaXeqYlessthanC (vars[scon.fX], vars[scon.fY], scon.fC);

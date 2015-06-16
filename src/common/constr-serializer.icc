@@ -24,12 +24,12 @@
 		return Constr_XeqYtimesZ::deserialize(s);
 	if(id == Constraints::XeqYmodZ)
 		return Constr_XeqYmodZ::deserialize(s);
-	if(id == Constraints::XeqCminusZ)
-		return Constr_XeqCminusZ::deserialize(s);
-	if(id == Constraints::XeqCdivZ)
-		return Constr_XeqCdivZ::deserialize(s);
-	if(id == Constraints::XeqCmodZ)
-		return Constr_XeqCmodZ::deserialize(s);
+	if(id == Constraints::XeqCminusY)
+		return Constr_XeqCminusY::deserialize(s);
+	if(id == Constraints::XeqCdivY)
+		return Constr_XeqCdivY::deserialize(s);
+	if(id == Constraints::XeqCmodY)
+		return Constr_XeqCmodY::deserialize(s);
 	if(id == Constraints::MetaXeqYlessthanC)
 		return Constr_MetaXeqYlessthanC::deserialize(s);
 	if(id == Constraints::MetaXeqYlesseqthanC)

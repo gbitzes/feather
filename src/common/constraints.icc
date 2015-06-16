@@ -328,20 +328,20 @@ class Constr_XeqYmodZ : public Constraint {
 		}
 };
 
-class Constr_XeqCminusZ : public Constraint {
+class Constr_XeqCminusY : public Constraint {
 	public:
 
 		const IntVarID fX;
 		const Int fC;
-		const IntVarID fZ;
+		const IntVarID fY;
 
-		Constr_XeqCminusZ(IntVarID x, Int c, IntVarID z)
-			 : Constraint(Constraints::XeqCminusZ), fX(x), fC(c), fZ(z) { } 
+		Constr_XeqCminusY(IntVarID x, Int c, IntVarID y)
+			 : Constraint(Constraints::XeqCminusY), fX(x), fC(c), fY(y) { } 
 		virtual std::string serialize() const {
 			std::ostringstream os;
-			os << "CONSTR " << Constraints::XeqCminusZ << " " <<  fX
+			os << "CONSTR " << Constraints::XeqCminusY << " " <<  fX
 			   << " " << fC
-			   << " " << fZ;
+			   << " " << fY;
 			return os.str();
 		}
 		static Constraint* deserialize(std::string s) {
@@ -350,26 +350,26 @@ class Constr_XeqCminusZ : public Constraint {
 			ss >> x;
 			Int c;
 			ss >> c;
-			IntVarID z;
-			ss >> z;
-			return new Constr_XeqCminusZ( x,c,z);
+			IntVarID y;
+			ss >> y;
+			return new Constr_XeqCminusY( x,c,y);
 		}
 };
 
-class Constr_XeqCdivZ : public Constraint {
+class Constr_XeqCdivY : public Constraint {
 	public:
 
 		const IntVarID fX;
 		const Int fC;
-		const IntVarID fZ;
+		const IntVarID fY;
 
-		Constr_XeqCdivZ(IntVarID x, Int c, IntVarID z)
-			 : Constraint(Constraints::XeqCdivZ), fX(x), fC(c), fZ(z) { } 
+		Constr_XeqCdivY(IntVarID x, Int c, IntVarID y)
+			 : Constraint(Constraints::XeqCdivY), fX(x), fC(c), fY(y) { } 
 		virtual std::string serialize() const {
 			std::ostringstream os;
-			os << "CONSTR " << Constraints::XeqCdivZ << " " <<  fX
+			os << "CONSTR " << Constraints::XeqCdivY << " " <<  fX
 			   << " " << fC
-			   << " " << fZ;
+			   << " " << fY;
 			return os.str();
 		}
 		static Constraint* deserialize(std::string s) {
@@ -378,26 +378,26 @@ class Constr_XeqCdivZ : public Constraint {
 			ss >> x;
 			Int c;
 			ss >> c;
-			IntVarID z;
-			ss >> z;
-			return new Constr_XeqCdivZ( x,c,z);
+			IntVarID y;
+			ss >> y;
+			return new Constr_XeqCdivY( x,c,y);
 		}
 };
 
-class Constr_XeqCmodZ : public Constraint {
+class Constr_XeqCmodY : public Constraint {
 	public:
 
 		const IntVarID fX;
 		const Int fC;
-		const IntVarID fZ;
+		const IntVarID fY;
 
-		Constr_XeqCmodZ(IntVarID x, Int c, IntVarID z)
-			 : Constraint(Constraints::XeqCmodZ), fX(x), fC(c), fZ(z) { } 
+		Constr_XeqCmodY(IntVarID x, Int c, IntVarID y)
+			 : Constraint(Constraints::XeqCmodY), fX(x), fC(c), fY(y) { } 
 		virtual std::string serialize() const {
 			std::ostringstream os;
-			os << "CONSTR " << Constraints::XeqCmodZ << " " <<  fX
+			os << "CONSTR " << Constraints::XeqCmodY << " " <<  fX
 			   << " " << fC
-			   << " " << fZ;
+			   << " " << fY;
 			return os.str();
 		}
 		static Constraint* deserialize(std::string s) {
@@ -406,9 +406,9 @@ class Constr_XeqCmodZ : public Constraint {
 			ss >> x;
 			Int c;
 			ss >> c;
-			IntVarID z;
-			ss >> z;
-			return new Constr_XeqCmodZ( x,c,z);
+			IntVarID y;
+			ss >> y;
+			return new Constr_XeqCmodY( x,c,y);
 		}
 };
 
