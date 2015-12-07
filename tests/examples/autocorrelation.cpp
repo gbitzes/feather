@@ -5,10 +5,7 @@ using namespace std;
 using namespace feather;
 			
 int autocorrelation(int N) {
-	char *cnthreads = getenv("NTHREADS");
-    if(cnthreads == NULL) FEATHER_THROW("NTHREADS not set");
-    int nthreads = atoi(cnthreads);
-	Solver slv( new ThreadManager(new NaxosGenerator(), nthreads, 1000) );
+    Solver slv( buildEnvManager() );
 
 	IntVarArray s(slv), c(slv), c2(slv);
 
