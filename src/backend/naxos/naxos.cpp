@@ -57,8 +57,8 @@ Ns_StackSearch::goal_iterator::operator ++ (void)
 
 void Ns_StackSearch::searchToGraphFile (const char *fileName) {
 	fileSearchGraph.open(fileName);
-	if(fileSearchGraph == NULL)
-		FEATHER_THROW("Could not open file");
+	//if(fileSearchGraph == NULL)
+	//	FEATHER_THROW("Could not open file");
 
 	fileSearchGraph << "digraph  \"Search Tree\"  {\n\n"
 	                << "\tnode [shape=point];\n\n"
@@ -202,9 +202,6 @@ Ns_StackSearch::pop (void)
 Naxos::constraintsToGraphFile (const char *fileName)
 {
 	fileConstraintsGraph.open(fileName);
-
-	if(fileConstraintsGraph == NULL)
-		FEATHER_THROW("Could not open file");
 
 	fileConstraintsGraph
 		<< "digraph  \"Constraint Network\"  {\n\n"
