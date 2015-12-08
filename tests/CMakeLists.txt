@@ -32,6 +32,6 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 add_subdirectory(${GTEST} ${GTEST_BINARY_DIR} )
 
 # Link
-target_link_libraries(tests feather gtest_main)
+target_link_libraries(tests feather gtest_main dw)
 set_target_properties(tests 
 	PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
