@@ -59,9 +59,9 @@ Int BufferManager::getMinObjValue() {
   return parent->getMinObjValue();
 }
 
-void BufferManager::setInitialDecisions(std::vector<bool> decisions) {
-    this->decisions = decisions;
-    child->setInitialDecisions(decisions);
+void BufferManager::setInitialState(const SearchState &state) {
+    this->state = state;
+    child->setInitialState(state);
 }
 
 void BufferManager::setParent(ParentManager *parent) {
@@ -104,8 +104,9 @@ bool BufferManager::nextSolution() {
   return true;
 }
 
-void BufferManager::newInstance(std::vector<bool> decisions) {
-  parent->newInstance(decisions);
+
+void BufferManager::newInstance(const SearchState &state) {
+    parent->newInstance(state);
 }
 
 } // namespace feather

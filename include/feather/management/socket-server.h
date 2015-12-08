@@ -27,7 +27,7 @@ class SocketServer : public ParentManager {
         ChildManager* child; 
         bool needwork;
         Representation* receiveRepresentation();
-        std::vector<bool> receiveDecisions();
+        SearchState receiveState();
         int fd;
         FILE *in, *out;
 		pthread_mutex_t socketWriteMutex;
@@ -53,7 +53,7 @@ class SocketServer : public ParentManager {
 
 		virtual Int getMinObjValue();
 		virtual void updateMinObjValue(Int);
-		virtual void newInstance(std::vector<bool> decisions);
+        virtual void newInstance(const SearchState &state);
 		virtual bool needMoreWork();
         virtual bool nextSolution();
         virtual void restart();

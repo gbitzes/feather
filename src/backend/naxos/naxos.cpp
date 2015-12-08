@@ -501,7 +501,7 @@ bool Naxos::imposeArcConsistency() {
 }
 
 
-/* 
+/*
  * Backtracks the search to the previous choice point.
  * Each OR-goal has two sub-goals that either of them can be satisfied.
  * If either of them has been completely searched, we can pick the other one
@@ -537,7 +537,10 @@ bool Naxos::backtrack() {
 		searchNodes.top().domainStore.restore();
 
 		while(searchNodes.top().numDecisions != 0) {
-			decisions.pop_back();
+            currentState.decisions.pop_back();
+            if(vMinObj != NULL)
+                currentState.objectives.pop_back();
+
 			searchNodes.top().numDecisions -= 1;
 		}
 
@@ -546,7 +549,9 @@ bool Naxos::backtrack() {
 		if( goalNextChoice != NULL) {
 			searchNodes.top().stackAND.push( goalNextChoice );
 			searchNodes.top().numDecisions += 1;
-			decisions.push_back(true);
+            if(vMinObj != NULL)
+                currentState.objectives.push_back(bestMinObjValue);
+            currentState.decisions.push_back(true);
 		}
 		else
 			continue;
@@ -656,7 +661,7 @@ void Naxos::start() {
 }
 
 /* Prunes the search tree using these decisions */
-pruneResult_t Naxos::prune(std::vector<bool> *decisions) {
+pruneResult_t Naxos::prune(const SearchState &state) {
 	if( firstNextSolution ) {
 		/* Search has not started yet - initialize it */
 		start();
@@ -671,17 +676,20 @@ pruneResult_t Naxos::prune(std::vector<bool> *decisions) {
 			return ONLY_ONE_SOLUTION;
 	}
 
-	if(decisions == NULL)
-		return OK;
+    if(state.decisions.size() == 0)
+        return OK;
 
 	/* Start the search using only the specified decisions */
 	NsGoal  *CurrGoal, *NewGoal;
 	bool  popped_a_goal;
-	std::vector<bool>::iterator it = decisions->begin();
+	std::vector<bool>::const_iterator it = state.decisions.begin();
 
     int currentdecision = 0;
-	while ( it != decisions->end() )
-	{
+    while(it != state.decisions.end()) {
+        if(state.objectives.size() != 0) {
+            vMinObj->remove(state.objectives[currentdecision], kPlusInf);
+            bestMinObjValue = state.objectives[currentdecision];
+        }
 
 		popped_a_goal  =  false;
 
@@ -719,7 +727,7 @@ pruneResult_t Naxos::prune(std::vector<bool> *decisions) {
 			else
 				searchNodes.top().stackAND.push( CurrGoal->getSecondSubGoal() );
 
-			it++;
+            it++;
             currentdecision++;
 
 			if ( popped_a_goal )
@@ -737,7 +745,7 @@ pruneResult_t Naxos::prune(std::vector<bool> *decisions) {
 			if ( ! imposeArcConsistency() )   {
 
                 LOG("Warning: Received inconsistent initial decisions");
-                //FEATHER_THROW("Inconsistency when processing " << currentdecision << " decision out of " << decisions->size());
+                FEATHER_THROW("Inconsistency when processing " << currentdecision << " decision out of " << state.decisions.size());
                 return NO_SOLUTIONS;
 				//FEATHER_THROW("Error: An invalid decision vector was given to NsProblemManager::prune that results in an inconsistent state");
 
@@ -764,6 +772,7 @@ pruneResult_t Naxos::prune(std::vector<bool> *decisions) {
 				searchNodes.solutionNode(vMinObj);
 
 				/* I've found a solution before exhausting the decision vector... */
+                //return NO_SOLUTIONS;
 				FEATHER_THROW("Error: Found a solution before using all decisions");
 			}
 		}
@@ -786,7 +795,7 @@ void Naxos::giveupWork() {
 	}
 
 
-	Int decisionCount = initialDecisions.size();
+	Int decisionCount = initialState.decisions.size();
 	std::vector<Ns_SearchNode*>::reverse_iterator it = nodes.rbegin();
     int totalnodes = nodes.size();
     int currentnode = 0;
@@ -830,12 +839,17 @@ void Naxos::giveupWork() {
 
 			}
 
-			std::vector<bool> decisionsForNewThread = std::vector<bool>(decisions.begin(), decisions.begin()+decisionCount );
-			decisionsForNewThread.push_back(true);
+            SearchState stateForNewThread;
+            stateForNewThread.decisions = std::vector<bool>(currentState.decisions.begin(), currentState.decisions.begin()+decisionCount);
+            if(currentState.objectives.size() != 0)
+                stateForNewThread.objectives = std::vector<Int>(currentState.objectives.begin(),
+                                             currentState.objectives.begin()+decisionCount+1);
+
+            stateForNewThread.decisions.push_back(true);
 
 			delete (*it)->goalNextChoice;
 			(*it)->goalNextChoice = NULL;
-			parent->newInstance(decisionsForNewThread);
+			parent->newInstance(stateForNewThread);
 			donatedGoals++;
 			return;
 		}
@@ -858,10 +872,7 @@ bool Naxos::nextSolution() {
 
 		 //TODO: get decision vector from Solver
          pruneResult_t result;
-         if(initialDecisions.empty())
-             result = prune(NULL);
-         else
-             result = prune(&initialDecisions);
+         result = prune(initialState);
 
 		 if( result == NO_SOLUTIONS ) {
 		 	return false;
@@ -983,12 +994,15 @@ bool Naxos::nextSolution() {
 				 * branch of this OR
 				 */
 
-				 decisions.push_back(true);
-				 parent->newInstance(decisions);
-				 decisions.pop_back();
+                if(vMinObj != NULL)
+                    currentState.objectives.push_back(bestMinObjValue);
+                currentState.decisions.push_back(true);
+
+                parent->newInstance(currentState);
+                currentState.decisions.pop_back();
 
 				searchNodes.top().stackAND.push( CurrGoal->getFirstSubGoal() );
-				decisions.push_back(false);
+                currentState.decisions.push_back(false);
 				searchNodes.top().numDecisions += 1;
 			}
 			else {
@@ -1001,7 +1015,9 @@ bool Naxos::nextSolution() {
 				searchNodes.top().stackAND.push( CurrGoal->getFirstSubGoal() );
 				// searchNodes.top().searchSpaceEstimate = estimateSearchSpace();
 
-				decisions.push_back(false);
+                if(vMinObj != NULL)
+                    currentState.objectives.push_back(bestMinObjValue);
+                currentState.decisions.push_back(false);
 				searchNodes.top().numDecisions += 1;
 
 				if ( popped_a_goal )
@@ -1091,12 +1107,12 @@ void Naxos::addDeque(const RepresentationIntDeque& dq) {
 }
 
 void Naxos::printState() {
-	for(int i = 0; i < initialDecisions.size(); i++)
+	/*for(int i = 0; i < initialDecisions.size(); i++)
 		std::cout << initialDecisions[i];
 	std::cout << "  - ";
 	for(int i = 0; i < decisions.size(); i++)
 		std::cout << decisions[i];
-	std::cout << std::endl;
+        std::cout << std::endl;*/
 }
 
 void Naxos::supplyRepresentation(const Representation& repr) {
@@ -1145,9 +1161,14 @@ void Naxos::setParent(ParentManager *parent) {
 	this->parent = parent;
 }
 
-void Naxos::setInitialDecisions(std::vector<bool> decisions) {
+/*void Naxos::setInitialDecisions(std::vector<bool> decisions) {
 	initialDecisions.insert(initialDecisions.begin(), decisions.begin(), decisions.end());
 	this->decisions.insert(this->decisions.begin(), decisions.begin(), decisions.end());
+    }*/
+
+void Naxos::setInitialState(const SearchState & state) {
+    initialState = state;
+    currentState = state;
 }
 
 Naxos::Naxos()

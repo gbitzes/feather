@@ -472,14 +472,14 @@ class Naxos : public ChildManager {
 		UInt iterations;
 		UInt donatedGoals;
 
-		std::vector<bool> decisions;
-		std::vector<bool> initialDecisions;
+        SearchState initialState;
+        SearchState currentState;
 
 		bool backtrack();
 		virtual void restart();
 		void start();
 
-		pruneResult_t prune(std::vector<bool> *decisions);
+		pruneResult_t prune(const SearchState & state);
 		void giveupWork();
 
 		/* The list of the soft (meta)constraints to be satisfied */
@@ -510,7 +510,7 @@ class Naxos : public ChildManager {
 		virtual IntDomain* getDomain(IntVarID);
 
 		virtual void setParent(ParentManager*);
-		virtual void setInitialDecisions(std::vector<bool>);
+        virtual void setInitialState(const SearchState & state);
 
 		///  True, if an inconsistency has been found.
 		bool foundInconsistency;

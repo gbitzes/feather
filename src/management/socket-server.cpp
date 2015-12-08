@@ -60,15 +60,15 @@ void SocketServer::setNeedMoreWork(bool val) {
     needwork = val;
 }
 
-void SocketServer::newInstance(std::vector<bool> decisions) {
+void SocketServer::newInstance(const SearchState &state) {
     setNeedMoreWork(false);
     pthread_mutex_lock(&socketWriteMutex);
     fprintf(out, "DONATION ");
     std::cout << "donating.. ";
-    for(int i = 0; i < decisions.size(); i++) {
-        if(decisions[i] == true) fprintf(out, "1");
-        if(decisions[i] == false) fprintf(out, "0");
-        std::cout << decisions[i];
+    for(int i = 0; i < state.decisions.size(); i++) {
+        if(state.decisions[i] == true) fprintf(out, "1");
+        if(state.decisions[i] == false) fprintf(out, "0");
+        std::cout << state.decisions[i];
     }
     std::cout << std::endl;
     fprintf(out, "\n");
@@ -102,18 +102,18 @@ Representation* SocketServer::receiveRepresentation() {
     return representation;
 }
 
-std::vector<bool> SocketServer::receiveDecisions() {
-    fprintf(out, "GIVE DECISIONS\n");
+SearchState SocketServer::receiveState() {
+    fprintf(out, "GIVE STATE\n");
     fflush(out);
 
     char buf[BUFLEN];
     fgets(buf, BUFLEN-1, in);
-    std::vector<bool> decisions;
+    SearchState state;
     for(int i = 0; i < BUFLEN && buf[i] != '\n'; i++) {
         if(buf[i] == '0')
-            decisions.push_back(false);
+            state.decisions.push_back(false);
         else if(buf[i] == '1')
-            decisions.push_back(true);
+            state.decisions.push_back(true);
         else {
             std::cout << "ERROR: received " << std::string(buf) << std::endl;
             std::cout << "bailing out" << std::endl;
@@ -122,9 +122,9 @@ std::vector<bool> SocketServer::receiveDecisions() {
     }
 
     std::cout << "Received decisions" << std::endl;
-    for(int i = 0; i < decisions.size(); i++) std::cout << decisions[i];
+    for(int i = 0; i < state.decisions.size(); i++) std::cout << state.decisions[i];
     std::cout << std::endl;
-    return decisions;
+    return state;
 }
 
 void SocketServer::safeWrite(char* msg) {
@@ -270,9 +270,9 @@ void SocketServer::solveRound() {
 }
 
 void SocketServer::handleRound() {
-    /* Get decisions */
-    std::vector<bool> decisions = receiveDecisions();
-    child->setInitialDecisions(decisions);
+    /* Get initial state */
+    SearchState state = receiveState();
+    child->setInitialState(state);
 
     /* Start search */
     fprintf(out, "SEARCHING\n");

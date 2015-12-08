@@ -22,7 +22,7 @@ class BufferManager : public IntermediateManager {
         Int bufsize;
         bool firstSolution, endofsearch;
 
-        std::vector<bool> decisions;
+        SearchState state;
         void cleanup();
 	public:
         BufferManager(Int bufsize, ChildManager *child);
@@ -37,8 +37,8 @@ class BufferManager : public IntermediateManager {
 
 		virtual Int getMinObjValue();
 		virtual void updateMinObjValue(Int);
-		virtual void newInstance(std::vector<bool> decisions);
-		virtual void setInitialDecisions(std::vector<bool> decisions);
+		virtual void newInstance(const SearchState &state);
+        virtual void setInitialState(const SearchState &state);
         virtual void setParent(ParentManager*);
 		virtual bool needMoreWork();
         virtual void restart();

@@ -117,11 +117,11 @@ Int ThreadManager::getMinObjValue() {
 	return minObjValue;
 }
 
-void ThreadManager::setInitialDecisions(std::vector<bool> decisions) {
+void ThreadManager::setInitialState(const SearchState &searchstate) {
 	if(state != ThreadManagerState::UNINITIALIZED && state != ThreadManagerState::INITIALIZED_NOT_SEARCHING)
 		FEATHER_THROW("Cannot set initial decisions at this point");
 
-    this->decisions = decisions;
+    this->searchstate = searchstate;
 }
 
 void ThreadManager::setParent(ParentManager *parent) {
@@ -194,7 +194,7 @@ bool ThreadManager::nextSolution() {
 		return false;
 	if(state == ThreadManagerState::INITIALIZED_NOT_SEARCHING) {
 		/* Launch the first thread */
-		newInstance(decisions);
+        newInstance(searchstate);
 		state = ThreadManagerState::INITIALIZED_SEARCHING;
 	}
 	FEATHER_ASSERT(representation != NULL);
@@ -247,16 +247,16 @@ Int ThreadManager::addToActiveThreads(Int n) {
 	return ret;
 }
 
-void ThreadManager::newInstance(std::vector<bool> decisions) {
+void ThreadManager::newInstance(const SearchState &newstate) {
     /* Parent needs work? */
     if(parent != NULL && state == ThreadManagerState::INITIALIZED_SEARCHING && parent->needMoreWork()) {
         if(loggingLevel >= 2) {
             std::stringstream ss;
-            for(int i = 0; i < decisions.size(); i++)
-                ss << decisions[i];
-            //this->log(2, "Donating " + ss.str() + " to parent");
+            for(int i = 0; i < newstate.decisions.size(); i++)
+                ss << newstate.decisions[i];
+            this->log(2, "Donating " + ss.str() + " to parent");
         }
-        parent->newInstance(decisions);
+        parent->newInstance(newstate);
         return;
     }
 
@@ -274,7 +274,7 @@ void ThreadManager::newInstance(std::vector<bool> decisions) {
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
 	ChildManager *pm = generator->generate();
-	pm->setInitialDecisions(decisions);
+    pm->setInitialState(newstate);
 	info.pm = pm;
 	threads.push_back(info);
 
@@ -283,12 +283,12 @@ void ThreadManager::newInstance(std::vector<bool> decisions) {
 	arguments->pm = pm;
 	arguments->id = threads.size()-1;
 
-    if(loggingLevel >= 2) {
+    /*if(loggingLevel >= 3) {
         std::stringstream ss;
-        for(int i = 0; i < decisions.size(); i++)
-	       	ss << decisions[i];
-	    //this->log(2, "About to create new thread with decisions = " + ss.str() );
-    }
+        for(int i = 0; i < newstate.decisions.size(); i++)
+	       	ss << newstate.decisions[i] << "-" << newstate.objectives[i] << " ";
+	    this->log(3, "About to create new thread with decisions = " + ss.str() );
+    }*/
 
 	pthread_create(info.handle, &attr, spawn_thread, arguments);
 	pthread_attr_destroy(&attr);

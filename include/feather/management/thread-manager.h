@@ -41,7 +41,7 @@ class ThreadManager : public IntermediateManager {
 		ChildGenerator *generator;
 
 		std::vector<ThreadInfo> threads;
-        std::vector<bool> decisions;
+        SearchState searchstate;
         ParentManager* parent;
 
 		// std::vector<ProblemManager*> pms;
@@ -76,8 +76,8 @@ class ThreadManager : public IntermediateManager {
 
 		virtual Int getMinObjValue();
 		virtual void updateMinObjValue(Int);
-		virtual void newInstance(std::vector<bool> decisions);
-		virtual void setInitialDecisions(std::vector<bool> decisions);
+		virtual void newInstance(const SearchState &state);
+        virtual void setInitialState(const SearchState &state);
         virtual void setParent(ParentManager*);
 		virtual bool needMoreWork();
         virtual void restart();

@@ -6,6 +6,17 @@
 
 namespace feather {
 
+/*
+ * A structure which fully describes how
+ * to reach a given search state
+ */
+
+struct SearchState {
+    std::vector<bool> decisions;
+    std::vector<Int> objectives;
+};
+
+
 class Representation;
 
 /*
@@ -38,7 +49,7 @@ class ParentManager : public virtual ProblemManager {
 	public:
 		virtual Int getMinObjValue() = 0;
 		virtual void updateMinObjValue(Int) = 0;
-		virtual void newInstance(std::vector<bool> decisions) = 0;
+		virtual void newInstance(const SearchState & state) = 0;
 		virtual bool needMoreWork() = 0;
 };
 
@@ -48,7 +59,7 @@ class ParentManager : public virtual ProblemManager {
 class ChildManager : public virtual ProblemManager {
 	public:
 		virtual void setParent(ParentManager*) = 0;
-		virtual void setInitialDecisions(std::vector<bool>) = 0;
+        virtual void setInitialState(const SearchState & state) = 0;
 };
 
 /*
