@@ -74,8 +74,9 @@ bool BufferManager::needMoreWork() {
 
 bool BufferManager::nextSolution() {
   if(!firstSolution) {
-    for(auto var : safe.back() ) {
-		 delete var.second;
+
+    for(std::map<Int, IntDomain* >::iterator var = safe.back().begin(); var != safe.back().end(); var++) {
+		 delete (*var).second;
     }
     safe.pop_back();
   }
@@ -96,8 +97,10 @@ bool BufferManager::nextSolution() {
 
     /* copy child's solutions */
     safe.push_back(std::map<Int, IntDomain*>());
-    for(auto var : representation->vars)
-      safe.back()[var.id] = child->getDomain(var.id);
+    for(std::vector<RepresentationIntVar>::const_iterator var = representation->vars.begin(); 
+        var != representation->vars.end(); 
+        var++)
+      safe.back()[(*var).id] = child->getDomain((*var).id);
   }
 
   if(safe.size() == 0) return false;

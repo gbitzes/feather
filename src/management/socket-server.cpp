@@ -193,8 +193,10 @@ void SocketServer::collectSolutions() {
     while(nextSolution()) {
         nsolutions++;
         std::map<Int, IntDomain*> *solution = new std::map<Int, IntDomain*>();
-        for(auto var : representation->vars)
-            (*solution)[var.id] = child->getDomain(var.id);
+        for(std::vector<RepresentationIntVar>::const_iterator var = representation->vars.begin(); 
+            var != representation->vars.end(); 
+            var++)
+            (*solution)[(*var).id] = child->getDomain((*var).id);
 
         pthread_mutex_lock(&vaultMutex);
         solutionvault.push_back(solution);
@@ -229,13 +231,13 @@ void SocketServer::solveRound() {
 
         pthread_mutex_lock(&socketWriteMutex);
         fprintf(out, "SOLUTION\n");
-        for(auto var : *solution) {
-            if(representation->limitedReporting && representation->reportedVars.count(var.first) == 0)
+        for(std::map<Int, IntDomain*>::iterator var = solution->begin(); var != solution->end(); var++) {
+            if(representation->limitedReporting && representation->reportedVars.count((*var).first) == 0)
                 continue;
 
-            fprintf(out, "%d ", var.first);
-            fprintf(out, "%s\n", var.second->toString().c_str());
-            delete var.second;
+            fprintf(out, "%d ", (*var).first);
+            fprintf(out, "%s\n", (*var).second->toString().c_str());
+            delete (*var).second;
         }
         fprintf(out, "END SOLUTION\n");
         delete solution;
