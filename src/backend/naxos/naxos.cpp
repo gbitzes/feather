@@ -513,7 +513,8 @@ bool Naxos::imposeArcConsistency() {
  */
 
 bool Naxos::backtrack() {
-
+    Int lastObjective = kPlusInf;
+    bool lastObjectiveSet = false;
 	while(1) {
 
 		NsGoal  *goalNextChoice = NULL;
@@ -536,10 +537,14 @@ bool Naxos::backtrack() {
 		/* Remove the top search node */
 		searchNodes.top().domainStore.restore();
 
+
 		while(searchNodes.top().numDecisions != 0) {
             currentState.decisions.pop_back();
-            if(vMinObj != NULL)
+            if(vMinObj != NULL) {
+                lastObjective = currentState.objectives.back();
+                lastObjectiveSet = true;
                 currentState.objectives.pop_back();
+            }
 
 			searchNodes.top().numDecisions -= 1;
 		}
@@ -549,8 +554,11 @@ bool Naxos::backtrack() {
 		if( goalNextChoice != NULL) {
 			searchNodes.top().stackAND.push( goalNextChoice );
 			searchNodes.top().numDecisions += 1;
-            if(vMinObj != NULL)
-                currentState.objectives.push_back(bestMinObjValue);
+            if(vMinObj != NULL) {
+                currentState.objectives.push_back(lastObjective);
+                FEATHER_ASSERT(lastObjectiveSet);
+            }
+
             currentState.decisions.push_back(true);
 		}
 		else
@@ -744,7 +752,10 @@ pruneResult_t Naxos::prune(const SearchState &state) {
 
 			if ( ! imposeArcConsistency() )   {
 
-                LOG("Warning: Received inconsistent initial decisions");
+                LOG("Warning: Received inconsistent initial decisions when processing " << currentdecision << " decision out of " << state.decisions.size());
+                for(int a = 0; a < state.decisions.size(); a++) {
+                    std::cout << state.decisions[a] << " " << state.objectives[a] << " ";
+                }
                 FEATHER_THROW("Inconsistency when processing " << currentdecision << " decision out of " << state.decisions.size());
                 return NO_SOLUTIONS;
 				//FEATHER_THROW("Error: An invalid decision vector was given to NsProblemManager::prune that results in an inconsistent state");
@@ -859,7 +870,7 @@ void Naxos::giveupWork() {
 		++it;
 	}
 
-	LOG("Warning: NsProblemManager::giveupWork() was not able to find any OR-goal to delegate");
+	//LOG("Warning: NsProblemManager::giveupWork() was not able to find any OR-goal to delegate");
 }
 
 /* Finds next solution of the problem.  Returns false when no solution is found */
