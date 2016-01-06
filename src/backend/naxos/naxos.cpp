@@ -832,6 +832,7 @@ void Naxos::giveupWork() {
 		
 		if( (*it)->goalNextChoice != NULL ) {
 
+#if 0
 			if(vMinObj != NULL) {
 
 				/*
@@ -849,6 +850,7 @@ void Naxos::giveupWork() {
 				 }
 
 			}
+#endif
 
             SearchState stateForNewThread;
             stateForNewThread.decisions = std::vector<bool>(currentState.decisions.begin(), currentState.decisions.begin()+decisionCount);
@@ -945,7 +947,7 @@ bool Naxos::nextSolution() {
 		//}
 
 		/* Is there a better global min value? */
-		if( parent != NULL && iterations%16 == 0 ) {
+		if(parent != NULL) { // && iterations%16 == 0 ) {
 
 		    Int globalBest = parent->getMinObjValue();
 
@@ -959,10 +961,11 @@ bool Naxos::nextSolution() {
 
 		 		vMinObj->remove(bestMinObjValue, kPlusInf);
 
-		 		if( foundInconsistency )
+		 		if( ! imposeArcConsistency() ) {
 		 			if( !backtrack() ) {
 		 				return false;
 		 			}
+                }
 		 	}
 		}
 
@@ -1026,8 +1029,9 @@ bool Naxos::nextSolution() {
 				searchNodes.top().stackAND.push( CurrGoal->getFirstSubGoal() );
 				// searchNodes.top().searchSpaceEstimate = estimateSearchSpace();
 
-                if(vMinObj != NULL)
+                if(vMinObj != NULL) {
                     currentState.objectives.push_back(bestMinObjValue);
+                }
                 currentState.decisions.push_back(false);
 				searchNodes.top().numDecisions += 1;
 
