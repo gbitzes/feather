@@ -40,6 +40,22 @@ int golomb(int N) {
     return solution;
 }
 
+TEST(Examples, golomb6) {
+    ASSERT_EQ(golomb(6), 17);
+}
+
+TEST(Examples, golomb7) {
+    ASSERT_EQ(golomb(7), 25);
+}
+
+TEST(Examples, golomb8) {
+    ASSERT_EQ(golomb(8), 34);
+}
+
+TEST(Examples, golomb9) {
+    ASSERT_EQ(golomb(9), 44);
+}
+
 TEST(Examples, golomb10) {
     ASSERT_EQ(golomb(10), 55);
 }
