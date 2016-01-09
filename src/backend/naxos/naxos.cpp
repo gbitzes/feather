@@ -568,7 +568,7 @@ bool Naxos::backtrack() {
 
 			vMinObj->remove(bestMinObjValue, kPlusInf);
 
-			if ( foundInconsistency )   {
+			if (foundInconsistency)   {
 
 				foundInconsistency  =  false;
 				getQueue().clear();
@@ -697,6 +697,13 @@ pruneResult_t Naxos::prune(const SearchState &state) {
         if(state.objectives.size() != 0) {
             vMinObj->remove(state.objectives[currentdecision], kPlusInf);
             bestMinObjValue = state.objectives[currentdecision];
+            if(! imposeArcConsistency() ) {
+                LOG("WARNING: failed arc consistency when processing " << currentdecision << " decision out of " << state.decisions.size());
+                for(int a = 0; a < state.decisions.size(); a++) {
+                    std::cout << state.decisions[a] << " " << state.objectives[a] << " ";
+                }
+                return NO_SOLUTIONS;
+            }
         }
 
 		popped_a_goal  =  false;
@@ -961,7 +968,7 @@ bool Naxos::nextSolution() {
 
 		 		vMinObj->remove(bestMinObjValue, kPlusInf);
 
-		 		if( ! imposeArcConsistency() ) {
+                if( ! imposeArcConsistency() ) {
 		 			if( !backtrack() ) {
 		 				return false;
 		 			}
@@ -1073,7 +1080,6 @@ bool Naxos::nextSolution() {
 			{
 				if ( vMinObj  !=  0 )   {
 					FEATHER_ASSERT(bestMinObjValue > vMinObj->max());
-					
 					bestMinObjValue  =  vMinObj->max();
 					//  We have taken care about the rare (and odd) case
 					//   where the domain of vMinObj has been augmented.
