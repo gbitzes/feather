@@ -145,19 +145,19 @@ namespace {
 struct thread_args {
     SocketClient *sc;
     SolverAddress *s;
-    std::vector<bool> decisions;
+    SearchState state;
 };
 
 void* spawn_thread(void *args) {
     std::cout << "spawning thread" << std::endl;
     thread_args *ta = (thread_args*) args;
-    ta->sc->monitorServer(*(ta->s), ta->decisions);
+    ta->sc->monitorServer(*(ta->s), ta->state);
     delete ta;
-} 
+}
 
 }
 
-void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions) {
+void SocketClient::monitorServer(SolverAddress &s, SearchState &searchstate) {
     char buf[BUFLEN];
     // pthread_mutex_lock(&waitingMutex);
     // SolverAddress s = waitingServers.front();
@@ -174,31 +174,28 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
     { char *res = fgets(buf, BUFLEN-1, s.in); 
     std::string tmp(res);
     tmp = tmp.substr(0, tmp.length()-1);
-    if(tmp != "GIVE DECISIONS") {
-        std::cout << "Protocol error - expected 'GIVE DECISIONS', received " << tmp << std::endl;
+    if(tmp != "GIVE STATE") {
+        std::cout << "Protocol error - expected 'GIVE STATE', received " << tmp << std::endl;
         exit(3);
     } }
 
-    /* Send decisions */
-    for(int i = 0; i < decisions.size(); i++) {
-        int val = 0;
-        if(decisions[i] == true) val = 1;
-        fprintf(s.out, "%d", val);
-    }
+    /* Send state */
+    std::string serialization = StateSerializer::serialize(searchstate, this->representation->hasMinObj());
+    fprintf(s.out, serialization.c_str());
     fprintf(s.out, "\n");
     fflush(s.out);
 
-    std::cout << "Decisions sent" << std::endl;
+    std::cout << "State sent" << std::endl;
 
     /* Make sure server state is sane */
-    { char *res = fgets(buf, BUFLEN-1, s.in); 
+    { char *res = fgets(buf, BUFLEN-1, s.in);
     std::string tmp(res);
     tmp = tmp.substr(0, tmp.length()-1);
     if(tmp != "SEARCHING") {
-        std::cout << "Protocol error - expected 'GIVE DECISIONS', received " << tmp << std::endl;
+        std::cout << "Protocol error - expected 'SEARCHING', received " << tmp << std::endl;
         exit(3);
     } }
-    
+
     /* Collect solutions and/or other messages */
     pthread_mutex_lock(&waitingMutex);
     s.currentlyBusy = true;
@@ -278,22 +275,14 @@ void SocketClient::monitorServer(SolverAddress &s, std::vector<bool> &decisions)
             return;
         }
         else if(msg == "DONATION") {
-            std::vector<bool> donation;
-            for(int i = 9; i < BUFLEN && buf[i] != '\n'; i++) {
-                if(buf[i] == '0')
-                    donation.push_back(false);
-                else if(buf[i] == '1')
-                    donation.push_back(true);
-                else {
-                    std::cout << "ERROR: received " << std::string(buf) << std::endl;
-                    std::cout << "bailing out" << std::endl;
-                    exit(2);
-                }
-            }
+            std::string rest;
+            getline(ss, rest);
+
+            SearchState donation = StateSerializer::deserialize(rest,  this->representation->minObj != -1);
             std::cout << "received donation: ";
-            for(int i = 0; i < donation.size(); i++) std::cout << donation[i];
+            for(int i = 0; i < donation.decisions.size(); i++) std::cout << donation.decisions[i];
             std::cout << std::endl;
-            
+
             pthread_mutex_lock(&waitingMutex);
             waitingJobs.push(donation);
             std::cout << "size of waiting jobs: " << waitingJobs.size() << std::endl;
@@ -330,7 +319,7 @@ void SocketClient::dispatchWork() {
 
         thread_args *ta = new thread_args();
         ta->sc = this;
-        ta->decisions = waitingJobs.front();
+        ta->state = waitingJobs.front();
         waitingJobs.pop();
         ta->s = waitingServers.front();
         waitingServers.pop();
@@ -351,10 +340,8 @@ bool SocketClient::nextSolution() {
         initializeSessions();
 
         /* Fire up the first */
-        {std::vector<bool> empty;
-         // empty.push_back(false);
-         // empty.push_back(false);
-         waitingJobs.push(empty);}
+        { SearchState empty;
+          waitingJobs.push(empty);}
 
         // {std::vector<bool> empty;
         //  empty.push_back(false);

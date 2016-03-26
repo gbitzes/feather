@@ -65,13 +65,15 @@ void SocketServer::newInstance(const SearchState &state) {
     pthread_mutex_lock(&socketWriteMutex);
     fprintf(out, "DONATION ");
     std::cout << "donating.. ";
-    for(int i = 0; i < state.decisions.size(); i++) {
-        if(state.decisions[i] == true) fprintf(out, "1");
-        if(state.decisions[i] == false) fprintf(out, "0");
-        std::cout << state.decisions[i];
-    }
-    std::cout << std::endl;
+    std::string serialization = StateSerializer::serialize(state, this->representation->hasMinObj());
+    fprintf(out, serialization.c_str());
     fprintf(out, "\n");
+    std::cout << serialization << std::endl;
+    //for(int i = 0; i < state.decisions.size(); i++) {
+    //    if(state.decisions[i] == true) fprintf(out, "1");
+    //    if(state.decisions[i] == false) fprintf(out, "0");
+    //    std::cout << state.decisions[i];
+    //}
     fflush(out);
     pthread_mutex_unlock(&socketWriteMutex);
 }
@@ -108,20 +110,9 @@ SearchState SocketServer::receiveState() {
 
     char buf[BUFLEN];
     fgets(buf, BUFLEN-1, in);
-    SearchState state;
-    for(int i = 0; i < BUFLEN && buf[i] != '\n'; i++) {
-        if(buf[i] == '0')
-            state.decisions.push_back(false);
-        else if(buf[i] == '1')
-            state.decisions.push_back(true);
-        else {
-            std::cout << "ERROR: received " << std::string(buf) << std::endl;
-            std::cout << "bailing out" << std::endl;
-            exit(2);
-        }
-    }
+    SearchState state = StateSerializer::deserialize(std::string(buf), this->representation->minObj != -1);
 
-    std::cout << "Received decisions" << std::endl;
+    std::cout << "Received state" << std::endl;
     for(int i = 0; i < state.decisions.size(); i++) std::cout << state.decisions[i];
     std::cout << std::endl;
     return state;

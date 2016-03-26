@@ -25,6 +25,43 @@ namespace {
 }
 
 namespace feather {
+    std::string StateSerializer::serialize(const SearchState &state, bool has_objective) {
+        std::ostringstream ss;
+        ss << state.decisions.size() << " ";
+        for(int i = 0; i < state.decisions.size(); i++) {
+            if(state.decisions[i] == true) ss << "1 ";
+            if(state.decisions[i] == false) ss << "0 ";
+            ss << " ";
+
+            if(has_objective) {
+                ss << state.objectives[i];
+            }
+            ss << " ";
+        }
+        return ss.str();
+    }
+
+    SearchState StateSerializer::deserialize(const std::string& str, bool has_objective) {
+        SearchState state;
+        std::stringstream ss(str);
+        int size;
+        ss >> size;
+        for(int i = 0; i < size; i++) {
+            bool decision = false;
+            int dec;
+            ss >> dec;
+            if(dec == 1) decision = true;
+            state.decisions.push_back(decision);
+
+            if(has_objective) {
+                Int obj;
+                ss >> obj;
+                state.objectives.push_back(obj);
+            }
+        }
+        return state;
+    }
+
     std::string RepresentationSerializer::serialize(const Representation& repr) {
         std::ostringstream ss;
         for(int i = 0; i < repr.constraints.size(); i++) {

@@ -59,8 +59,11 @@ namespace feather {
             limitedReporting = false;
             minObj = -1;
         }
-
 		~Representation();
+
+        bool hasMinObj() const {
+            return minObj != -1;
+        }
     };
 
 

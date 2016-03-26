@@ -55,7 +55,7 @@ class SocketClient : public ProblemManager {
         std::vector<SolverAddress*> servers;
 
         std::queue<SolverAddress*> waitingServers;
-        std::queue<std::vector<bool> > waitingJobs;
+        std::queue<SearchState> waitingJobs;
         pthread_mutex_t waitingMutex;
         pthread_mutex_t solutionMutex;
         pthread_mutex_t activeServersMutex;
@@ -70,9 +70,8 @@ class SocketClient : public ProblemManager {
         void dispatchWork();
 
         std::map<IntVarID, IntDomain* > currentSolution;
-        
     public:
-        void monitorServer(SolverAddress &, std::vector<bool> &); 
+        void monitorServer(SolverAddress &, SearchState &);
         SocketClient(std::vector<SolverAddress*>);
 		virtual void supplyRepresentation(const Representation &);
 		virtual void clearRepresentation();
