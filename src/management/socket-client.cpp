@@ -16,7 +16,7 @@
 
 #include <feather/utils.h>
 
-#define BUFLEN 1000
+#define BUFLEN 100000
 
 namespace feather {
 
