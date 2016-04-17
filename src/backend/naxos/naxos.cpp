@@ -564,17 +564,17 @@ bool Naxos::backtrack() {
 		else
 			continue;
 
-		if(vMinObj  !=  0) {
+		// if(vMinObj  !=  0) {
 
-			vMinObj->remove(bestMinObjValue, kPlusInf);
+		// 	vMinObj->remove(bestMinObjValue, kPlusInf);
 
-			if (foundInconsistency)   {
+		// 	if (foundInconsistency)   {
 
-				foundInconsistency  =  false;
-				getQueue().clear();
-				continue;
-			}
-		}
+		// 		foundInconsistency  =  false;
+		// 		getQueue().clear();
+		// 		continue;
+		// 	}
+		// }
 
 		return  true;
 	}
@@ -695,15 +695,18 @@ pruneResult_t Naxos::prune(const SearchState &state) {
     int currentdecision = 0;
     while(it != state.decisions.end()) {
         if(state.objectives.size() != 0) {
-            vMinObj->remove(state.objectives[currentdecision], kPlusInf);
-            bestMinObjValue = state.objectives[currentdecision];
-            if(! imposeArcConsistency() ) {
-                LOG("WARNING: failed arc consistency when processing " << currentdecision << " decision out of " << state.decisions.size());
-                for(int a = 0; a < state.decisions.size(); a++) {
-                    std::cout << state.decisions[a] << " " << state.objectives[a] << " ";
-                }
-                return NO_SOLUTIONS;
-            }
+        	// if(currentdecision != state.objectives.size()-1) {
+            	vMinObj->remove(state.objectives[currentdecision], kPlusInf);
+            	bestMinObjValue = state.objectives[currentdecision];
+        	
+	            if(! imposeArcConsistency() ) {
+	                LOG("WARNING: failed arc consistency when processing " << currentdecision << " decision out of " << state.decisions.size());
+	                for(int a = 0; a < state.decisions.size(); a++) {
+	                    std::cout << state.decisions[a] << " " << state.objectives[a] << " ";
+	                }
+	                return NO_SOLUTIONS;
+	            }
+	        // }
         }
 
 		popped_a_goal  =  false;
@@ -861,9 +864,10 @@ void Naxos::giveupWork() {
 
             SearchState stateForNewThread;
             stateForNewThread.decisions = std::vector<bool>(currentState.decisions.begin(), currentState.decisions.begin()+decisionCount);
-            if(currentState.objectives.size() != 0)
+            if(currentState.objectives.size() != 0) {
                 stateForNewThread.objectives = std::vector<Int>(currentState.objectives.begin(),
                                              currentState.objectives.begin()+decisionCount+1);
+            }
 
             stateForNewThread.decisions.push_back(true);
 
@@ -919,8 +923,6 @@ bool Naxos::nextSolution() {
 	}
 
 
-
-
 	if ( ( ! imposeArcConsistency() )
 			|| (searchNodes.top().stackAND.empty()
 				&&  searchNodes.top().delayedGoal == searchNodes.gend()) )
@@ -953,28 +955,6 @@ bool Naxos::nextSolution() {
 		// 		giveupWork();
 		//}
 
-		/* Is there a better global min value? */
-		if(parent != NULL) { // && iterations%16 == 0 ) {
-
-		    Int globalBest = parent->getMinObjValue();
-
-		 	if(globalBest < bestMinObjValue) {
-		 		bestMinObjValue = globalBest;
-
-				/*				
-				 * Remove all values worse than the global minimum and
-				 * check if state is still consistent
-				 */ 
-
-		 		vMinObj->remove(bestMinObjValue, kPlusInf);
-
-                if( ! imposeArcConsistency() ) {
-		 			if( !backtrack() ) {
-		 				return false;
-		 			}
-                }
-		 	}
-		}
 
 		popped_a_goal  =  false;
 
@@ -1047,6 +1027,45 @@ bool Naxos::nextSolution() {
 
 			}
 
+			if(vMinObj  !=  0) {
+				if(parent) {
+					Int globalBest = parent->getMinObjValue();
+					if(globalBest < bestMinObjValue) {
+						bestMinObjValue = globalBest;
+					}
+				}
+
+				vMinObj->remove(bestMinObjValue, kPlusInf);
+				if(!imposeArcConsistency()) {
+					if(!backtrack()) {
+						return false;
+					}
+				}
+			}
+
+		    /* Is there a better global min value? */
+		    // if(parent != NULL) { // && iterations%16 == 0 ) {
+
+		    //     Int globalBest = parent->getMinObjValue();
+
+		 	  //   if(globalBest < bestMinObjValue) {
+		 		 //    bestMinObjValue = globalBest;
+
+				    				
+				  //    * Remove all values worse than the global minimum and
+				  //    * check if state is still consistent
+				      
+
+		 		 //     vMinObj->remove(bestMinObjValue, kPlusInf);
+
+      //               if( ! imposeArcConsistency() ) {
+		 			//     if( !backtrack() ) {
+		 			// 	    return false;
+		 			//     }
+      //               }
+		 	  //   }
+		    // }
+
 
 		}  else  {
 
@@ -1078,6 +1097,8 @@ bool Naxos::nextSolution() {
 			} else if ( searchNodes.top().stackAND.empty()
 					&&  searchNodes.top().delayedGoal == searchNodes.gend() )
 			{
+				
+				searchNodes.solutionNode(vMinObj);
 				if ( vMinObj  !=  0 )   {
 					FEATHER_ASSERT(bestMinObjValue > vMinObj->max());
 					bestMinObjValue  =  vMinObj->max();
@@ -1091,13 +1112,15 @@ bool Naxos::nextSolution() {
 						if( bestMinObjValue < globalBest ) {
 							parent->updateMinObjValue(bestMinObjValue);
 						}
+						else {
+							return nextSolution();
+						}
 
 					}
 
 				}
 
-				searchNodes.solutionNode(vMinObj);
-				// std::cout << "Found solution after " << iterations << " iterations" << std::endl;
+				// std::cout << "Found solution with obj value: " << vMinObj->max() << ", bestMinObjValue: " << bestMinObjValue << ", globalBest: " << parent->getMinObjValue() << " after " << iterations << " iterations" << std::endl;
 				// cout << "Found solution, search space estimation is " << estimateSearchSpace() << endl;
 				// if( estimateSearchSpace() != 1)
 				// 	throw NsException("search space not 1");
