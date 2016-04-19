@@ -223,8 +223,10 @@ void SocketServer::solveRound() {
         pthread_mutex_lock(&socketWriteMutex);
         fprintf(out, "SOLUTION\n");
         for(std::map<Int, IntDomain*>::iterator var = solution->begin(); var != solution->end(); var++) {
-            if(representation->limitedReporting && representation->reportedVars.count((*var).first) == 0)
+            if(representation->limitedReporting && representation->reportedVars.count((*var).first) == 0) {
+                delete (*var).second;
                 continue;
+            }
 
             fprintf(out, "%d ", (*var).first);
             fprintf(out, "%s\n", (*var).second->toString().c_str());
